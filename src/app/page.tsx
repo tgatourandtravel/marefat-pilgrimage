@@ -90,7 +90,7 @@ export default function HomePage() {
               View Tours
             </a>
             <a
-              href="/booking"
+              href="/consultation"
               className="inline-flex items-center justify-center rounded-full border border-charcoal/15 bg-ivory/70 px-7 py-3 text-sm font-medium text-charcoal shadow-sm shadow-charcoal/5 backdrop-blur-sm transition hover:border-gold hover:text-charcoal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ivory"
             >
               Book Consultation
@@ -337,7 +337,7 @@ export default function HomePage() {
             </div>
             <div className="mt-5 space-y-3 text-sm">
               <a
-                href="/booking"
+                href="/consultation"
                 className="inline-flex w-full items-center justify-center rounded-full bg-charcoal px-6 py-3 text-sm font-medium text-ivory shadow-soft transition hover:bg-charcoal/90"
               >
                 Start online booking

@@ -84,7 +84,7 @@ function HeaderContent() {
 
         <div className="flex items-center gap-3">
           <a
-            href="/booking"
+            href="/consultation"
             className="hidden rounded-full bg-charcoal px-4 py-2 text-xs font-medium text-ivory shadow-soft transition hover:bg-charcoal/90 md:inline-flex"
           >
             Book Consultation
@@ -133,7 +133,7 @@ function HeaderContent() {
               ))}
               <div className="border-t border-charcoal/5 pt-3">
                 <a
-                  href="/booking"
+                  href="/consultation"
                   className="flex w-full items-center justify-center rounded-full bg-charcoal px-4 py-2.5 text-sm font-medium text-ivory shadow-soft transition hover:bg-charcoal/90"
                 >
                   Book Consultation
