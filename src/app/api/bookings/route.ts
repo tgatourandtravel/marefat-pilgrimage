@@ -5,6 +5,9 @@ import { generateOTP, getOTPExpiry } from '@/lib/utils/otp';
 import { sendOTPEmail } from '@/lib/email/resend';
 import type { Booking } from '@/lib/supabase/types';
 
+// Force dynamic rendering to prevent static optimization at build time
+export const dynamic = 'force-dynamic';
+
 interface TravelerInput {
   firstName: string;
   lastName: string;

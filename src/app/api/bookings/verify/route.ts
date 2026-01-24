@@ -5,6 +5,9 @@ import { isOTPExpired } from '@/lib/utils/otp';
 import { sendBookingConfirmationEmail } from '@/lib/email/resend';
 import type { Booking, VerificationCode } from '@/lib/supabase/types';
 
+// Force dynamic rendering to prevent static optimization at build time
+export const dynamic = 'force-dynamic';
+
 interface VerifyRequest {
   bookingRef: string;
   email: string;
