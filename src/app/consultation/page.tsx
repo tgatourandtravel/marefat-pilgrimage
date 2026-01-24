@@ -148,7 +148,7 @@ export default function ConsultationPage() {
             </a>
             <span className="text-charcoal/30">|</span>
             <a
-              href="mailto:info@marefat-pilgrimage.com"
+              href="mailto:info@marefatpilgrimage.com"
               className="inline-flex items-center gap-2 text-sm font-medium text-charcoal transition hover:text-gold"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

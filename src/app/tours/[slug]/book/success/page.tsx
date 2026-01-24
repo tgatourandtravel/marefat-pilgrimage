@@ -136,10 +136,10 @@ function SuccessContent() {
             <p className="mt-2 text-xs text-charcoal/70">
               Contact us at{" "}
               <a
-                href="mailto:support@marefat-pilgrimage.com"
+                href="mailto:info@marefatpilgrimage.com"
                 className="font-medium text-gold-dark transition hover:underline"
               >
-                support@marefat-pilgrimage.com
+                info@marefatpilgrimage.com
               </a>
               {" "}or call{" "}
               <a
