@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import "./globals.css";
+import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 
 const navItems: { href: string; label: string }[] = [
   { href: "/", label: "Home" },
@@ -89,12 +90,6 @@ function HeaderContent() {
           >
             Book Consultation
           </a>
-          <a
-            href="https://wa.me/0000000000"
-            className="hidden items-center justify-center rounded-full border border-charcoal/15 bg-ivory/90 px-3 py-2 text-[11px] font-medium text-charcoal shadow-sm shadow-charcoal/5 transition hover:border-gold/80 sm:inline-flex md:px-3.5"
-          >
-            WhatsApp
-          </a>
 
           {/* Mobile menu button */}
           <button
@@ -138,12 +133,6 @@ function HeaderContent() {
                 >
                   Book Consultation
                 </a>
-                <a
-                  href="https://wa.me/0000000000"
-                  className="mt-2 flex w-full items-center justify-center rounded-full border border-charcoal/15 bg-ivory/90 px-4 py-2.5 text-sm font-medium text-charcoal shadow-sm shadow-charcoal/5 transition hover:border-gold/80"
-                >
-                  WhatsApp
-                </a>
               </div>
             </div>
           </nav>
@@ -175,6 +164,9 @@ export default function RootLayout({
           <HeaderContent />
 
           <main className="flex-1">{children}</main>
+
+          {/* Floating WhatsApp Button */}
+          <FloatingWhatsApp />
 
           <footer className="border-t border-charcoal/5 bg-ivory/80">
             <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-10 text-xs text-charcoal/60 sm:px-8 sm:text-[13px] lg:px-12">
