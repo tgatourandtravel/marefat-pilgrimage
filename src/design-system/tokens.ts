@@ -33,6 +33,11 @@ export const colors = {
     light: "#f0e4c8",
     pale: "#f7f0e0",
   },
+  danger: {
+    DEFAULT: "#dc2626", // red-600
+    light: "#fecaca", // red-200
+    dark: "#991b1b", // red-800
+  },
 } as const;
 
 export const spacing = {

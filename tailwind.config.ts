@@ -38,6 +38,11 @@ const config: Config = {
           light: "#f0e4c8",
           pale: "#f7f0e0",
         },
+        danger: {
+          DEFAULT: "#dc2626",
+          light: "#fecaca",
+          dark: "#991b1b",
+        },
       },
       spacing: {
         xs: "0.5rem",

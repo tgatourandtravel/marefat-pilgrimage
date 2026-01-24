@@ -1,16 +1,86 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase/client";
+import { generateBookingPDF, type BookingData } from "@/lib/pdf/booking-pdf";
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const bookingRef = searchParams.get("ref") || "MAR-XXXXX";
   const verified = searchParams.get("verified") === "true";
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
-  const handleDownloadPDF = () => {
-    alert(`PDF download for booking ${bookingRef} will be generated. This feature will be implemented with a backend service.`);
+  const handleDownloadPDF = async () => {
+    setIsDownloading(true);
+    setDownloadError(null);
+
+    try {
+      // Fetch booking data from Supabase
+      const { data: bookingData, error: bookingError } = await supabase
+        .from('bookings')
+        .select('*')
+        .eq('booking_ref', bookingRef)
+        .single();
+
+      if (bookingError || !bookingData) {
+        throw new Error('Booking not found');
+      }
+
+      // Fetch travelers data
+      const { data: travelersData, error: travelersError } = await supabase
+        .from('travelers')
+        .select('*')
+        .eq('booking_id', bookingData.id)
+        .order('traveler_order', { ascending: true });
+
+      if (travelersError) {
+        throw new Error('Failed to fetch traveler information');
+      }
+
+      // Format data for PDF
+      const pdfData: BookingData = {
+        bookingRef: bookingData.booking_ref,
+        tourTitle: bookingData.tour_title,
+        tourDestination: bookingData.tour_destination,
+        tourStartDate: bookingData.tour_start_date,
+        tourDurationDays: bookingData.tour_duration_days,
+        numberOfTravelers: bookingData.number_of_travelers,
+        travelers: travelersData.map(t => ({
+          firstName: t.first_name,
+          lastName: t.last_name,
+          email: t.email,
+          phone: t.phone,
+          passportNumber: t.passport_number,
+          nationality: t.nationality,
+          passportExpiry: t.passport_expiry,
+          dateOfBirth: t.date_of_birth,
+        })),
+        basePricePerPerson: bookingData.base_price_per_person,
+        insuranceTotal: bookingData.insurance_total,
+        flightTotal: bookingData.flight_total,
+        grandTotal: bookingData.grand_total,
+        depositAmount: bookingData.deposit_amount,
+        hasInsurance: bookingData.has_insurance,
+        hasFlightBooking: bookingData.has_flight_booking,
+        contactEmail: bookingData.contact_email,
+        contactPhone: bookingData.contact_phone,
+        createdAt: bookingData.created_at,
+        expiresAt: bookingData.expires_at,
+      };
+
+      // Generate and download PDF
+      generateBookingPDF(pdfData);
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      setDownloadError(
+        error instanceof Error ? error.message : 'Failed to generate PDF. Please try again.'
+      );
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   // Calculate expiry date (1 week from now)
@@ -67,13 +137,33 @@ function SuccessContent() {
             {/* Download PDF Button */}
             <button
               onClick={handleDownloadPDF}
-              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-charcoal/15 bg-ivory px-6 py-2.5 text-sm font-medium text-charcoal shadow-sm transition hover:border-charcoal/30 hover:shadow-md"
+              disabled={isDownloading}
+              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-charcoal/15 bg-ivory px-6 py-2.5 text-sm font-medium text-charcoal shadow-sm transition hover:border-charcoal/30 hover:shadow-md disabled:cursor-wait disabled:opacity-60"
             >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              Download Confirmation PDF
+              {isDownloading ? (
+                <>
+                  <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Generating PDF...
+                </>
+              ) : (
+                <>
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Download Confirmation PDF
+                </>
+              )}
             </button>
+
+            {/* Error Message */}
+            {downloadError && (
+              <div className="mt-3 rounded-lg border border-danger bg-danger-light/10 p-3">
+                <p className="text-xs text-danger">{downloadError}</p>
+              </div>
+            )}
           </div>
 
           {/* Bank Details - Only shown after verification */}
