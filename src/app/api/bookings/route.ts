@@ -1,0 +1,189 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { supabaseAdmin } from '@/lib/supabase/server';
+import { generateBookingRef } from '@/lib/utils/booking-ref';
+import { generateOTP, getOTPExpiry } from '@/lib/utils/otp';
+import { sendOTPEmail } from '@/lib/email/resend';
+import type { Booking } from '@/lib/supabase/types';
+
+interface TravelerInput {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  passportNumber: string;
+  nationality: string;
+  passportExpiry: string;
+  dateOfBirth: string;
+}
+
+interface CreateBookingRequest {
+  tourSlug: string;
+  tourTitle: string;
+  tourDestination: string;
+  tourStartDate?: string;
+  tourDurationDays?: number;
+  travelers: TravelerInput[];
+  hasInsurance: boolean;
+  hasFlightBooking: boolean;
+  flightIncludedInTour: boolean;
+  basePricePerPerson: number;
+  insuranceCostPerPerson: number;
+  flightCostPerPerson: number;
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body: CreateBookingRequest = await request.json();
+
+    // Validate required fields
+    if (!body.tourSlug || !body.travelers || body.travelers.length === 0) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Calculate totals
+    const numberOfTravelers = body.travelers.length;
+    const baseTotal = body.basePricePerPerson * numberOfTravelers;
+    const insuranceTotal = body.hasInsurance
+      ? body.insuranceCostPerPerson * numberOfTravelers
+      : 0;
+    const flightTotal = body.hasFlightBooking && !body.flightIncludedInTour
+      ? body.flightCostPerPerson * numberOfTravelers
+      : 0;
+    const grandTotal = baseTotal + insuranceTotal + flightTotal;
+    const depositAmount = Math.floor(grandTotal * 0.3);
+
+    // Generate unique booking reference
+    let bookingRef = generateBookingRef();
+    let attempts = 0;
+    while (attempts < 10) {
+      const { data: existing } = await supabaseAdmin
+        .from('bookings')
+        .select('id')
+        .eq('booking_ref', bookingRef)
+        .single();
+
+      if (!existing) break;
+      bookingRef = generateBookingRef();
+      attempts++;
+    }
+
+    // Get primary contact info
+    const primaryTraveler = body.travelers[0];
+
+    // Create booking
+    const { data: booking, error: bookingError } = await supabaseAdmin
+      .from('bookings')
+      .insert({
+        booking_ref: bookingRef,
+        tour_slug: body.tourSlug,
+        tour_title: body.tourTitle,
+        tour_destination: body.tourDestination,
+        tour_start_date: body.tourStartDate || null,
+        tour_duration_days: body.tourDurationDays || null,
+        contact_email: primaryTraveler.email.toLowerCase(),
+        contact_phone: primaryTraveler.phone,
+        base_price_per_person: body.basePricePerPerson,
+        number_of_travelers: numberOfTravelers,
+        insurance_total: insuranceTotal,
+        flight_total: flightTotal,
+        grand_total: grandTotal,
+        deposit_amount: depositAmount,
+        has_insurance: body.hasInsurance,
+        has_flight_booking: body.hasFlightBooking,
+        status: 'pending_verification',
+        is_verified: false,
+        verified_at: null,
+        expires_at: null,
+      })
+      .select()
+      .single();
+
+    if (bookingError) {
+      console.error('Booking creation error:', bookingError);
+      return NextResponse.json(
+        { error: 'Failed to create booking' },
+        { status: 500 }
+      );
+    }
+
+    // Insert travelers
+    const travelersToInsert = body.travelers.map((traveler, index) => ({
+      booking_id: booking.id,
+      first_name: traveler.firstName,
+      last_name: traveler.lastName,
+      email: traveler.email.toLowerCase(),
+      phone: traveler.phone,
+      date_of_birth: traveler.dateOfBirth,
+      nationality: traveler.nationality,
+      passport_number: traveler.passportNumber,
+      passport_expiry: traveler.passportExpiry,
+      traveler_order: index + 1,
+      is_primary_contact: index === 0,
+    }));
+
+    const { error: travelersError } = await supabaseAdmin
+      .from('travelers')
+      .insert(travelersToInsert);
+
+    if (travelersError) {
+      console.error('Travelers insertion error:', travelersError);
+      // Rollback booking
+      await supabaseAdmin.from('bookings').delete().eq('id', booking.id);
+      return NextResponse.json(
+        { error: 'Failed to save traveler information' },
+        { status: 500 }
+      );
+    }
+
+    // Generate and store OTP
+    const otpCode = generateOTP();
+    const otpExpiry = getOTPExpiry();
+
+    const { error: otpError } = await supabaseAdmin
+      .from('verification_codes')
+      .insert({
+        booking_id: booking.id,
+        code: otpCode,
+        code_type: 'email',
+        expires_at: otpExpiry.toISOString(),
+        is_used: false,
+        used_at: null,
+        attempts: 0,
+        max_attempts: 5,
+      });
+
+    if (otpError) {
+      console.error('OTP creation error:', otpError);
+    }
+
+    // Send OTP email
+    try {
+      await sendOTPEmail({
+        to: primaryTraveler.email,
+        firstName: primaryTraveler.firstName,
+        bookingRef: bookingRef,
+        otpCode: otpCode,
+      });
+    } catch (emailError) {
+      console.error('Email sending error:', emailError);
+      // Don't fail the request, user can resend
+    }
+
+    return NextResponse.json({
+      success: true,
+      bookingRef: bookingRef,
+      email: primaryTraveler.email,
+      message: 'Booking created. Please check your email for verification code.',
+    });
+
+  } catch (error) {
+    console.error('API error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

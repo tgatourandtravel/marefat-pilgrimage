@@ -138,20 +138,60 @@ export default function TourBookingPage({ params }: Props) {
     setStep((s) => Math.max(1, s - 1) as Step);
   };
 
+  const [submitError, setSubmitError] = useState("");
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!validateStep(step)) return;
-    
+
     setIsSubmitting(true);
-    
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    // Generate booking reference
-    const bookingRef = `MAR-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
-    
-    // Redirect to success page with booking reference
-    router.push(`/tours/${params.slug}/book/success?ref=${bookingRef}`);
+    setSubmitError("");
+
+    try {
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tourSlug: params.slug,
+          tourTitle: tour.title,
+          tourDestination: tour.destination,
+          tourStartDate: null,
+          tourDurationDays: parseInt(tour.duration) || null,
+          travelers: travelers.map(t => ({
+            firstName: t.firstName,
+            lastName: t.lastName,
+            email: t.email,
+            phone: t.phone,
+            passportNumber: t.passportNumber,
+            nationality: t.nationality,
+            passportExpiry: t.passportExpiry,
+            dateOfBirth: t.dateOfBirth,
+          })),
+          hasInsurance: addons.insurance,
+          hasFlightBooking: addons.flightBooking,
+          flightIncludedInTour: tour.flightIncluded,
+          basePricePerPerson: tour.basePrice,
+          insuranceCostPerPerson: 99,
+          flightCostPerPerson: 450,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create booking");
+      }
+
+      // Redirect to verification page
+      router.push(
+        `/tours/${params.slug}/book/verify?ref=${data.bookingRef}&email=${encodeURIComponent(data.email)}`
+      );
+    } catch (error) {
+      console.error("Booking error:", error);
+      setSubmitError(error instanceof Error ? error.message : "Failed to create booking. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Calculate totals
@@ -866,6 +906,13 @@ export default function TourBookingPage({ params }: Props) {
                       Your payment information is secure and encrypted
                     </p>
                   </div>
+                </div>
+              )}
+
+              {/* Error Display */}
+              {submitError && (
+                <div className="rounded-xl border border-red-200 bg-red-50 p-4">
+                  <p className="text-sm text-red-600">{submitError}</p>
                 </div>
               )}
 
