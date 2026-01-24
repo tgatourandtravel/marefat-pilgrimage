@@ -343,7 +343,7 @@ export default function HomePage() {
                 Start online booking
               </a>
               <a
-                href="https://wa.me/4917662421747"
+                href="https://wa.me/19543308904"
                 className="inline-flex w-full items-center justify-center rounded-full border border-charcoal/15 bg-ivory/80 px-6 py-3 text-sm font-medium text-charcoal shadow-sm shadow-charcoal/5 transition hover:border-gold"
               >
                 Message on WhatsApp

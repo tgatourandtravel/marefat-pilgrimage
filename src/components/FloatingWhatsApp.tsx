@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 export function FloatingWhatsApp() {
   const [isVisible, setIsVisible] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
-  const phoneNumber = "4917662421747"; // +49 176 62421747
+  const phoneNumber = "19543308904"; // +1 (954) 330-8904
 
   // Hide button when user scrolls to bottom (to avoid overlapping with footer/buttons)
   useEffect(() => {
