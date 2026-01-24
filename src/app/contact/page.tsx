@@ -102,7 +102,7 @@ export default function ContactPage() {
                   </span>
                 </p>
                 <Link
-                  href="https://wa.me/0000000000"
+                  href="https://wa.me/4917662421747"
                   className="mt-4 block"
                 >
                   <Button

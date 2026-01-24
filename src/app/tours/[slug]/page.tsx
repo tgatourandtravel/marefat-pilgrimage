@@ -107,7 +107,7 @@ export default function TourDetailPage({ params }: Props) {
               Book this tour
             </Link>
             <a
-              href="https://wa.me/0000000000"
+              href="https://wa.me/4917662421747"
               className="inline-flex items-center justify-center rounded-full border border-charcoal/15 bg-ivory/80 px-6 py-2.5 text-xs font-medium text-charcoal shadow-sm shadow-charcoal/5 transition hover:border-gold"
             >
               WhatsApp our team

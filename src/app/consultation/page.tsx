@@ -138,7 +138,7 @@ export default function ConsultationPage() {
           </p>
           <div className="mt-3 flex flex-wrap items-center justify-center gap-4">
             <a
-              href="https://wa.me/4917647aborede"
+              href="https://wa.me/4917662421747"
               className="inline-flex items-center gap-2 text-sm font-medium text-charcoal transition hover:text-gold"
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
