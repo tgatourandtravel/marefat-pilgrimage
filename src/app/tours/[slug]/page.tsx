@@ -1,84 +1,20 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { getTourBySlug, getAllTours } from "@/data/tours";
 
-// Simple placeholder tour data – in real app, fetch from DB by slug
-const TOURS = [
-  {
-    slug: "signature-ramadan-umrah",
-    title: "Signature Ramadan Umrah",
-    destination: "Makkah & Madinah",
-    type: "Umrah",
-    durationDays: 10,
-    startDate: "2026-03-15",
-    description:
-      "A thoughtfully paced Ramadan Umrah with premium hotels close to the Haramain, guided rituals, and quiet time for personal worship.",
-    highlights: [
-      "5★ stays within a few minutes’ walk to the Haramain",
-      "Small, calm groups with scholar guidance in multiple languages",
-      "Arrival assistance and private airport transfers available",
-      "Flexible pre/post extensions in Madinah or Jeddah",
-    ],
-    itinerary: [
-      "Arrival in Jeddah, transfer to Makkah, check‑in to hotel",
-      "Umrah rites with scholar guidance and group orientation",
-      "Free day for individual worship in Masjid al‑Haram",
-      "Optional ziyarat around Makkah (Thawr, Hira – exterior view)",
-      "Transfer to Madinah, check‑in near Masjid an‑Nabawi",
-      "Guided ziyarat in Madinah; visit historical sites",
-      "Free day in Madinah for prayers and reflection",
-      "Return to Makkah for final days of ibadah",
-      "Closing gathering and personal dua",
-      "Departure and assisted airport transfers",
-    ],
-    hotelInfo:
-      "5★ properties within a few minutes’ walk to the Haramain, daily breakfast included. Late check‑out where available.",
-    flightsInfo:
-      "Return economy flights from major EU hubs can be arranged on request with flexible routing.",
-    included: [
-      "Visa processing assistance",
-      "Airport transfers",
-      "Daily breakfast",
-      "Guided group Umrah",
-      "Scholarly support in group",
-    ],
-    excluded: [
-      "International flights (optional add‑on)",
-      "Personal expenses and shopping",
-      "Travel insurance",
-    ],
-    documentsNeeded: [
-      "Passport valid for at least 6 months",
-      "Passport‑sized photos",
-      "Vaccination records (as per latest regulations)",
-      "Completed visa application forms",
-    ],
-    packages: [
-      {
-        name: "Economy",
-        price: "€2,650",
-        description: "Quality 4★ hotels with shared transfers.",
-      },
-      {
-        name: "Standard",
-        price: "€3,250",
-        description: "5★ hotels with small group transfers.",
-      },
-      {
-        name: "VIP",
-        price: "On request",
-        description: "Suite options, private transfers, and custom dates.",
-      },
-    ],
-  },
-  // Other tours could be added here...
-];
+// Generate static params for all tours
+export function generateStaticParams() {
+  return getAllTours().map((tour) => ({
+    slug: tour.slug,
+  }));
+}
 
 type Props = {
   params: { slug: string };
 };
 
 export function generateMetadata({ params }: Props): Metadata {
-  const tour = TOURS.find((t) => t.slug === params.slug);
+  const tour = getTourBySlug(params.slug);
   if (!tour) {
     return {
       title: "Tour not found – Marefat Pilgrimage",
@@ -91,7 +27,7 @@ export function generateMetadata({ params }: Props): Metadata {
 }
 
 export default function TourDetailPage({ params }: Props) {
-  const tour = TOURS.find((t) => t.slug === params.slug);
+  const tour = getTourBySlug(params.slug);
 
   if (!tour) {
     return (

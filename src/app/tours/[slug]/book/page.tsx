@@ -3,6 +3,7 @@
 import { useState, FormEvent, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { getTourBySlug } from "@/data/tours";
 
 type TravelerInfo = {
   id: string;
@@ -18,36 +19,23 @@ type TravelerInfo = {
 
 type Step = 1 | 2 | 3 | 4;
 
-// Tour data - in production, fetch from API/database
+// Get tour data from central data file
 const getTourData = (slug: string) => {
-  const tours: Record<string, any> = {
-    "signature-ramadan-umrah": {
-      title: "Signature Ramadan Umrah",
-      destination: "Makkah & Madinah",
-      duration: "10 days",
-      basePrice: 3250,
-      flightIncluded: true,
-      image: "/api/placeholder/400/300",
-    },
-    "karbala-najaf-retreat": {
-      title: "Karbala & Najaf Retreat",
-      destination: "Karbala & Najaf",
-      duration: "7 days",
-      basePrice: 1650,
-      flightIncluded: false,
-      image: "/api/placeholder/400/300",
-    },
-    "mashhad-spiritual-weekend": {
-      title: "Mashhad Spiritual Weekend",
-      destination: "Mashhad, Iran",
-      duration: "4 days",
-      basePrice: 890,
-      flightIncluded: false,
-      image: "/api/placeholder/400/300",
-    },
-  };
+  const tour = getTourBySlug(slug);
 
-  return tours[slug] || {
+  if (tour) {
+    return {
+      title: tour.title,
+      destination: tour.destination,
+      duration: `${tour.durationDays} days`,
+      basePrice: tour.priceFrom,
+      flightIncluded: tour.flightIncluded,
+      image: tour.images?.[0] || "/api/placeholder/400/300",
+    };
+  }
+
+  // Fallback for tours not found
+  return {
     title: "Premium Pilgrimage Tour",
     destination: "Sacred Sites",
     duration: "Multiple days",

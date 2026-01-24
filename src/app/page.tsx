@@ -1,52 +1,7 @@
-const featuredTours = [
-  {
-    slug: "signature-ramadan-umrah",
-    title: "Signature Ramadan Umrah",
-    destination: "Makkah & Madinah",
-    type: "Umrah",
-    startDate: "2026-03-15",
-    endDate: "2026-03-25",
-    durationDays: 10,
-    priceFrom: 3250,
-    hotelStars: 5,
-    flightIncluded: true,
-    meals: "Breakfast & Dinner",
-    packageLevel: "Premium",
-  },
-  {
-    slug: "executive-hajj-program",
-    title: "Executive Hajj Program",
-    destination: "Makkah, Mina, Arafat",
-    type: "Hajj",
-    startDate: "2026-06-01",
-    endDate: "2026-06-19",
-    durationDays: 18,
-    priceFrom: 0,
-    hotelStars: 5,
-    flightIncluded: true,
-    meals: "Full Board",
-    packageLevel: "Premium",
-  },
-  {
-    slug: "karbala-najaf-retreat",
-    title: "Karbala & Najaf Retreat",
-    destination: "Karbala & Najaf",
-    type: "Ziyarat",
-    startDate: "2026-02-10",
-    endDate: "2026-02-17",
-    durationDays: 7,
-    priceFrom: 1650,
-    hotelStars: 4,
-    flightIncluded: false,
-    meals: "Breakfast only",
-    packageLevel: "Economy",
-    earlyBirdDiscount: {
-      discountedPrice: 1450,
-      originalPrice: 1650,
-      deadline: "2026-01-25",
-    },
-  },
-];
+import { getFeaturedTours } from "@/data/tours";
+
+// Get featured tours from central data file
+const featuredTours = getFeaturedTours();
 
 const testimonials = [
   {
