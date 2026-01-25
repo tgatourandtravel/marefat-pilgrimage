@@ -146,7 +146,7 @@ export default function ToursPage() {
       {/* Price Range */}
       <div>
         <label className="mb-2 block text-xs font-medium text-charcoal/75">
-          Price Range: €{priceMin || 0} - €{priceMax || "20,000"}
+          Price Range: ${priceMin || 0} - ${priceMax || "20,000"}
         </label>
         <div className="flex gap-2">
           <input
@@ -490,10 +490,10 @@ export default function ToursPage() {
                             </p>
                             <div className="mt-1 flex items-baseline gap-2">
                               <span className="text-xs text-charcoal/50 line-through">
-                                €{tour.earlyBirdDiscount.originalPrice.toLocaleString()}
+                                ${tour.earlyBirdDiscount.originalPrice.toLocaleString()}
                               </span>
                               <span className="text-lg font-bold text-charcoal">
-                                €{tour.earlyBirdDiscount.discountedPrice.toLocaleString()}
+                                ${tour.earlyBirdDiscount.discountedPrice.toLocaleString()}
                               </span>
                             </div>
                           </div>
@@ -501,7 +501,7 @@ export default function ToursPage() {
                           <div>
                             <p className="text-xs text-charcoal/60">From</p>
                             <p className="text-lg font-semibold text-charcoal">
-                              {tour.priceFrom > 0 ? `€${tour.priceFrom.toLocaleString()}` : "On request"}
+                              {tour.priceFrom > 0 ? `$${tour.priceFrom.toLocaleString()}` : "On request"}
                             </p>
                           </div>
                         )}

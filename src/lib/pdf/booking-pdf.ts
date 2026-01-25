@@ -72,7 +72,7 @@ export function generateBookingPDF(data: BookingData): void {
   };
 
   // Helper to format currency
-  const formatCurrency = (amount: number) => `€${amount.toLocaleString()}`;
+  const formatCurrency = (amount: number) => `$${amount.toLocaleString()}`;
 
   // Helper to format date
   const formatDate = (dateString?: string) => {

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getTourBySlug } from "@/data/tours";
 import { validateTravelerFields } from "@/lib/utils/validation";
+import { Input } from "@/components/ui/Input";
+import { Card } from "@/components/ui/Card";
 
 type TravelerInfo = {
   id: string;
@@ -119,6 +121,13 @@ export default function TourBookingPage({ params }: Props) {
   // Update individual traveler data
   const updateTraveler = (index: number, field: keyof TravelerInfo, value: string) => {
     const updated = [...travelers];
+    const oldValue = updated[index][field];
+    
+    // Check if value actually changed
+    if (oldValue === value) {
+      return;
+    }
+    
     updated[index] = { ...updated[index], [field]: value };
     setTravelers(updated);
 
@@ -155,7 +164,7 @@ export default function TourBookingPage({ params }: Props) {
     validateField(index, field, travelers[index][field]);
   };
 
-  // Validation
+  // Validation - only called when user clicks Continue button
   const validateStep = (currentStep: Step): boolean => {
     if (currentStep === 1) {
       const tourStartDate = fullTourData?.startDate;
@@ -168,31 +177,38 @@ export default function TourBookingPage({ params }: Props) {
         if (Object.keys(fieldErrors).length > 0) {
           hasErrors = true;
           newErrors[index] = fieldErrors;
-          
-          // Mark all fields as touched
-          setTouchedFields(prev => ({
-            ...prev,
-            [index]: new Set(['firstName', 'lastName', 'email', 'phone', 'passportNumber', 'nationality', 'passportExpiry', 'dateOfBirth'])
-          }));
         }
       });
 
-      // Update errors state
+      // Update errors state ONLY if there are errors
       if (hasErrors) {
         setErrors(newErrors);
         
+        // Mark all fields as touched
+        setTouchedFields(prev => {
+          const updated = { ...prev };
+          travelers.forEach((_, index) => {
+            updated[index] = new Set(['firstName', 'lastName', 'email', 'phone', 'passportNumber', 'nationality', 'passportExpiry', 'dateOfBirth']);
+          });
+          return updated;
+        });
+        
         // Scroll to first error field
-        if (fieldsStartRef.current) {
-          const yOffset = -150;
-          const y = fieldsStartRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
-          window.scrollTo({ top: y, behavior: "smooth" });
-        }
+        setTimeout(() => {
+          if (fieldsStartRef.current) {
+            const yOffset = -150;
+            const y = fieldsStartRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            window.scrollTo({ top: y, behavior: "smooth" });
+          }
+        }, 100);
         
         return false;
       }
 
-      // Clear errors if validation passes
-      setErrors({});
+      // Only clear errors if there were previously errors
+      if (Object.keys(errors).length > 0) {
+        setErrors({});
+      }
       return true;
     }
     return true;
@@ -333,7 +349,7 @@ export default function TourBookingPage({ params }: Props) {
               {/* Step 1: Traveler Information (Dynamic) */}
               {step === 1 && (
                 <div ref={fieldsStartRef} className="space-y-6">
-                  <div className="rounded-2xl border border-charcoal/5 bg-ivory p-6 shadow-sm">
+                  <Card variant="elevated" padding="lg">
                     <h2 className="font-display text-lg font-semibold text-charcoal">
                       Traveler Information
                     </h2>
@@ -409,200 +425,112 @@ export default function TourBookingPage({ params }: Props) {
                         </p>
                       )}
                     </div>
-                  </div>
+                  </Card>
 
                   {/* Traveler Forms */}
                   {travelers.map((traveler, index) => (
-                    <div
+                    <Card
                       key={traveler.id}
-                      className="space-y-4 rounded-2xl border border-charcoal/5 bg-ivory p-6 shadow-sm"
+                      variant="elevated"
+                      padding="lg"
+                      className="space-y-4"
                     >
                       <h3 className="text-sm font-semibold uppercase tracking-wide text-charcoal/70">
                         Traveler {index + 1}
                       </h3>
                       
                       <div className="grid gap-4 sm:grid-cols-2">
-                        <div>
-                          <label className="mb-1.5 block text-xs font-medium text-charcoal">
-                            First Name *
-                          </label>
-                          <input
-                            type="text"
-                            value={traveler.firstName}
-                            onChange={(e) => updateTraveler(index, "firstName", e.target.value)}
-                            onBlur={() => handleFieldBlur(index, "firstName")}
-                            required
-                            className={`w-full rounded-xl border px-3 py-2.5 text-sm text-charcoal transition focus:outline-none focus:ring-2 ${
-                              errors[index]?.firstName
-                                ? 'border-danger focus:border-danger focus:ring-danger/20 bg-danger-light/10'
-                                : 'border-charcoal/10 focus:border-gold focus:ring-gold/20 bg-ivory'
-                            }`}
-                          />
-                          {errors[index]?.firstName && (
-                            <p className="mt-1 text-xs text-danger">{errors[index].firstName}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="mb-1.5 block text-xs font-medium text-charcoal">
-                            Last Name *
-                          </label>
-                          <input
-                            type="text"
-                            value={traveler.lastName}
-                            onChange={(e) => updateTraveler(index, "lastName", e.target.value)}
-                            onBlur={() => handleFieldBlur(index, "lastName")}
-                            required
-                            className={`w-full rounded-xl border px-3 py-2.5 text-sm text-charcoal transition focus:outline-none focus:ring-2 ${
-                              errors[index]?.lastName
-                                ? 'border-danger focus:border-danger focus:ring-danger/20 bg-danger-light/10'
-                                : 'border-charcoal/10 focus:border-gold focus:ring-gold/20 bg-ivory'
-                            }`}
-                          />
-                          {errors[index]?.lastName && (
-                            <p className="mt-1 text-xs text-danger">{errors[index].lastName}</p>
-                          )}
-                        </div>
+                        <Input
+                          label="First Name"
+                          type="text"
+                          value={traveler.firstName}
+                          onChange={(e) => updateTraveler(index, "firstName", e.target.value)}
+                          onBlur={() => handleFieldBlur(index, "firstName")}
+                          error={errors[index]?.firstName}
+                          required
+                        />
+                        <Input
+                          label="Last Name"
+                          type="text"
+                          value={traveler.lastName}
+                          onChange={(e) => updateTraveler(index, "lastName", e.target.value)}
+                          onBlur={() => handleFieldBlur(index, "lastName")}
+                          error={errors[index]?.lastName}
+                          required
+                        />
                       </div>
 
                       <div className="grid gap-4 sm:grid-cols-2">
-                        <div>
-                          <label className="mb-1.5 block text-xs font-medium text-charcoal">
-                            Email *
-                          </label>
-                          <input
-                            type="email"
-                            value={traveler.email}
-                            onChange={(e) => updateTraveler(index, "email", e.target.value)}
-                            onBlur={() => handleFieldBlur(index, "email")}
-                            required
-                            className={`w-full rounded-xl border px-3 py-2.5 text-sm text-charcoal transition focus:outline-none focus:ring-2 ${
-                              errors[index]?.email
-                                ? 'border-danger focus:border-danger focus:ring-danger/20 bg-danger-light/10'
-                                : 'border-charcoal/10 focus:border-gold focus:ring-gold/20 bg-ivory'
-                            }`}
-                          />
-                          {errors[index]?.email && (
-                            <p className="mt-1 text-xs text-danger">{errors[index].email}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="mb-1.5 block text-xs font-medium text-charcoal">
-                            Phone (with country code) *
-                          </label>
-                          <input
-                            type="tel"
-                            value={traveler.phone}
-                            onChange={(e) => updateTraveler(index, "phone", e.target.value)}
-                            onBlur={() => handleFieldBlur(index, "phone")}
-                            required
-                            placeholder="+1 234 567 8900"
-                            className={`w-full rounded-xl border px-3 py-2.5 text-sm text-charcoal transition focus:outline-none focus:ring-2 ${
-                              errors[index]?.phone
-                                ? 'border-danger focus:border-danger focus:ring-danger/20 bg-danger-light/10'
-                                : 'border-charcoal/10 focus:border-gold focus:ring-gold/20 bg-ivory'
-                            }`}
-                          />
-                          {errors[index]?.phone && (
-                            <p className="mt-1 text-xs text-danger">{errors[index].phone}</p>
-                          )}
-                        </div>
+                        <Input
+                          label="Email"
+                          type="email"
+                          value={traveler.email}
+                          onChange={(e) => updateTraveler(index, "email", e.target.value)}
+                          onBlur={() => handleFieldBlur(index, "email")}
+                          error={errors[index]?.email}
+                          required
+                        />
+                        <Input
+                          label="Phone Number"
+                          type="tel"
+                          value={traveler.phone}
+                          onChange={(e) => updateTraveler(index, "phone", e.target.value)}
+                          onBlur={() => handleFieldBlur(index, "phone")}
+                          error={errors[index]?.phone}
+                          placeholder="+1 (234) 567-8900"
+                          helperText="Include country code (e.g., +1 for USA)"
+                          required
+                        />
                       </div>
 
                       <div className="grid gap-4 sm:grid-cols-3">
-                        <div>
-                          <label className="mb-1.5 block text-xs font-medium text-charcoal">
-                            Passport Number *
-                          </label>
-                          <input
-                            type="text"
-                            value={traveler.passportNumber}
-                            onChange={(e) => updateTraveler(index, "passportNumber", e.target.value)}
-                            onBlur={() => handleFieldBlur(index, "passportNumber")}
-                            required
-                            className={`w-full rounded-xl border px-3 py-2.5 text-sm text-charcoal transition focus:outline-none focus:ring-2 ${
-                              errors[index]?.passportNumber
-                                ? 'border-danger focus:border-danger focus:ring-danger/20 bg-danger-light/10'
-                                : 'border-charcoal/10 focus:border-gold focus:ring-gold/20 bg-ivory'
-                            }`}
-                          />
-                          {errors[index]?.passportNumber && (
-                            <p className="mt-1 text-xs text-danger">{errors[index].passportNumber}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="mb-1.5 block text-xs font-medium text-charcoal">
-                            Nationality *
-                          </label>
-                          <input
-                            type="text"
-                            value={traveler.nationality}
-                            onChange={(e) => updateTraveler(index, "nationality", e.target.value)}
-                            onBlur={() => handleFieldBlur(index, "nationality")}
-                            required
-                            className={`w-full rounded-xl border px-3 py-2.5 text-sm text-charcoal transition focus:outline-none focus:ring-2 ${
-                              errors[index]?.nationality
-                                ? 'border-danger focus:border-danger focus:ring-danger/20 bg-danger-light/10'
-                                : 'border-charcoal/10 focus:border-gold focus:ring-gold/20 bg-ivory'
-                            }`}
-                          />
-                          {errors[index]?.nationality && (
-                            <p className="mt-1 text-xs text-danger">{errors[index].nationality}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="mb-1.5 block text-xs font-medium text-charcoal">
-                            Date of Birth *
-                          </label>
-                          <input
-                            type="date"
-                            value={traveler.dateOfBirth}
-                            onChange={(e) => updateTraveler(index, "dateOfBirth", e.target.value)}
-                            onBlur={() => handleFieldBlur(index, "dateOfBirth")}
-                            required
-                            className={`w-full rounded-xl border px-3 py-2.5 text-sm text-charcoal transition focus:outline-none focus:ring-2 ${
-                              errors[index]?.dateOfBirth
-                                ? 'border-danger focus:border-danger focus:ring-danger/20 bg-danger-light/10'
-                                : 'border-charcoal/10 focus:border-gold focus:ring-gold/20 bg-ivory'
-                            }`}
-                          />
-                          {errors[index]?.dateOfBirth && (
-                            <p className="mt-1 text-xs text-danger">{errors[index].dateOfBirth}</p>
-                          )}
-                        </div>
+                        <Input
+                          label="Passport Number"
+                          type="text"
+                          value={traveler.passportNumber}
+                          onChange={(e) => updateTraveler(index, "passportNumber", e.target.value)}
+                          onBlur={() => handleFieldBlur(index, "passportNumber")}
+                          error={errors[index]?.passportNumber}
+                          required
+                        />
+                        <Input
+                          label="Nationality"
+                          type="text"
+                          value={traveler.nationality}
+                          onChange={(e) => updateTraveler(index, "nationality", e.target.value)}
+                          onBlur={() => handleFieldBlur(index, "nationality")}
+                          error={errors[index]?.nationality}
+                          required
+                        />
+                        <Input
+                          label="Date of Birth"
+                          type="date"
+                          value={traveler.dateOfBirth}
+                          onChange={(e) => updateTraveler(index, "dateOfBirth", e.target.value)}
+                          onBlur={() => handleFieldBlur(index, "dateOfBirth")}
+                          error={errors[index]?.dateOfBirth}
+                          required
+                        />
                       </div>
 
-                      <div>
-                        <label className="mb-1.5 block text-xs font-medium text-charcoal">
-                          Passport Expiry Date *
-                        </label>
-                        <input
-                          type="date"
-                          value={traveler.passportExpiry}
-                          onChange={(e) => updateTraveler(index, "passportExpiry", e.target.value)}
-                          onBlur={() => handleFieldBlur(index, "passportExpiry")}
-                          required
-                          className={`w-full rounded-xl border px-3 py-2.5 text-sm text-charcoal transition focus:outline-none focus:ring-2 ${
-                            errors[index]?.passportExpiry
-                              ? 'border-danger focus:border-danger focus:ring-danger/20 bg-danger-light/10'
-                              : 'border-charcoal/10 focus:border-gold focus:ring-gold/20 bg-ivory'
-                          }`}
-                        />
-                        {errors[index]?.passportExpiry ? (
-                          <p className="mt-1.5 text-xs text-danger">{errors[index].passportExpiry}</p>
-                        ) : (
-                          <p className="mt-1.5 text-xs text-charcoal/60">
-                            Must be valid for at least 6 months from travel date
-                          </p>
-                        )}
-                      </div>
-                    </div>
+                      <Input
+                        label="Passport Expiry Date"
+                        type="date"
+                        value={traveler.passportExpiry}
+                        onChange={(e) => updateTraveler(index, "passportExpiry", e.target.value)}
+                        onBlur={() => handleFieldBlur(index, "passportExpiry")}
+                        error={errors[index]?.passportExpiry}
+                        helperText={!errors[index]?.passportExpiry ? "Must be valid for at least 6 months from travel date" : undefined}
+                        required
+                      />
+                    </Card>
                   ))}
                 </div>
               )}
 
               {/* Step 2: Add-ons */}
               {step === 2 && (
-                <div className="space-y-6 rounded-2xl border border-charcoal/5 bg-ivory p-6 shadow-sm">
+                <Card variant="elevated" padding="lg" className="space-y-6">
                   <h2 className="font-display text-lg font-semibold text-charcoal">
                     Enhance Your Journey
                   </h2>
@@ -620,10 +548,10 @@ export default function TourBookingPage({ params }: Props) {
                           Travel Insurance
                         </p>
                         <p className="text-xs text-charcoal/60">
-                          Comprehensive coverage for peace of mind • €99 per traveler
+                          Comprehensive coverage for peace of mind • $99 per traveler
                         </p>
                       </div>
-                      <span className="text-sm font-semibold text-charcoal">€99</span>
+                      <span className="text-sm font-semibold text-charcoal">$99</span>
                     </label>
 
                     <label className={`flex items-start gap-3 rounded-xl border p-4 transition ${
@@ -645,32 +573,32 @@ export default function TourBookingPage({ params }: Props) {
                         <p className="text-xs text-charcoal/60">
                           {tour.flightIncluded
                             ? "Round-trip flights are included in this package"
-                            : "Let us arrange your round-trip flights • €450 per traveler"
+                            : "Let us arrange your round-trip flights • $450 per traveler"
                           }
                         </p>
                       </div>
                       {!tour.flightIncluded && (
-                        <span className="text-sm font-semibold text-charcoal">€450</span>
+                        <span className="text-sm font-semibold text-charcoal">$450</span>
                       )}
                     </label>
                   </div>
-                </div>
+                </Card>
               )}
 
               {/* Step 4: Review & Confirmation */}
               {step === 4 && (
                 <div className="space-y-6">
-                  <div className="rounded-2xl border border-charcoal/5 bg-ivory p-6 shadow-sm">
+                  <Card variant="elevated" padding="lg">
                     <h2 className="font-display text-lg font-semibold text-charcoal">
                       Review Your Booking
                     </h2>
                     <p className="mt-2 text-xs text-charcoal/60">
                       Please review all details carefully before confirming your booking
                     </p>
-                  </div>
+                  </Card>
 
                   {/* Tour Details */}
-                  <div className="rounded-2xl border border-charcoal/5 bg-ivory p-5 shadow-sm">
+                  <Card variant="elevated" padding="md">
                     <h3 className="border-b border-charcoal/5 pb-3 text-sm font-semibold text-charcoal">
                       Tour Details
                     </h3>
@@ -692,10 +620,10 @@ export default function TourBookingPage({ params }: Props) {
                         <span className="font-medium text-charcoal">{numberOfTravelers} {numberOfTravelers === 1 ? "person" : "people"}</span>
                       </div>
                     </div>
-                  </div>
+                  </Card>
 
                   {/* Traveler Information */}
-                  <div className="rounded-2xl border border-charcoal/5 bg-ivory p-5 shadow-sm">
+                  <Card variant="elevated" padding="md">
                     <div className="flex items-center justify-between border-b border-charcoal/5 pb-3">
                       <h3 className="text-sm font-semibold text-charcoal">
                         Traveler Information
@@ -762,10 +690,10 @@ export default function TourBookingPage({ params }: Props) {
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </Card>
 
                   {/* Add-ons & Extras */}
-                  <div className="rounded-2xl border border-charcoal/5 bg-ivory p-5 shadow-sm">
+                  <Card variant="elevated" padding="md">
                     <div className="flex items-center justify-between border-b border-charcoal/5 pb-3">
                       <h3 className="text-sm font-semibold text-charcoal">
                         Add-ons & Extras
@@ -792,7 +720,7 @@ export default function TourBookingPage({ params }: Props) {
                             </div>
                             <span className="text-charcoal">Travel Insurance</span>
                           </div>
-                          <span className="font-medium text-charcoal">€{insuranceCost}</span>
+                          <span className="font-medium text-charcoal">${insuranceCost}</span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-2 text-charcoal/60">
@@ -825,7 +753,7 @@ export default function TourBookingPage({ params }: Props) {
                             </div>
                             <span className="text-charcoal">Flight Booking</span>
                           </div>
-                          <span className="font-medium text-charcoal">€{flightCost}</span>
+                          <span className="font-medium text-charcoal">${flightCost}</span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-2 text-charcoal/60">
@@ -836,10 +764,10 @@ export default function TourBookingPage({ params }: Props) {
                         </div>
                       )}
                     </div>
-                  </div>
+                  </Card>
 
                   {/* Payment Method */}
-                  <div className="rounded-2xl border border-charcoal/5 bg-ivory p-5 shadow-sm">
+                  <Card variant="elevated" padding="md">
                     <div className="flex items-center justify-between border-b border-charcoal/5 pb-3">
                       <h3 className="text-sm font-semibold text-charcoal">
                         Payment Method
@@ -866,48 +794,48 @@ export default function TourBookingPage({ params }: Props) {
                         <p className="text-xs text-charcoal/60">Direct transfer to business account</p>
                       </div>
                     </div>
-                  </div>
+                  </Card>
 
                   {/* Price Summary */}
-                  <div className="rounded-2xl border border-gold/30 bg-gradient-to-br from-gold/5 to-gold-soft/10 p-5 shadow-sm">
+                  <Card variant="bordered" padding="md" className="border-gold/30 bg-gradient-to-br from-gold/5 to-gold-soft/10">
                     <h3 className="mb-4 text-sm font-semibold text-charcoal">
                       Price Summary
                     </h3>
                     <div className="space-y-2.5 text-sm">
                       <div className="flex justify-between">
                         <span className="text-charcoal/70">Tour Package × {numberOfTravelers}</span>
-                        <span className="text-charcoal">€{baseTotal.toLocaleString()}</span>
+                        <span className="text-charcoal">${baseTotal.toLocaleString()}</span>
                       </div>
                       {addons.insurance && (
                         <div className="flex justify-between">
                           <span className="text-charcoal/70">Travel Insurance</span>
-                          <span className="text-charcoal">€{insuranceCost.toLocaleString()}</span>
+                          <span className="text-charcoal">${insuranceCost.toLocaleString()}</span>
                         </div>
                       )}
                       {addons.flightBooking && !tour.flightIncluded && (
                         <div className="flex justify-between">
                           <span className="text-charcoal/70">Flight Booking</span>
-                          <span className="text-charcoal">€{flightCost.toLocaleString()}</span>
+                          <span className="text-charcoal">${flightCost.toLocaleString()}</span>
                         </div>
                       )}
                       <div className="border-t border-charcoal/10 pt-2.5">
                         <div className="flex justify-between">
                           <span className="font-semibold text-charcoal">Total Amount</span>
-                          <span className="text-lg font-bold text-charcoal">€{grandTotal.toLocaleString()}</span>
+                          <span className="text-lg font-bold text-charcoal">${grandTotal.toLocaleString()}</span>
                         </div>
                         <div className="mt-2 flex justify-between text-xs">
                           <span className="text-charcoal/70">Deposit Due Now (30%)</span>
-                          <span className="font-semibold text-gold-dark">€{depositAmount.toLocaleString()}</span>
+                          <span className="font-semibold text-gold-dark">${depositAmount.toLocaleString()}</span>
                         </div>
                         <p className="mt-2 text-xs text-charcoal/60">
-                          Remaining balance of €{(grandTotal - depositAmount).toLocaleString()} due 30 days before departure
+                          Remaining balance of ${(grandTotal - depositAmount).toLocaleString()} due 30 days before departure
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </Card>
 
                   {/* Terms Acceptance */}
-                  <div className="rounded-2xl border border-charcoal/5 bg-ivory p-5 shadow-sm">
+                  <Card variant="elevated" padding="md">
                     <label className="flex items-start gap-3 cursor-pointer">
                       <input
                         type="checkbox"
@@ -926,13 +854,13 @@ export default function TourBookingPage({ params }: Props) {
                         {" "}of Marefat Pilgrimage.
                       </p>
                     </label>
-                  </div>
+                  </Card>
                 </div>
               )}
 
               {/* Step 3: Payment Method */}
               {step === 3 && (
-                <div className="space-y-6 rounded-2xl border border-charcoal/5 bg-ivory p-6 shadow-sm">
+                <Card variant="elevated" padding="lg" className="space-y-6">
                   <h2 className="font-display text-lg font-semibold text-charcoal">
                     Payment Method
                   </h2>
@@ -1027,7 +955,7 @@ export default function TourBookingPage({ params }: Props) {
                   <div className="rounded-xl bg-gold/10 p-4">
                     <p className="text-xs leading-relaxed text-charcoal/75">
                       <strong className="font-semibold text-charcoal">Payment Terms:</strong> A 30% deposit
-                      (€{depositAmount.toLocaleString()}) is due now to confirm your booking. The remaining balance
+                      (${depositAmount.toLocaleString()}) is due now to confirm your booking. The remaining balance
                       is due 30 days before departure. Full payment details and invoice will be sent to your email.
                     </p>
                   </div>
@@ -1040,13 +968,13 @@ export default function TourBookingPage({ params }: Props) {
                       Your payment information is secure and encrypted
                     </p>
                   </div>
-                </div>
+                </Card>
               )}
 
               {/* Error Display */}
               {submitError && (
-                <div className="rounded-xl border border-red-200 bg-red-50 p-4">
-                  <p className="text-sm text-red-600">{submitError}</p>
+                <div className="rounded-xl border border-danger-light bg-danger-light/20 p-4">
+                  <p className="text-sm text-danger">{submitError}</p>
                 </div>
               )}
 
@@ -1065,7 +993,6 @@ export default function TourBookingPage({ params }: Props) {
                   <button
                     type="button"
                     onClick={handleNext}
-                    disabled={!validateStep(step)}
                     className="rounded-full bg-charcoal px-8 py-3 text-sm font-medium text-ivory shadow-soft transition hover:bg-charcoal/90 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Continue
@@ -1111,7 +1038,7 @@ export default function TourBookingPage({ params }: Props) {
                     Base Price × {numberOfTravelers} {numberOfTravelers === 1 ? "traveler" : "travelers"}
                   </span>
                   <span className="font-medium text-charcoal">
-                    €{baseTotal.toLocaleString()}
+                    ${baseTotal.toLocaleString()}
                   </span>
                 </div>
 
@@ -1119,7 +1046,7 @@ export default function TourBookingPage({ params }: Props) {
                   <div className="flex justify-between text-sm">
                     <span className="text-charcoal/70">Travel Insurance</span>
                     <span className="font-medium text-charcoal">
-                      €{insuranceCost}
+                      ${insuranceCost}
                     </span>
                   </div>
                 )}
@@ -1130,7 +1057,7 @@ export default function TourBookingPage({ params }: Props) {
                       Flight Booking {tour.flightIncluded && "(Included)"}
                     </span>
                     <span className="font-medium text-charcoal">
-                      {tour.flightIncluded ? "—" : `€${flightCost}`}
+                      {tour.flightIncluded ? "—" : `$${flightCost}`}
                     </span>
                   </div>
                 )}
@@ -1142,11 +1069,11 @@ export default function TourBookingPage({ params }: Props) {
                     Total
                   </span>
                   <span className="font-display text-lg font-bold text-charcoal">
-                    €{grandTotal.toLocaleString()}
+                    ${grandTotal.toLocaleString()}
                   </span>
                 </div>
                 <p className="text-xs text-charcoal/60">
-                  30% deposit (€{depositAmount.toLocaleString()}) due now
+                  30% deposit (${depositAmount.toLocaleString()}) due now
                 </p>
               </div>
             </div>

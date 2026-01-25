@@ -49,7 +49,7 @@ export function validateEmail(email: string): ValidationResult {
 }
 
 /**
- * Validate phone number (international format, US primary)
+ * Validate phone number (international format, works with react-phone-number-input)
  * Accepts formats like: +1 234 567 8900, +44 20 1234 5678, etc.
  */
 export function validatePhone(phone: string): ValidationResult {
@@ -71,19 +71,8 @@ export function validatePhone(phone: string): ValidationResult {
   if (!phoneRegex.test(cleaned)) {
     return {
       valid: false,
-      error: "Please enter a valid phone number with country code (e.g., +1 234 567 8900)",
+      error: "Please enter a valid phone number",
     };
-  }
-
-  // US-specific validation (optional but recommended)
-  if (cleaned.startsWith('+1')) {
-    // US numbers should have exactly 11 digits (+1 and 10-digit number)
-    if (cleaned.length !== 12) {
-      return {
-        valid: false,
-        error: "US phone numbers should be in format: +1 XXX XXX XXXX",
-      };
-    }
   }
 
   return { valid: true };

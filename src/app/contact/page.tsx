@@ -1,8 +1,16 @@
+"use client";
+
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { Container, Section, PageHeader } from "@/components/layout";
 import { Card, Button, Input, Select, Textarea } from "@/components/ui";
 
 export default function ContactPage() {
+  // State for form fields (for PhoneInput controlled component)
+  const [phone, setPhone] = useState<string>("");
+
   return (
     <main className="bg-ivory">
       <Section variant="bordered" padding="lg">
@@ -41,7 +49,9 @@ export default function ContactPage() {
                   <Input
                     type="tel"
                     label="Phone / WhatsApp"
-                    placeholder="+00 …"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+1 (234) 567-8900"
                     size="sm"
                   />
                   <Select

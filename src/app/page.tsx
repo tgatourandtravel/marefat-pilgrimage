@@ -150,7 +150,7 @@ export default function HomePage() {
             </a>
           </div>
           <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {featuredTours.map((tour) => (
+            {featuredTours.slice(0, 3).map((tour) => (
               <a
                 key={tour.slug}
                 href={`/tours/${tour.slug}`}
@@ -223,10 +223,10 @@ export default function HomePage() {
                           </p>
                           <div className="mt-1 flex items-baseline gap-2">
                             <span className="text-xs text-charcoal/50 line-through">
-                              €{tour.earlyBirdDiscount.originalPrice.toLocaleString()}
+                              ${tour.earlyBirdDiscount.originalPrice.toLocaleString()}
                             </span>
                             <span className="text-lg font-bold text-charcoal">
-                              €{tour.earlyBirdDiscount.discountedPrice.toLocaleString()}
+                              ${tour.earlyBirdDiscount.discountedPrice.toLocaleString()}
                             </span>
                           </div>
                         </div>
@@ -234,7 +234,7 @@ export default function HomePage() {
                         <div>
                           <p className="text-xs text-charcoal/60">From</p>
                           <p className="text-lg font-semibold text-charcoal">
-                            {tour.priceFrom > 0 ? `€${tour.priceFrom.toLocaleString()}` : "On request"}
+                            {tour.priceFrom > 0 ? `$${tour.priceFrom.toLocaleString()}` : "On request"}
                           </p>
                         </div>
                       )}

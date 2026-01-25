@@ -33,7 +33,7 @@ function SuccessContent() {
       const { data: travelersData, error: travelersError } = await supabase
         .from('travelers')
         .select('*')
-        .eq('booking_id', bookingData.id)
+        .eq('booking_id', (bookingData as any).id)
         .order('traveler_order', { ascending: true });
 
       if (travelersError) {
@@ -41,14 +41,15 @@ function SuccessContent() {
       }
 
       // Format data for PDF
+      const booking = bookingData as any;
       const pdfData: BookingData = {
-        bookingRef: bookingData.booking_ref,
-        tourTitle: bookingData.tour_title,
-        tourDestination: bookingData.tour_destination,
-        tourStartDate: bookingData.tour_start_date,
-        tourDurationDays: bookingData.tour_duration_days,
-        numberOfTravelers: bookingData.number_of_travelers,
-        travelers: travelersData.map(t => ({
+        bookingRef: booking.booking_ref,
+        tourTitle: booking.tour_title,
+        tourDestination: booking.tour_destination,
+        tourStartDate: booking.tour_start_date,
+        tourDurationDays: booking.tour_duration_days,
+        numberOfTravelers: booking.number_of_travelers,
+        travelers: (travelersData || []).map((t: any) => ({
           firstName: t.first_name,
           lastName: t.last_name,
           email: t.email,
@@ -58,17 +59,17 @@ function SuccessContent() {
           passportExpiry: t.passport_expiry,
           dateOfBirth: t.date_of_birth,
         })),
-        basePricePerPerson: bookingData.base_price_per_person,
-        insuranceTotal: bookingData.insurance_total,
-        flightTotal: bookingData.flight_total,
-        grandTotal: bookingData.grand_total,
-        depositAmount: bookingData.deposit_amount,
-        hasInsurance: bookingData.has_insurance,
-        hasFlightBooking: bookingData.has_flight_booking,
-        contactEmail: bookingData.contact_email,
-        contactPhone: bookingData.contact_phone,
-        createdAt: bookingData.created_at,
-        expiresAt: bookingData.expires_at,
+        basePricePerPerson: booking.base_price_per_person,
+        insuranceTotal: booking.insurance_total,
+        flightTotal: booking.flight_total,
+        grandTotal: booking.grand_total,
+        depositAmount: booking.deposit_amount,
+        hasInsurance: booking.has_insurance,
+        hasFlightBooking: booking.has_flight_booking,
+        contactEmail: booking.contact_email,
+        contactPhone: booking.contact_phone,
+        createdAt: booking.created_at,
+        expiresAt: booking.expires_at,
       };
 
       // Generate and download PDF
