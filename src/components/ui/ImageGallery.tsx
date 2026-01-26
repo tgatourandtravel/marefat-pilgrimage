@@ -24,6 +24,7 @@ export function ImageGallery({ images, tourTitle }: ImageGalleryProps) {
             src={displayImages[selectedIndex]}
             alt={`${tourTitle} - Image ${selectedIndex + 1}`}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 60vw, 800px"
             className="object-cover"
             priority={selectedIndex === 0}
           />
@@ -56,6 +57,7 @@ export function ImageGallery({ images, tourTitle }: ImageGalleryProps) {
                   src={img}
                   alt={`${tourTitle} thumbnail ${index + 1}`}
                   fill
+                  sizes="(max-width: 640px) 33vw, 120px"
                   className="object-cover"
                 />
               ) : (

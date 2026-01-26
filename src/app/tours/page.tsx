@@ -2,8 +2,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
-import { PackageBadge } from "@/components/ui/PackageBadge";
+import { TourCard } from "@/components/ui";
 import { getAllTours, type Tour } from "@/data/tours";
 
 // Get tours from central data file
@@ -433,88 +432,7 @@ export default function ToursPage() {
 
             <div className="grid gap-6 lg:grid-cols-2">
               {filteredTours.map((tour) => (
-                <Link
-                  key={tour.slug}
-                  href={`/tours/${tour.slug}`}
-                  className="group flex flex-col gap-4 rounded-2xl border border-charcoal/5 bg-ivory/90 p-5 shadow-sm shadow-charcoal/5 transition hover:-translate-y-1 hover:shadow-soft hover:border-gold/20 cursor-pointer"
-                >
-                  {/* Image */}
-                  <div className="h-40 w-full flex-shrink-0 rounded-xl bg-gradient-to-tr from-charcoal/80 via-charcoal/40 to-gold-soft/70 opacity-80 transition group-hover:opacity-100" />
-
-                  {/* Content */}
-                  <div className="flex flex-1 flex-col space-y-2">
-                    {/* Badges */}
-                    <div className="flex flex-wrap items-center gap-2">
-                      <PackageBadge level={tour.packageLevel} />
-                      <span className="text-[11px] uppercase tracking-[0.16em] text-charcoal/60">
-                        {tour.type}
-                      </span>
-                    </div>
-
-                    {/* Title */}
-                    <h2 className="text-sm font-semibold text-charcoal transition group-hover:text-gold sm:text-base">
-                      {tour.title}
-                    </h2>
-
-                    {/* Date */}
-                    <p className="text-xs text-charcoal/70">
-                      {new Date(tour.startDate).toLocaleDateString("en-GB", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })} • {tour.durationDays} days
-                    </p>
-
-                    {/* Details */}
-                    <div className="space-y-1.5">
-                      <div className="flex flex-wrap gap-x-2 gap-y-1 text-[11px] text-charcoal/70">
-                        <span>{tour.hotelStars}★ hotel</span>
-                        <span>•</span>
-                        <span>{tour.flightIncluded ? "✓ Flight included" : "✗ Flight not included"}</span>
-                      </div>
-                      <div className="flex flex-wrap gap-x-2 gap-y-1 text-[11px] text-charcoal/70">
-                        <span>Meals: {tour.meals}</span>
-                      </div>
-                    </div>
-
-                    {/* Price & CTA */}
-                    <div className="flex items-end justify-between gap-3 pt-3">
-                      <div>
-                        {tour.earlyBirdDiscount && new Date() <= new Date(tour.earlyBirdDiscount.deadline) ? (
-                          <div>
-                            <p className="text-[10px] font-semibold uppercase tracking-wide text-gold">
-                              Early Bird • Until {new Date(tour.earlyBirdDiscount.deadline).toLocaleDateString("en-GB", {
-                                day: "numeric",
-                                month: "short",
-                              })}
-                            </p>
-                            <div className="mt-1 flex items-baseline gap-2">
-                              <span className="text-xs text-charcoal/50 line-through">
-                                ${tour.earlyBirdDiscount.originalPrice.toLocaleString()}
-                              </span>
-                              <span className="text-lg font-bold text-charcoal">
-                                ${tour.earlyBirdDiscount.discountedPrice.toLocaleString()}
-                              </span>
-                            </div>
-                          </div>
-                        ) : (
-                          <div>
-                            <p className="text-xs text-charcoal/60">From</p>
-                            <p className="text-lg font-semibold text-charcoal">
-                              {tour.priceFrom > 0 ? `$${tour.priceFrom.toLocaleString()}` : "On request"}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 text-xs font-medium text-charcoal/70 transition group-hover:text-gold">
-                        <span>View</span>
-                        <svg className="h-4 w-4 transition group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
+                <TourCard key={tour.slug} tour={tour} />
               ))}
 
               {filteredTours.length === 0 && (

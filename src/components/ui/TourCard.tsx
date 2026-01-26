@@ -1,0 +1,134 @@
+"use client";
+
+import Link from "next/link";
+import Image from "next/image";
+import { Tour } from "@/data/tours";
+import { PackageBadge } from "./PackageBadge";
+
+interface TourCardProps {
+  tour: Tour;
+}
+
+/**
+ * TourCard Component
+ *
+ * Displays a tour preview card with:
+ * - Image with 16:9 aspect ratio (optimized for 1200x675px)
+ * - Package badge and type
+ * - Title, dates, and key features
+ * - Early bird pricing if available
+ */
+export function TourCard({ tour }: TourCardProps) {
+  const hasEarlyBird = tour.earlyBirdDiscount && new Date() <= new Date(tour.earlyBirdDiscount.deadline);
+  const isOnRequest = tour.priceFrom === 0;
+
+  // Get the first image or use placeholder
+  const cardImage = tour.images?.[0] || null;
+
+  return (
+    <Link
+      href={`/tours/${tour.slug}`}
+      className="group flex flex-col gap-4 rounded-2xl border border-charcoal/5 bg-ivory/90 p-5 shadow-sm shadow-charcoal/5 transition hover:-translate-y-1 hover:border-gold/20 hover:shadow-soft"
+    >
+      {/* Image - 16:9 aspect ratio */}
+      <div className="relative aspect-[16/9] w-full flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-tr from-charcoal/80 via-charcoal/40 to-gold-soft/70">
+        {cardImage ? (
+          <Image
+            src={cardImage}
+            alt={tour.title}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
+            className="object-cover opacity-90 transition group-hover:opacity-100 group-hover:scale-105"
+          />
+        ) : (
+          // Placeholder gradient when no image
+          <div className="absolute inset-0 flex items-center justify-center opacity-80 transition group-hover:opacity-100">
+            <span className="text-sm font-medium text-ivory/60">{tour.type}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="flex flex-1 flex-col space-y-2">
+        {/* Badge + Type tag */}
+        <div className="flex items-center gap-2">
+          <PackageBadge level={tour.packageLevel} />
+          <span className="text-[11px] uppercase tracking-[0.16em] text-charcoal/60">
+            {tour.type}
+          </span>
+        </div>
+
+        {/* Title */}
+        <h2 className="text-sm font-semibold text-charcoal transition group-hover:text-gold sm:text-base">
+          {tour.title}
+        </h2>
+
+        {/* Date & Duration */}
+        <p className="text-xs text-charcoal/70">
+          {new Date(tour.startDate).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          })} - {new Date(tour.endDate).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })} • {tour.durationDays} days
+        </p>
+
+        {/* Details */}
+        <div className="space-y-1.5">
+          <div className="flex flex-wrap gap-x-2 gap-y-1 text-[11px] text-charcoal/70">
+            <span>{tour.hotelStars}★ hotel</span>
+            <span>•</span>
+            <span>{tour.flightIncluded ? "✓ Flight included" : "✗ Flight not included"}</span>
+          </div>
+          <div className="flex flex-wrap gap-x-2 gap-y-1 text-[11px] text-charcoal/70">
+            <span>Meals: {tour.meals}</span>
+          </div>
+        </div>
+
+        {/* Price & CTA */}
+        <div className="flex items-end justify-between gap-3 pt-3">
+          <div>
+            {isOnRequest ? (
+              <div>
+                <p className="text-xs text-charcoal/60">Price</p>
+                <p className="text-lg font-semibold text-charcoal">On request</p>
+              </div>
+            ) : hasEarlyBird ? (
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-gold">
+                  Early Bird • Until {new Date(tour.earlyBirdDiscount!.deadline).toLocaleDateString("en-US", {
+                    day: "numeric",
+                    month: "short",
+                  })}
+                </p>
+                <div className="mt-1 flex items-baseline gap-2">
+                  <span className="text-xs text-charcoal/50 line-through">
+                    ${tour.earlyBirdDiscount!.originalPrice.toLocaleString()}
+                  </span>
+                  <span className="text-lg font-bold text-charcoal">
+                    ${tour.earlyBirdDiscount!.discountedPrice.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <p className="text-xs text-charcoal/60">From</p>
+                <p className="text-lg font-semibold text-charcoal">
+                  ${tour.priceFrom.toLocaleString()}
+                </p>
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-2 text-xs font-medium text-charcoal/70 transition group-hover:text-gold">
+            <span>View</span>
+            <svg className="h-4 w-4 transition group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}

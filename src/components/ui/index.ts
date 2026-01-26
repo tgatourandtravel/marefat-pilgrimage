@@ -23,3 +23,4 @@ export {
   type TabsContentProps,
 } from "./Tabs";
 export { ImageGallery, type ImageGalleryProps } from "./ImageGallery";
+export { TourCard } from "./TourCard";

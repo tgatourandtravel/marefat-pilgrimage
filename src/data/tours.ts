@@ -191,7 +191,7 @@ export const TOURS: Tour[] = [
     ],
 
     images: [
-      "/images/tours/hajj-2026/hero.png",
+      "/images/tours/hajj-2026/hajj-thumbnail-3.png",
     ],
   },
 
@@ -303,12 +303,7 @@ export const TOURS: Tour[] = [
     ],
 
     images: [
-      "/images/tours/spring-break-combo-2026/01-hero.png",
-      "/images/tours/spring-break-combo-2026/02-guide.png",
-      "/images/tours/spring-break-combo-2026/03-hotels.png",
-      "/images/tours/spring-break-combo-2026/04-meals.png",
-      "/images/tours/spring-break-combo-2026/05-details.png",
-      "/images/tours/spring-break-combo-2026/06-transport.png",
+      "/images/tours/spring-break-combo-2026/combo-thumbnail-1.png",
     ],
   },
 
@@ -416,12 +411,7 @@ export const TOURS: Tour[] = [
     ],
 
     images: [
-      "/images/tours/karbala-spring-break-2026/01-hero.png",
-      "/images/tours/karbala-spring-break-2026/02-guide.png",
-      "/images/tours/karbala-spring-break-2026/03-hotel.png",
-      "/images/tours/karbala-spring-break-2026/04-transport.png",
-      "/images/tours/karbala-spring-break-2026/05-meals.png",
-      "/images/tours/karbala-spring-break-2026/06-shrine.png",
+      "/images/tours/karbala-spring-break-2026/Karbala-thumbnail-1.png",
     ],
   },
 
@@ -528,12 +518,7 @@ export const TOURS: Tour[] = [
     ],
 
     images: [
-      "/images/tours/spring-break-umrah-2026/01-hero.png",
-      "/images/tours/spring-break-umrah-2026/02-details.png",
-      "/images/tours/spring-break-umrah-2026/03-guide.png",
-      "/images/tours/spring-break-umrah-2026/04-transport.png",
-      "/images/tours/spring-break-umrah-2026/05-hotels.png",
-      "/images/tours/spring-break-umrah-2026/06-meals.png",
+      "/images/tours/spring-break-umrah-2026/umrah-thumbnail-1.png",
     ],
   },
 ];

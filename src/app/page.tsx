@@ -1,4 +1,5 @@
 import { getFeaturedTours } from "@/data/tours";
+import { TourCard } from "@/components/ui";
 
 // Get featured tours from central data file
 const featuredTours = getFeaturedTours();
@@ -151,103 +152,7 @@ export default function HomePage() {
           </div>
           <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {featuredTours.slice(0, 3).map((tour) => (
-              <a
-                key={tour.slug}
-                href={`/tours/${tour.slug}`}
-                className="group flex flex-col gap-4 rounded-2xl border border-charcoal/5 bg-ivory/90 p-5 shadow-sm shadow-charcoal/5 transition hover:-translate-y-1 hover:shadow-soft hover:border-gold/20 cursor-pointer"
-              >
-                {/* Image */}
-                <div className="h-40 w-full flex-shrink-0 rounded-xl bg-gradient-to-tr from-charcoal/80 via-charcoal/40 to-gold-soft/70 opacity-80 transition group-hover:opacity-100" />
-
-                {/* Content */}
-                <div className="flex flex-1 flex-col space-y-2">
-                  {/* Badges */}
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${
-                      tour.packageLevel === "Premium"
-                        ? "bg-gradient-to-r from-gold/20 to-gold-soft/20 text-gold-dark border border-gold/30 shadow-sm"
-                        : "bg-gradient-to-r from-charcoal/5 to-charcoal/10 text-charcoal/80 border border-charcoal/15 shadow-sm"
-                    }`}>
-                      {tour.packageLevel === "Premium" ? (
-                        <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ) : (
-                        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                        </svg>
-                      )}
-                      {tour.packageLevel}
-                    </span>
-                    <span className="text-[11px] uppercase tracking-[0.16em] text-charcoal/60">
-                      {tour.type}
-                    </span>
-                  </div>
-
-                  {/* Title */}
-                  <h2 className="text-sm font-semibold text-charcoal transition group-hover:text-gold sm:text-base">
-                    {tour.title}
-                  </h2>
-
-                  {/* Date */}
-                  <p className="text-xs text-charcoal/70">
-                    {new Date(tour.startDate).toLocaleDateString("en-GB", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })} • {tour.durationDays} days
-                  </p>
-
-                  {/* Details */}
-                  <div className="space-y-1.5">
-                    <div className="flex flex-wrap gap-x-2 gap-y-1 text-[11px] text-charcoal/70">
-                      <span>{tour.hotelStars}★ hotel</span>
-                      <span>•</span>
-                      <span>{tour.flightIncluded ? "✓ Flight included" : "✗ Flight not included"}</span>
-                    </div>
-                    <div className="flex flex-wrap gap-x-2 gap-y-1 text-[11px] text-charcoal/70">
-                      <span>Meals: {tour.meals}</span>
-                    </div>
-                  </div>
-
-                  {/* Price & CTA */}
-                  <div className="flex items-end justify-between gap-3 pt-3">
-                    <div>
-                      {tour.earlyBirdDiscount && new Date() <= new Date(tour.earlyBirdDiscount.deadline) ? (
-                        <div>
-                          <p className="text-[10px] font-semibold uppercase tracking-wide text-gold">
-                            Early Bird • Until {new Date(tour.earlyBirdDiscount.deadline).toLocaleDateString("en-GB", {
-                              day: "numeric",
-                              month: "short",
-                            })}
-                          </p>
-                          <div className="mt-1 flex items-baseline gap-2">
-                            <span className="text-xs text-charcoal/50 line-through">
-                              ${tour.earlyBirdDiscount.originalPrice.toLocaleString()}
-                            </span>
-                            <span className="text-lg font-bold text-charcoal">
-                              ${tour.earlyBirdDiscount.discountedPrice.toLocaleString()}
-                            </span>
-                          </div>
-                        </div>
-                      ) : (
-                        <div>
-                          <p className="text-xs text-charcoal/60">From</p>
-                          <p className="text-lg font-semibold text-charcoal">
-                            {tour.priceFrom > 0 ? `$${tour.priceFrom.toLocaleString()}` : "On request"}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 text-xs font-medium text-charcoal/70 transition group-hover:text-gold">
-                      <span>View</span>
-                      <svg className="h-4 w-4 transition group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </a>
+              <TourCard key={tour.slug} tour={tour} />
             ))}
           </div>
         </div>
