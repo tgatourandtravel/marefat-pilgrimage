@@ -343,12 +343,12 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                         We assist with visa processing for all participants
                       </span>
                     </li>
-                    <li className="flex items-start gap-2">
+                  {/*<li className="flex items-start gap-2">
                       <span className="mt-[6px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-gold" />
                       <span>
                         Please ensure vaccination certificates are up to date
                       </span>
-                    </li>
+                    </li>*/}
                   </ul>
                 </Card>
               </TabsContent>

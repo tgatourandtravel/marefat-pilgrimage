@@ -8,11 +8,19 @@ import type { Booking } from '@/lib/supabase/types';
 // Force dynamic rendering to prevent static optimization at build time
 export const dynamic = 'force-dynamic';
 
-interface TravelerInput {
+// Booker: Person making the reservation (has contact info)
+interface BookerInput {
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
+  isTraveling: boolean;
+}
+
+// Traveler: Person traveling (passport info only)
+interface TravelerInput {
+  firstName: string;
+  lastName: string;
   passportNumber: string;
   nationality: string;
   passportExpiry: string;
@@ -25,6 +33,7 @@ interface CreateBookingRequest {
   tourDestination: string;
   tourStartDate?: string;
   tourDurationDays?: number;
+  booker: BookerInput;
   travelers: TravelerInput[];
   hasInsurance: boolean;
   hasFlightBooking: boolean;
@@ -39,9 +48,17 @@ export async function POST(request: NextRequest) {
     const body: CreateBookingRequest = await request.json();
 
     // Validate required fields
-    if (!body.tourSlug || !body.travelers || body.travelers.length === 0) {
+    if (!body.tourSlug || !body.booker || !body.travelers || body.travelers.length === 0) {
       return NextResponse.json(
         { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Validate booker has email
+    if (!body.booker.email) {
+      return NextResponse.json(
+        { error: 'Booker email is required' },
         { status: 400 }
       );
     }
@@ -73,10 +90,7 @@ export async function POST(request: NextRequest) {
       attempts++;
     }
 
-    // Get primary contact info
-    const primaryTraveler = body.travelers[0];
-
-    // Create booking
+    // Create booking with booker as contact
     const { data: booking, error: bookingError } = await supabaseAdmin
       .from('bookings')
       .insert({
@@ -86,8 +100,8 @@ export async function POST(request: NextRequest) {
         tour_destination: body.tourDestination,
         tour_start_date: body.tourStartDate || null,
         tour_duration_days: body.tourDurationDays || null,
-        contact_email: primaryTraveler.email.toLowerCase(),
-        contact_phone: primaryTraveler.phone,
+        contact_email: body.booker.email.toLowerCase(),
+        contact_phone: body.booker.phone,
         base_price_per_person: body.basePricePerPerson,
         number_of_travelers: numberOfTravelers,
         insurance_total: insuranceTotal,
@@ -107,24 +121,28 @@ export async function POST(request: NextRequest) {
     if (bookingError) {
       console.error('Booking creation error:', bookingError);
       return NextResponse.json(
-        { error: 'Failed to create booking' },
+        {
+          error: 'Failed to create booking',
+          details: process.env.NODE_ENV === 'development' ? bookingError.message : undefined
+        },
         { status: 500 }
       );
     }
 
     // Insert travelers
+    // Note: email/phone are stored at booking level (booker), not per traveler
     const travelersToInsert = body.travelers.map((traveler, index) => ({
       booking_id: booking.id,
       first_name: traveler.firstName,
       last_name: traveler.lastName,
-      email: traveler.email.toLowerCase(),
-      phone: traveler.phone,
+      email: index === 0 && body.booker.isTraveling ? body.booker.email.toLowerCase() : '',
+      phone: index === 0 && body.booker.isTraveling ? body.booker.phone : '',
       date_of_birth: traveler.dateOfBirth,
       nationality: traveler.nationality,
       passport_number: traveler.passportNumber,
       passport_expiry: traveler.passportExpiry,
       traveler_order: index + 1,
-      is_primary_contact: index === 0,
+      is_primary_contact: index === 0 && body.booker.isTraveling,
     }));
 
     const { error: travelersError } = await supabaseAdmin
@@ -136,7 +154,10 @@ export async function POST(request: NextRequest) {
       // Rollback booking
       await supabaseAdmin.from('bookings').delete().eq('id', booking.id);
       return NextResponse.json(
-        { error: 'Failed to save traveler information' },
+        {
+          error: 'Failed to save traveler information',
+          details: process.env.NODE_ENV === 'development' ? travelersError.message : undefined
+        },
         { status: 500 }
       );
     }
@@ -162,11 +183,11 @@ export async function POST(request: NextRequest) {
       console.error('OTP creation error:', otpError);
     }
 
-    // Send OTP email
+    // Send OTP email to booker
     try {
       await sendOTPEmail({
-        to: primaryTraveler.email,
-        firstName: primaryTraveler.firstName,
+        to: body.booker.email,
+        firstName: body.booker.firstName,
         bookingRef: bookingRef,
         otpCode: otpCode,
       });
@@ -178,14 +199,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       bookingRef: bookingRef,
-      email: primaryTraveler.email,
+      email: body.booker.email,
       message: 'Booking created. Please check your email for verification code.',
     });
 
   } catch (error) {
     console.error('API error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      {
+        error: 'Internal server error',
+        details: process.env.NODE_ENV === 'development' && error instanceof Error ? error.message : undefined
+      },
       { status: 500 }
     );
   }

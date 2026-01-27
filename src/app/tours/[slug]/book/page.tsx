@@ -4,16 +4,23 @@ import { useState, FormEvent, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getTourBySlug } from "@/data/tours";
-import { validateTravelerFields } from "@/lib/utils/validation";
+import { validateTravelerFields, validateBookerFields } from "@/lib/utils/validation";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 
-type TravelerInfo = {
-  id: string;
+// Booker: The person making the reservation and payment
+type BookerInfo = {
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
+};
+
+// Traveler: Person traveling (no email/phone needed)
+type TravelerInfo = {
+  id: string;
+  firstName: string;
+  lastName: string;
   passportNumber: string;
   nationality: string;
   passportExpiry: string;
@@ -60,14 +67,23 @@ export default function TourBookingPage({ params }: Props) {
   const fieldsStartRef = useRef<HTMLDivElement>(null);
 
   const [step, setStep] = useState<Step>(1);
+
+  // Booker information (person making the reservation)
+  const [booker, setBooker] = useState<BookerInfo>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+  });
+  const [isBookerTraveling, setIsBookerTraveling] = useState(true);
+
+  // Travelers information
   const [numberOfTravelers, setNumberOfTravelers] = useState<number>(1);
   const [travelers, setTravelers] = useState<TravelerInfo[]>([
     {
       id: "traveler-1",
       firstName: "",
       lastName: "",
-      email: "",
-      phone: "",
       passportNumber: "",
       nationality: "",
       passportExpiry: "",
@@ -75,9 +91,12 @@ export default function TourBookingPage({ params }: Props) {
     }
   ]);
 
+  // Booker errors
+  const [bookerErrors, setBookerErrors] = useState<Record<string, string>>({});
+
   // Error tracking state: travelerIndex -> fieldName -> errorMessage
   const [errors, setErrors] = useState<Record<number, Record<string, string>>>({});
-  
+
   // Touched fields tracking: travelerIndex -> Set of field names
   const [touchedFields, setTouchedFields] = useState<Record<number, Set<string>>>({});
 
@@ -107,8 +126,6 @@ export default function TourBookingPage({ params }: Props) {
         id: `traveler-${i + 1}`,
         firstName: "",
         lastName: "",
-        email: "",
-        phone: "",
         passportNumber: "",
         nationality: "",
         passportExpiry: "",
@@ -116,6 +133,34 @@ export default function TourBookingPage({ params }: Props) {
       });
     }
     setTravelers(newTravelers);
+  };
+
+  // Update booker field
+  const updateBooker = (field: keyof BookerInfo, value: string) => {
+    setBooker(prev => ({ ...prev, [field]: value }));
+
+    // If booker is traveling, sync name to first traveler
+    if (isBookerTraveling && (field === "firstName" || field === "lastName")) {
+      const updated = [...travelers];
+      updated[0] = { ...updated[0], [field]: value };
+      setTravelers(updated);
+    }
+  };
+
+  // Handle booker traveling toggle
+  const handleBookerTravelingChange = (isTraveling: boolean) => {
+    setIsBookerTraveling(isTraveling);
+
+    if (isTraveling) {
+      // Sync booker name to first traveler
+      const updated = [...travelers];
+      updated[0] = {
+        ...updated[0],
+        firstName: booker.firstName,
+        lastName: booker.lastName,
+      };
+      setTravelers(updated);
+    }
   };
 
   // Update individual traveler data
@@ -141,8 +186,9 @@ export default function TourBookingPage({ params }: Props) {
   const validateField = (index: number, field: keyof TravelerInfo, value: string) => {
     const traveler = { ...travelers[index], [field]: value };
     const tourStartDate = fullTourData?.startDate;
-    const fieldErrors = validateTravelerFields(traveler, tourStartDate);
-    
+    const skipNameValidation = index === 0 && isBookerTraveling;
+    const fieldErrors = validateTravelerFields(traveler, tourStartDate, skipNameValidation);
+
     setErrors(prev => ({
       ...prev,
       [index]: {
@@ -169,11 +215,26 @@ export default function TourBookingPage({ params }: Props) {
     if (currentStep === 1) {
       const tourStartDate = fullTourData?.startDate;
       let hasErrors = false;
-      const newErrors: Record<number, Record<string, string>> = {};
 
-      // Validate all travelers
+      // 1. Validate booker first
+      const bookerFieldErrors = validateBookerFields(booker);
+      if (Object.keys(bookerFieldErrors).length > 0) {
+        hasErrors = true;
+        setBookerErrors(bookerFieldErrors);
+      } else {
+        setBookerErrors({});
+      }
+
+      // 2. Validate all travelers
+      const newErrors: Record<number, Record<string, string>> = {};
       travelers.forEach((traveler, index) => {
-        const fieldErrors = validateTravelerFields(traveler, tourStartDate);
+        // For traveler 1 when booker is traveling, skip name validation (comes from booker)
+        const skipNameValidation = index === 0 && isBookerTraveling;
+        const travelerToValidate = skipNameValidation
+          ? { ...traveler, firstName: booker.firstName, lastName: booker.lastName }
+          : traveler;
+
+        const fieldErrors = validateTravelerFields(travelerToValidate, tourStartDate, skipNameValidation);
         if (Object.keys(fieldErrors).length > 0) {
           hasErrors = true;
           newErrors[index] = fieldErrors;
@@ -183,12 +244,12 @@ export default function TourBookingPage({ params }: Props) {
       // Update errors state ONLY if there are errors
       if (hasErrors) {
         setErrors(newErrors);
-        
+
         // Mark all fields as touched
         setTouchedFields(prev => {
           const updated = { ...prev };
           travelers.forEach((_, index) => {
-            updated[index] = new Set(['firstName', 'lastName', 'email', 'phone', 'passportNumber', 'nationality', 'passportExpiry', 'dateOfBirth']);
+            updated[index] = new Set(['firstName', 'lastName', 'passportNumber', 'nationality', 'passportExpiry', 'dateOfBirth']);
           });
           return updated;
         });
@@ -240,13 +301,21 @@ export default function TourBookingPage({ params }: Props) {
           tourSlug: params.slug,
           tourTitle: tour.title,
           tourDestination: tour.destination,
-          tourStartDate: null,
-          tourDurationDays: parseInt(tour.duration) || null,
-          travelers: travelers.map(t => ({
-            firstName: t.firstName,
-            lastName: t.lastName,
-            email: t.email,
-            phone: t.phone,
+          tourStartDate: fullTourData?.startDate || null,
+          tourDurationDays: fullTourData?.durationDays || null,
+          // Booker information (contact for booking)
+          booker: {
+            firstName: booker.firstName,
+            lastName: booker.lastName,
+            email: booker.email,
+            phone: booker.phone,
+            isTraveling: isBookerTraveling,
+          },
+          // Travelers with passport info
+          travelers: travelers.map((t, index) => ({
+            // If booker is traveler 1, use booker's name
+            firstName: (index === 0 && isBookerTraveling) ? booker.firstName : t.firstName,
+            lastName: (index === 0 && isBookerTraveling) ? booker.lastName : t.lastName,
             passportNumber: t.passportNumber,
             nationality: t.nationality,
             passportExpiry: t.passportExpiry,
@@ -264,7 +333,10 @@ export default function TourBookingPage({ params }: Props) {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to create booking");
+        const errorMsg = data.details
+          ? `${data.error}: ${data.details}`
+          : data.error || "Failed to create booking";
+        throw new Error(errorMsg);
       }
 
       // Redirect to verification page
@@ -346,15 +418,91 @@ export default function TourBookingPage({ params }: Props) {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Step 1: Traveler Information (Dynamic) */}
+              {/* Step 1: Booker & Traveler Information */}
               {step === 1 && (
                 <div ref={fieldsStartRef} className="space-y-6">
+                  {/* Booker Information Card */}
+                  <Card variant="elevated" padding="lg" className="space-y-4">
+                    <div>
+                      <h2 className="font-display text-lg font-semibold text-charcoal">
+                        Contact Information
+                      </h2>
+                      <p className="mt-2 text-xs text-charcoal/60">
+                        Person responsible for this booking. We'll send confirmation and updates to this contact.
+                      </p>
+                    </div>
+
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <Input
+                        label="First Name"
+                        type="text"
+                        value={booker.firstName}
+                        onChange={(e) => updateBooker("firstName", e.target.value)}
+                        error={bookerErrors.firstName}
+                        required
+                      />
+                      <Input
+                        label="Last Name"
+                        type="text"
+                        value={booker.lastName}
+                        onChange={(e) => updateBooker("lastName", e.target.value)}
+                        error={bookerErrors.lastName}
+                        required
+                      />
+                    </div>
+
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <Input
+                        label="Email"
+                        type="email"
+                        value={booker.email}
+                        onChange={(e) => updateBooker("email", e.target.value)}
+                        error={bookerErrors.email}
+                        helperText={!bookerErrors.email ? "For booking confirmation and updates" : undefined}
+                        required
+                      />
+                      <Input
+                        label="Phone Number"
+                        type="tel"
+                        value={booker.phone}
+                        onChange={(e) => updateBooker("phone", e.target.value)}
+                        error={bookerErrors.phone}
+                        placeholder="+1 (234) 567-8900"
+                        helperText={!bookerErrors.phone ? "Include country code" : undefined}
+                        required
+                      />
+                    </div>
+
+                    {/* Booker traveling checkbox */}
+                    <div className="mt-4 rounded-xl border border-charcoal/10 bg-ivory/50 p-4">
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={isBookerTraveling}
+                          onChange={(e) => handleBookerTravelingChange(e.target.checked)}
+                          className="h-4 w-4 rounded border-charcoal/30 text-gold transition focus:ring-2 focus:ring-gold/70"
+                        />
+                        <div>
+                          <p className="text-sm font-medium text-charcoal">
+                            I am also traveling on this trip
+                          </p>
+                          <p className="text-xs text-charcoal/60">
+                            {isBookerTraveling
+                              ? "Your name will be added as Traveler 1"
+                              : "You are booking for others only"}
+                          </p>
+                        </div>
+                      </label>
+                    </div>
+                  </Card>
+
+                  {/* Traveler Count & List */}
                   <Card variant="elevated" padding="lg">
                     <h2 className="font-display text-lg font-semibold text-charcoal">
                       Traveler Information
                     </h2>
                     <p className="mt-2 text-xs text-charcoal/60">
-                      Please provide details for all travelers
+                      Passport details for all travelers
                     </p>
 
                     {/* Number of Travelers Selector */}
@@ -400,8 +548,6 @@ export default function TourBookingPage({ params }: Props) {
                                     id: `traveler-${newCount}`,
                                     firstName: "",
                                     lastName: "",
-                                    email: "",
-                                    phone: "",
                                     passportNumber: "",
                                     nationality: "",
                                     passportExpiry: "",
@@ -428,103 +574,105 @@ export default function TourBookingPage({ params }: Props) {
                   </Card>
 
                   {/* Traveler Forms */}
-                  {travelers.map((traveler, index) => (
-                    <Card
-                      key={traveler.id}
-                      variant="elevated"
-                      padding="lg"
-                      className="space-y-4"
-                    >
-                      <h3 className="text-sm font-semibold uppercase tracking-wide text-charcoal/70">
-                        Traveler {index + 1}
-                      </h3>
-                      
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <Input
-                          label="First Name"
-                          type="text"
-                          value={traveler.firstName}
-                          onChange={(e) => updateTraveler(index, "firstName", e.target.value)}
-                          onBlur={() => handleFieldBlur(index, "firstName")}
-                          error={errors[index]?.firstName}
-                          required
-                        />
-                        <Input
-                          label="Last Name"
-                          type="text"
-                          value={traveler.lastName}
-                          onChange={(e) => updateTraveler(index, "lastName", e.target.value)}
-                          onBlur={() => handleFieldBlur(index, "lastName")}
-                          error={errors[index]?.lastName}
-                          required
-                        />
-                      </div>
+                  {travelers.map((traveler, index) => {
+                    const isFirstTravelerAndBooker = index === 0 && isBookerTraveling;
 
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <Input
-                          label="Email"
-                          type="email"
-                          value={traveler.email}
-                          onChange={(e) => updateTraveler(index, "email", e.target.value)}
-                          onBlur={() => handleFieldBlur(index, "email")}
-                          error={errors[index]?.email}
-                          required
-                        />
-                        <Input
-                          label="Phone Number"
-                          type="tel"
-                          value={traveler.phone}
-                          onChange={(e) => updateTraveler(index, "phone", e.target.value)}
-                          onBlur={() => handleFieldBlur(index, "phone")}
-                          error={errors[index]?.phone}
-                          placeholder="+1 (234) 567-8900"
-                          helperText="Include country code (e.g., +1 for USA)"
-                          required
-                        />
-                      </div>
+                    return (
+                      <Card
+                        key={traveler.id}
+                        variant="elevated"
+                        padding="lg"
+                        className="space-y-4"
+                      >
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-sm font-semibold uppercase tracking-wide text-charcoal/70">
+                            Traveler {index + 1}
+                          </h3>
+                          {isFirstTravelerAndBooker && (
+                            <span className="rounded-full bg-gold/20 px-3 py-1 text-[10px] font-semibold text-gold-dark">
+                              Booker
+                            </span>
+                          )}
+                        </div>
 
-                      <div className="grid gap-4 sm:grid-cols-3">
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          <Input
+                            label="First Name"
+                            type="text"
+                            value={isFirstTravelerAndBooker ? booker.firstName : traveler.firstName}
+                            onChange={(e) => {
+                              if (isFirstTravelerAndBooker) {
+                                updateBooker("firstName", e.target.value);
+                              } else {
+                                updateTraveler(index, "firstName", e.target.value);
+                              }
+                            }}
+                            onBlur={() => handleFieldBlur(index, "firstName")}
+                            error={errors[index]?.firstName}
+                            disabled={isFirstTravelerAndBooker}
+                            required
+                          />
+                          <Input
+                            label="Last Name"
+                            type="text"
+                            value={isFirstTravelerAndBooker ? booker.lastName : traveler.lastName}
+                            onChange={(e) => {
+                              if (isFirstTravelerAndBooker) {
+                                updateBooker("lastName", e.target.value);
+                              } else {
+                                updateTraveler(index, "lastName", e.target.value);
+                              }
+                            }}
+                            onBlur={() => handleFieldBlur(index, "lastName")}
+                            error={errors[index]?.lastName}
+                            disabled={isFirstTravelerAndBooker}
+                            required
+                          />
+                        </div>
+
+                        <div className="grid gap-4 sm:grid-cols-3">
+                          <Input
+                            label="Passport Number"
+                            type="text"
+                            value={traveler.passportNumber}
+                            onChange={(e) => updateTraveler(index, "passportNumber", e.target.value)}
+                            onBlur={() => handleFieldBlur(index, "passportNumber")}
+                            error={errors[index]?.passportNumber}
+                            required
+                          />
+                          <Input
+                            label="Nationality"
+                            type="text"
+                            value={traveler.nationality}
+                            onChange={(e) => updateTraveler(index, "nationality", e.target.value)}
+                            onBlur={() => handleFieldBlur(index, "nationality")}
+                            error={errors[index]?.nationality}
+                            required
+                          />
+                          <Input
+                            label="Date of Birth"
+                            type="date"
+                            value={traveler.dateOfBirth}
+                            onChange={(e) => updateTraveler(index, "dateOfBirth", e.target.value)}
+                            onBlur={() => handleFieldBlur(index, "dateOfBirth")}
+                            error={errors[index]?.dateOfBirth}
+                            required
+                          />
+                        </div>
+
                         <Input
-                          label="Passport Number"
-                          type="text"
-                          value={traveler.passportNumber}
-                          onChange={(e) => updateTraveler(index, "passportNumber", e.target.value)}
-                          onBlur={() => handleFieldBlur(index, "passportNumber")}
-                          error={errors[index]?.passportNumber}
-                          required
-                        />
-                        <Input
-                          label="Nationality"
-                          type="text"
-                          value={traveler.nationality}
-                          onChange={(e) => updateTraveler(index, "nationality", e.target.value)}
-                          onBlur={() => handleFieldBlur(index, "nationality")}
-                          error={errors[index]?.nationality}
-                          required
-                        />
-                        <Input
-                          label="Date of Birth"
+                          label="Passport Expiry Date"
                           type="date"
-                          value={traveler.dateOfBirth}
-                          onChange={(e) => updateTraveler(index, "dateOfBirth", e.target.value)}
-                          onBlur={() => handleFieldBlur(index, "dateOfBirth")}
-                          error={errors[index]?.dateOfBirth}
+                          value={traveler.passportExpiry}
+                          onChange={(e) => updateTraveler(index, "passportExpiry", e.target.value)}
+                          onBlur={() => handleFieldBlur(index, "passportExpiry")}
+                          error={errors[index]?.passportExpiry}
+                          helperText={!errors[index]?.passportExpiry ? "Must be valid for at least 6 months from travel date" : undefined}
                           required
                         />
-                      </div>
-
-                      <Input
-                        label="Passport Expiry Date"
-                        type="date"
-                        value={traveler.passportExpiry}
-                        onChange={(e) => updateTraveler(index, "passportExpiry", e.target.value)}
-                        onBlur={() => handleFieldBlur(index, "passportExpiry")}
-                        error={errors[index]?.passportExpiry}
-                        helperText={!errors[index]?.passportExpiry ? "Must be valid for at least 6 months from travel date" : undefined}
-                        required
-                      />
-                    </Card>
-                  ))}
+                      </Card>
+                    );
+                  })}
                 </div>
               )}
 
@@ -622,11 +770,56 @@ export default function TourBookingPage({ params }: Props) {
                     </div>
                   </Card>
 
+                  {/* Contact Information (Booker) */}
+                  <Card variant="elevated" padding="md">
+                    <div className="flex items-center justify-between border-b border-charcoal/5 pb-3">
+                      <h3 className="text-sm font-semibold text-charcoal">
+                        Contact Information
+                      </h3>
+                      <button
+                        type="button"
+                        onClick={() => setStep(1)}
+                        className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-charcoal/70 transition hover:bg-charcoal/5"
+                      >
+                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Edit
+                      </button>
+                    </div>
+                    <div className="mt-4 rounded-xl bg-ivory/50 p-4 border border-charcoal/5">
+                      <div className="flex items-center gap-2 mb-3">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-charcoal/70">
+                          Booking Contact
+                        </p>
+                        {isBookerTraveling && (
+                          <span className="rounded-full bg-gold/20 px-2 py-0.5 text-[9px] font-semibold text-gold-dark">
+                            Also Traveling
+                          </span>
+                        )}
+                      </div>
+                      <div className="grid gap-3 text-xs sm:grid-cols-2">
+                        <div>
+                          <p className="text-charcoal/60">Full Name</p>
+                          <p className="mt-0.5 font-medium text-charcoal">{booker.firstName} {booker.lastName}</p>
+                        </div>
+                        <div>
+                          <p className="text-charcoal/60">Email</p>
+                          <p className="mt-0.5 text-charcoal">{booker.email}</p>
+                        </div>
+                        <div className="sm:col-span-2">
+                          <p className="text-charcoal/60">Phone Number</p>
+                          <p className="mt-0.5 text-charcoal">{booker.phone}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+
                   {/* Traveler Information */}
                   <Card variant="elevated" padding="md">
                     <div className="flex items-center justify-between border-b border-charcoal/5 pb-3">
                       <h3 className="text-sm font-semibold text-charcoal">
-                        Traveler Information
+                        Traveler Details
                       </h3>
                       <button
                         type="button"
@@ -640,55 +833,60 @@ export default function TourBookingPage({ params }: Props) {
                       </button>
                     </div>
                     <div className="mt-4 space-y-4">
-                      {travelers.map((traveler, index) => (
-                        <div key={traveler.id} className="rounded-xl bg-ivory/50 p-4 border border-charcoal/5">
-                          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-charcoal/70">
-                            Traveler {index + 1}
-                          </p>
-                          <div className="grid gap-3 text-xs sm:grid-cols-2">
-                            <div>
-                              <p className="text-charcoal/60">Full Name</p>
-                              <p className="mt-0.5 font-medium text-charcoal">{traveler.firstName} {traveler.lastName}</p>
-                            </div>
-                            <div>
-                              <p className="text-charcoal/60">Date of Birth</p>
-                              <p className="mt-0.5 text-charcoal">
-                                {new Date(traveler.dateOfBirth).toLocaleDateString("en-GB", {
-                                  day: "2-digit",
-                                  month: "short",
-                                  year: "numeric",
-                                })}
+                      {travelers.map((traveler, index) => {
+                        const isFirstAndBooker = index === 0 && isBookerTraveling;
+                        const displayFirstName = isFirstAndBooker ? booker.firstName : traveler.firstName;
+                        const displayLastName = isFirstAndBooker ? booker.lastName : traveler.lastName;
+
+                        return (
+                          <div key={traveler.id} className="rounded-xl bg-ivory/50 p-4 border border-charcoal/5">
+                            <div className="flex items-center gap-2 mb-3">
+                              <p className="text-xs font-semibold uppercase tracking-wide text-charcoal/70">
+                                Traveler {index + 1}
                               </p>
+                              {isFirstAndBooker && (
+                                <span className="rounded-full bg-gold/20 px-2 py-0.5 text-[9px] font-semibold text-gold-dark">
+                                  Booker
+                                </span>
+                              )}
                             </div>
-                            <div>
-                              <p className="text-charcoal/60">Passport Number</p>
-                              <p className="mt-0.5 font-mono text-charcoal">{traveler.passportNumber}</p>
-                            </div>
-                            <div>
-                              <p className="text-charcoal/60">Nationality</p>
-                              <p className="mt-0.5 text-charcoal">{traveler.nationality}</p>
-                            </div>
-                            <div>
-                              <p className="text-charcoal/60">Passport Expiry</p>
-                              <p className="mt-0.5 text-charcoal">
-                                {new Date(traveler.passportExpiry).toLocaleDateString("en-GB", {
-                                  day: "2-digit",
-                                  month: "short",
-                                  year: "numeric",
-                                })}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-charcoal/60">Email</p>
-                              <p className="mt-0.5 text-charcoal">{traveler.email}</p>
-                            </div>
-                            <div className="sm:col-span-2">
-                              <p className="text-charcoal/60">Phone Number</p>
-                              <p className="mt-0.5 text-charcoal">{traveler.phone}</p>
+                            <div className="grid gap-3 text-xs sm:grid-cols-2">
+                              <div>
+                                <p className="text-charcoal/60">Full Name</p>
+                                <p className="mt-0.5 font-medium text-charcoal">{displayFirstName} {displayLastName}</p>
+                              </div>
+                              <div>
+                                <p className="text-charcoal/60">Date of Birth</p>
+                                <p className="mt-0.5 text-charcoal">
+                                  {traveler.dateOfBirth ? new Date(traveler.dateOfBirth).toLocaleDateString("en-GB", {
+                                    day: "2-digit",
+                                    month: "short",
+                                    year: "numeric",
+                                  }) : "—"}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-charcoal/60">Passport Number</p>
+                                <p className="mt-0.5 font-mono text-charcoal">{traveler.passportNumber}</p>
+                              </div>
+                              <div>
+                                <p className="text-charcoal/60">Nationality</p>
+                                <p className="mt-0.5 text-charcoal">{traveler.nationality}</p>
+                              </div>
+                              <div className="sm:col-span-2">
+                                <p className="text-charcoal/60">Passport Expiry</p>
+                                <p className="mt-0.5 text-charcoal">
+                                  {traveler.passportExpiry ? new Date(traveler.passportExpiry).toLocaleDateString("en-GB", {
+                                    day: "2-digit",
+                                    month: "short",
+                                    year: "numeric",
+                                  }) : "—"}
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </Card>
 
@@ -1012,30 +1210,51 @@ export default function TourBookingPage({ params }: Props) {
 
           {/* Right: Order Summary (Sticky) */}
           <div className="lg:sticky lg:top-6 lg:self-start">
-            <div className="space-y-6 rounded-2xl border border-charcoal/5 bg-ivory p-6 shadow-soft">
-              <h2 className="font-display text-lg font-semibold text-charcoal">
-                Order Summary
-              </h2>
+            <div className="space-y-5 rounded-2xl border border-charcoal/5 bg-ivory p-6 shadow-soft">
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-charcoal/10 pb-4">
+                <h2 className="font-display text-lg font-semibold text-charcoal">
+                  Order Summary
+                </h2>
+                <span className="rounded-full bg-charcoal/5 px-2.5 py-1 text-xs font-medium text-charcoal/70">
+                  {numberOfTravelers} {numberOfTravelers === 1 ? "traveler" : "travelers"}
+                </span>
+              </div>
 
-              {/* Tour image */}
-              <div className="h-40 w-full overflow-hidden rounded-xl bg-gradient-to-tr from-charcoal/80 via-charcoal/40 to-gold-soft/70" />
-
-              <div>
+              {/* Tour Details */}
+              <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-charcoal">
                   {tour.title}
                 </h3>
-                <p className="mt-1 text-xs text-charcoal/60">
-                  {tour.destination} • {tour.duration}
-                </p>
-                <p className="mt-1 text-xs text-charcoal/60">
-                  {numberOfTravelers} {numberOfTravelers === 1 ? "Traveler" : "Travelers"}
-                </p>
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-charcoal/60">Destination</span>
+                    <span className="font-medium text-charcoal/80">{tour.destination}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-charcoal/60">Duration</span>
+                    <span className="font-medium text-charcoal/80">{tour.duration}</span>
+                  </div>
+                  {fullTourData?.startDate && (
+                    <div className="flex justify-between">
+                      <span className="text-charcoal/60">Travel Date</span>
+                      <span className="font-medium text-charcoal/80">
+                        {new Date(fullTourData.startDate).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
 
-              <div className="space-y-3 border-t border-charcoal/5 pt-4">
+              {/* Price Breakdown */}
+              <div className="space-y-3 border-t border-charcoal/10 pt-4">
                 <div className="flex justify-between text-sm">
                   <span className="text-charcoal/70">
-                    Base Price × {numberOfTravelers} {numberOfTravelers === 1 ? "traveler" : "travelers"}
+                    Base Price × {numberOfTravelers}
                   </span>
                   <span className="font-medium text-charcoal">
                     ${baseTotal.toLocaleString()}
@@ -1051,19 +1270,25 @@ export default function TourBookingPage({ params }: Props) {
                   </div>
                 )}
 
-                {(tour.flightIncluded || addons.flightBooking) && (
+                {addons.flightBooking && !tour.flightIncluded && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-charcoal/70">
-                      Flight Booking {tour.flightIncluded && "(Included)"}
-                    </span>
+                    <span className="text-charcoal/70">Flight Booking</span>
                     <span className="font-medium text-charcoal">
-                      {tour.flightIncluded ? "—" : `$${flightCost}`}
+                      ${flightCost}
                     </span>
+                  </div>
+                )}
+
+                {tour.flightIncluded && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-charcoal/70">Flight</span>
+                    <span className="text-xs font-medium text-gold-dark">Included</span>
                   </div>
                 )}
               </div>
 
-              <div className="space-y-2 border-t border-charcoal/5 pt-4">
+              {/* Total */}
+              <div className="space-y-3 border-t border-charcoal/10 pt-4">
                 <div className="flex justify-between">
                   <span className="font-display text-base font-semibold text-charcoal">
                     Total
@@ -1072,9 +1297,17 @@ export default function TourBookingPage({ params }: Props) {
                     ${grandTotal.toLocaleString()}
                   </span>
                 </div>
-                <p className="text-xs text-charcoal/60">
-                  30% deposit (${depositAmount.toLocaleString()}) due now
-                </p>
+
+                {/* Deposit Info */}
+                <div className="rounded-lg bg-gold/10 p-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="font-medium text-charcoal/80">Deposit Due Now (30%)</span>
+                    <span className="font-semibold text-charcoal">${depositAmount.toLocaleString()}</span>
+                  </div>
+                  <p className="mt-1.5 text-[10px] text-charcoal/60">
+                    Remaining balance due 30 days before departure
+                  </p>
+                </div>
               </div>
             </div>
 

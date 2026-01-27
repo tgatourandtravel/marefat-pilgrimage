@@ -260,46 +260,75 @@ export function validateName(name: string, fieldName: string): ValidationResult 
 }
 
 /**
- * Validate all traveler fields at once
+ * Validate booker fields (person making the reservation)
+ */
+export function validateBookerFields(
+  booker: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+  }
+): Record<string, string> {
+  const errors: Record<string, string> = {};
+
+  // Validate first name
+  const firstNameResult = validateName(booker.firstName, "First name");
+  if (!firstNameResult.valid) {
+    errors.firstName = firstNameResult.error!;
+  }
+
+  // Validate last name
+  const lastNameResult = validateName(booker.lastName, "Last name");
+  if (!lastNameResult.valid) {
+    errors.lastName = lastNameResult.error!;
+  }
+
+  // Validate email
+  const emailResult = validateEmail(booker.email);
+  if (!emailResult.valid) {
+    errors.email = emailResult.error!;
+  }
+
+  // Validate phone
+  const phoneResult = validatePhone(booker.phone);
+  if (!phoneResult.valid) {
+    errors.phone = phoneResult.error!;
+  }
+
+  return errors;
+}
+
+/**
+ * Validate traveler fields (passport info only, no email/phone)
  * Returns an object with field names as keys and error messages as values
  */
 export function validateTravelerFields(
   traveler: {
     firstName: string;
     lastName: string;
-    email: string;
-    phone: string;
     passportNumber: string;
     nationality: string;
     passportExpiry: string;
     dateOfBirth: string;
   },
-  tourStartDate?: string
+  tourStartDate?: string,
+  skipNameValidation?: boolean // For when booker is traveler 1
 ): Record<string, string> {
   const errors: Record<string, string> = {};
 
-  // Validate first name
-  const firstNameResult = validateName(traveler.firstName, "First name");
-  if (!firstNameResult.valid) {
-    errors.firstName = firstNameResult.error!;
-  }
+  // Validate first name (unless skipped for booker)
+  if (!skipNameValidation) {
+    const firstNameResult = validateName(traveler.firstName, "First name");
+    if (!firstNameResult.valid) {
+      errors.firstName = firstNameResult.error!;
+    }
 
-  // Validate last name
-  const lastNameResult = validateName(traveler.lastName, "Last name");
-  if (!lastNameResult.valid) {
-    errors.lastName = lastNameResult.error!;
-  }
-
-  // Validate email
-  const emailResult = validateEmail(traveler.email);
-  if (!emailResult.valid) {
-    errors.email = emailResult.error!;
-  }
-
-  // Validate phone
-  const phoneResult = validatePhone(traveler.phone);
-  if (!phoneResult.valid) {
-    errors.phone = phoneResult.error!;
+    // Validate last name
+    const lastNameResult = validateName(traveler.lastName, "Last name");
+    if (!lastNameResult.valid) {
+      errors.lastName = lastNameResult.error!;
+    }
   }
 
   // Validate passport number

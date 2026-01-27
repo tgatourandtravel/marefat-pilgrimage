@@ -58,6 +58,7 @@ export type Tour = {
   meals: MealsType;
   transfer: boolean;
   spiritualGuide: boolean;
+  spiritualGuideName?: string; // e.g., "Sayed M. Sadiq Qazwini"
 
   // Optional features
   popularityScore?: number; // 0-100, used for sorting
@@ -108,6 +109,7 @@ export const TOURS: Tour[] = [
     meals: "Full Board",
     transfer: true,
     spiritualGuide: true,
+    spiritualGuideName: "Sayed Jafar Qazwini & Sayed Jafar Qazwini",
 
     popularityScore: 99,
     isFeatured: true,
@@ -141,7 +143,8 @@ export const TOURS: Tour[] = [
     ],
 
     hotelInfo:
-      "5★ Pullman Zamzam Hotel in Madinah (3 nights) and 5★ Marriott Jabal Omar in Makkah (10 nights). Both hotels are within close proximity to the holy sites.",
+      "Madinah & Makkah",
+      /*"5★ Pullman Zamzam Hotel in Madinah (3 nights) and 5★ Marriott Jabal Omar in Makkah (10 nights). Both hotels are within close proximity to the holy sites.",*/
 
     flightsInfo:
       "Round-trip flights from major US cities included in the package. Business class upgrades available upon request.",
@@ -214,10 +217,11 @@ export const TOURS: Tour[] = [
     priceFrom: 2000, // $2,000 USD (early bird)
 
     hotelStars: 5,
-    flightIncluded: true,
+    flightIncluded: false,
     meals: "Breakfast & Dinner",
     transfer: true,
     spiritualGuide: true,
+    spiritualGuideName: "Sayed Jafar Qazwini & Sayed Sadiq Qazwini",
 
     popularityScore: 98,
     isFeatured: true,
@@ -258,13 +262,13 @@ export const TOURS: Tour[] = [
     ],
 
     hotelInfo:
-      "5★ hotels in all destinations. Umrah: Mövenpick (Anwar al Maddinah) & Address Jabal Omar. Karbala: Royal Karbala. Najaf: Qasr Al Dur. All hotels steps from the holy sites.",
+      "",
+      /*"5★ hotels in all destinations. Umrah: Mövenpick (Anwar al Maddinah) & Address Jabal Omar. Karbala: Royal Karbala. Najaf: Qasr Al Dur. All hotels steps from the holy sites.",*/
 
     flightsInfo:
       "All flights included: US to Saudi Arabia, Saudi to Iraq, Iraq to US. Seamless connections managed by Marefat Pilgrimage.",
 
     included: [
-      "All international and domestic flights",
       "5★ hotel accommodations in all destinations",
       "Breakfast and dinner daily",
       "All VIP ground transportation",
@@ -275,6 +279,7 @@ export const TOURS: Tour[] = [
     ],
 
     excluded: [
+      "International flights",
       "Lunch meals",
       "Personal expenses",
       "Travel insurance (recommended)",
@@ -284,9 +289,7 @@ export const TOURS: Tour[] = [
     documentsNeeded: [
       "Valid passport (6+ months)",
       "Passport photos (2x2 inches)",
-      "Saudi Umrah visa (we assist)",
-      "Iraqi visa (we assist)",
-      "Vaccination records",
+      "Residence permit",
     ],
 
     packages: [
@@ -326,10 +329,11 @@ export const TOURS: Tour[] = [
     priceFrom: 1099, // $1,099 USD
 
     hotelStars: 5,
-    flightIncluded: true,
+    flightIncluded: false,
     meals: "Full Board",
     transfer: true,
     spiritualGuide: true,
+    spiritualGuideName: "Sayed Sadiq Qazwini",
 
     popularityScore: 90,
     isFeatured: true,
@@ -369,13 +373,13 @@ export const TOURS: Tour[] = [
     ],
 
     hotelInfo:
-      "5★ hotels just steps from the holy sites. Karbala: Royal Karbala. Najaf: Qasr Al Dur. Walk with ease to the shrines, day or night. Rest peacefully between prayers in luxury that elevates your spiritual journey.",
+      "Karbala & Najaf",
+      /*"5★ hotels just steps from the holy sites. Karbala: Royal Karbala. Najaf: Qasr Al Dur. Walk with ease to the shrines, day or night. Rest peacefully between prayers in luxury that elevates your spiritual journey.",*/
 
     flightsInfo:
       "Round-trip flights from major US cities included in the package.",
 
     included: [
-      "Round-trip flights from US",
       "5★ hotel accommodation near shrines",
       "Full board - breakfast, lunch & dinner daily",
       "All ground VIP transportation",
@@ -385,6 +389,7 @@ export const TOURS: Tour[] = [
     ],
 
     excluded: [
+      "International flights",
       "Personal expenses",
       "Travel insurance (recommended)",
       "Optional activities and upgrades",
@@ -393,8 +398,7 @@ export const TOURS: Tour[] = [
     documentsNeeded: [
       "Valid passport (6+ months)",
       "Passport photos (2x2 inches)",
-      "Iraqi visa (we assist with processing)",
-      "Vaccination records",
+      "Residence permit",
     ],
 
     packages: [
@@ -434,10 +438,11 @@ export const TOURS: Tour[] = [
     priceFrom: 1599, // $1,599 USD
 
     hotelStars: 5,
-    flightIncluded: true,
+    flightIncluded: false,
     meals: "Breakfast & Dinner",
     transfer: true,
     spiritualGuide: true,
+    spiritualGuideName: "Sayed Jafar Qazwini",
 
     popularityScore: 95,
     isFeatured: true,
@@ -475,13 +480,13 @@ export const TOURS: Tour[] = [
     ],
 
     hotelInfo:
-      "5★ renowned hotels steps from the holy sites. Madinah: Mövenpick (Anwar al Maddinah). Makkah: Address Jabal Omar. Walk with ease to the Haramain, day or night.",
+      "Madinah & Makkah",
+      /*"5★ renowned hotels steps from the holy sites. Madinah: Mövenpick (Anwar al Maddinah). Makkah: Address Jabal Omar. Walk with ease to the Haramain, day or night.",*/
 
     flightsInfo:
       "Round-trip economy flights from major US cities included. Business class upgrades available upon request.",
 
     included: [
-      "Round-trip flights from US",
       "5★ accommodation near holy sites",
       "Breakfast and lunch daily",
       "Umrah visa processing",
@@ -491,6 +496,7 @@ export const TOURS: Tour[] = [
     ],
 
     excluded: [
+      "International flights",
       "Dinner meals",
       "Personal expenses",
       "Travel insurance (recommended)",
@@ -500,8 +506,7 @@ export const TOURS: Tour[] = [
     documentsNeeded: [
       "Valid passport (6+ months)",
       "Passport photos (2x2 inches)",
-      "Vaccination certificate",
-      "Umrah visa application (we assist)",
+      "Residence permit",
     ],
 
     packages: [

@@ -80,11 +80,20 @@ export function TourCard({ tour }: TourCardProps) {
           <div className="flex flex-wrap gap-x-2 gap-y-1 text-[11px] text-charcoal/70">
             <span>{tour.hotelStars}★ hotel</span>
             <span>•</span>
-            <span>{tour.flightIncluded ? "✓ Flight included" : "✗ Flight not included"}</span>
-          </div>
-          <div className="flex flex-wrap gap-x-2 gap-y-1 text-[11px] text-charcoal/70">
             <span>Meals: {tour.meals}</span>
+            {tour.flightIncluded && (
+              <>
+                <span>•</span>
+                <span>✓ Flight included</span>
+              </>
+            )}
           </div>
+          {/* Spiritual Guide - emphasized */}
+          {tour.spiritualGuideName && (
+            <p className="text-[11px] font-semibold text-gold-dark">
+              Guide: {tour.spiritualGuideName}
+            </p>
+          )}
         </div>
 
         {/* Price & CTA */}
