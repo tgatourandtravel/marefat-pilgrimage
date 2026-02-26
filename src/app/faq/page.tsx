@@ -30,7 +30,7 @@ const FAQ_ITEMS = [
     category: "umrah",
     question: "Are you a licensed agency for Umrah and Ziyarat tours?",
     answer:
-      "Yes. Marefat Pilgrimage operates with full licensing and works exclusively with accredited partners in Saudi Arabia, Iraq, and Iran. Copies of licenses can be provided on request.",
+      "Yes. Marefat Pilgrimage operates with full licensing and works exclusively with accredited partners in Saudi Arabia and Iraq. Copies of licenses can be provided on request.",
   },
   {
     category: "umrah",

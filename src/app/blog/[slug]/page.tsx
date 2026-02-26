@@ -200,9 +200,9 @@ const POSTS: BlogPost[] = [
   },
   {
     slug: "visa-requirements-countries",
-    title: "Visa Requirements: Saudi Arabia, Iraq, and Iran",
+    title: "Visa Requirements: Saudi Arabia and Iraq",
     category: "Visa & Documents",
-    readingTime: "5 min read",
+    readingTime: "4 min read",
     author: "Marefat Team",
     date: "December 3, 2024",
     image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1200&h=600&fit=crop",
@@ -234,19 +234,6 @@ const POSTS: BlogPost[] = [
           "Supporting documents as required by Iraqi consulate",
           "Travel itinerary and accommodation details",
           "Some nationalities may require sponsorship",
-        ],
-      },
-      {
-        title: "Iran (Ziyarat)",
-        content: [
-          "For visiting Mashhad and other holy sites:",
-        ],
-        listItems: [
-          "Valid passport",
-          "Iranian visa (tourist or pilgrimage visa)",
-          "Passport photos",
-          "Travel insurance (sometimes required)",
-          "Confirmed accommodation bookings",
         ],
       },
       {

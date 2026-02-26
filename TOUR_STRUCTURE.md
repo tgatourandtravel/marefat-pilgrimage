@@ -102,7 +102,7 @@ This document describes the standardized structure for all tours in the Marefat 
   documentsNeeded: [
     "Valid passport (6+ months)",
     "Passport photos",
-    "Vaccination certificate",
+    "Residence permit",
     // All required documents
   ],
 

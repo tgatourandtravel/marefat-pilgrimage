@@ -56,9 +56,9 @@ const POSTS = [
   },
   {
     slug: "visa-requirements-countries",
-    title: "Visa Requirements: Saudi Arabia, Iraq, and Iran",
+    title: "Visa Requirements: Saudi Arabia and Iraq",
     category: "Visa & Documents",
-    readingTime: "5 min read",
+    readingTime: "4 min read",
     author: "Marefat Team",
     excerpt:
       "An overview of visa requirements, documentation needed, and processing timelines for pilgrimage destinations.",

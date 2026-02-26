@@ -19,7 +19,7 @@ const testimonials = [
   },
   {
     name: "Family Karimi",
-    location: "Tehran, Iran",
+    location: "Baghdad, Iraq",
     quote:
       "For our parents’ first Umrah, Marefat made sure they felt supported and at ease at every step.",
   },
@@ -29,7 +29,7 @@ const faqsPreview = [
   {
     question: "Are you a licensed and registered agency?",
     answer:
-      "Yes. Marefat Pilgrimage operates with full licensing and works only with accredited partners in Saudi Arabia, Iraq, and Iran.",
+      "Yes. Marefat Pilgrimage operates with full licensing and works only with accredited partners in Saudi Arabia and Iraq.",
   },
   {
     question: "Can you assist with visas and documentation?",
@@ -81,7 +81,7 @@ export default function HomePage() {
             <br />
           </h1>
           <p className="mt-6 max-w-xl text-sm leading-relaxed text-charcoal/70 sm:text-base lg:max-w-lg">
-            Your pilgrimage to Makkah, Madinah, Iraq, or Iran is the journey of a lifetime. We honor your sacred intent by providing a sanctuary of calm—pairing handpicked 5-star hotels with a supportive, human presence that handles every detail. Focus on your devotion; let us care for the rest.
+            Your pilgrimage to Makkah, Madinah, or Iraq is the journey of a lifetime. We honor your sacred intent by providing a sanctuary of calm—pairing handpicked 5-star hotels with a supportive, human presence that handles every detail. Focus on your devotion; let us care for the rest.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <a

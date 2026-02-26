@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Tour } from "@/data/tours";
 import { PackageBadge } from "./PackageBadge";
+import { urlFor } from "@/lib/sanity/queries";
 
 interface TourCardProps {
-  tour: Tour;
+  tour: any; // Accept both Sanity and static tour formats
 }
 
 /**
@@ -22,12 +22,30 @@ export function TourCard({ tour }: TourCardProps) {
   const hasEarlyBird = tour.earlyBirdDiscount && new Date() <= new Date(tour.earlyBirdDiscount.deadline);
   const isOnRequest = tour.priceFrom === 0;
 
-  // Get the first image or use placeholder
-  const cardImage = tour.images?.[0] || null;
+  // Get the first image - handle both Sanity and static formats
+  const firstImage = tour.images?.[0];
+  let cardImage: string | null = null;
+
+  if (firstImage) {
+    if (typeof firstImage === "string") {
+      // Static format - direct path
+      cardImage = firstImage;
+    } else if (firstImage.asset) {
+      // Sanity format - use image URL builder
+      try {
+        cardImage = urlFor(firstImage).width(800).height(450).quality(85).url();
+      } catch (error) {
+        console.error("Error building Sanity image URL:", error);
+      }
+    }
+  }
+
+  // Normalize slug (handle both string and {current: string} formats)
+  const tourSlug = typeof tour.slug === "string" ? tour.slug : tour.slug?.current || "";
 
   return (
     <Link
-      href={`/tours/${tour.slug}`}
+      href={`/tours/${tourSlug}`}
       className="group flex flex-col gap-4 rounded-2xl border border-charcoal/5 bg-ivory/90 p-5 shadow-sm shadow-charcoal/5 transition hover:-translate-y-1 hover:border-gold/20 hover:shadow-soft"
     >
       {/* Image - 16:9 aspect ratio */}
