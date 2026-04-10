@@ -7,6 +7,9 @@ export type BookingStatus =
   | 'cancelled'
   | 'expired';
 
+export type PaymentMethod = 'bank_transfer' | 'card';
+export type PaymentStatus = 'unpaid' | 'requires_action' | 'paid' | 'failed' | 'refunded';
+
 export interface Booking {
   id: string;
   booking_ref: string;
@@ -25,6 +28,10 @@ export interface Booking {
   deposit_amount: number;
   has_insurance: boolean;
   has_flight_booking: boolean;
+  stripe_payment_intent_id: string | null;
+  payment_method: PaymentMethod;
+  payment_status: PaymentStatus;
+  payment_paid_at: string | null;
   status: BookingStatus;
   is_verified: boolean;
   verified_at: string | null;

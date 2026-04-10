@@ -188,3 +188,42 @@ export async function sendBookingConfirmationEmail({
     `,
   });
 }
+
+interface SendPaymentSuccessAdminEmailParams {
+  bookingRef: string;
+  customerEmail: string;
+  amount: number;
+  currency: string;
+  tourTitle: string;
+}
+
+export async function sendPaymentSuccessAdminEmail({
+  bookingRef,
+  customerEmail,
+  amount,
+  currency,
+  tourTitle,
+}: SendPaymentSuccessAdminEmailParams) {
+  const adminEmail = process.env.PAYMENT_ADMIN_EMAIL || "info@marefatpilgrimage.com";
+
+  return resend.emails.send({
+    from: "Marefat Pilgrimage <noreply@marefatpilgrimage.com>",
+    to: adminEmail,
+    subject: `Payment received: ${bookingRef}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <body style="font-family: system-ui, sans-serif; color: #151515;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 24px;">
+          <h2 style="margin: 0 0 16px;">Deposit payment received</h2>
+          <p><strong>Booking reference:</strong> ${bookingRef}</p>
+          <p><strong>Tour:</strong> ${tourTitle}</p>
+          <p><strong>Customer email:</strong> ${customerEmail}</p>
+          <p><strong>Amount:</strong> ${currency} ${amount.toLocaleString()}</p>
+          <p style="margin-top: 20px;">Please review this booking in your dashboard and continue operations.</p>
+        </div>
+      </body>
+      </html>
+    `,
+  });
+}

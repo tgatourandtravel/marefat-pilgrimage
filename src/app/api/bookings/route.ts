@@ -41,6 +41,7 @@ interface CreateBookingRequest {
   basePricePerPerson: number;
   insuranceCostPerPerson: number;
   flightCostPerPerson: number;
+  paymentMethod?: 'bank' | 'card';
 }
 
 export async function POST(request: NextRequest) {
@@ -74,6 +75,7 @@ export async function POST(request: NextRequest) {
       : 0;
     const grandTotal = baseTotal + insuranceTotal + flightTotal;
     const depositAmount = Math.floor(grandTotal * 0.3);
+    const selectedPaymentMethod = body.paymentMethod === 'card' ? 'card' : 'bank_transfer';
 
     // Generate unique booking reference
     let bookingRef = generateBookingRef();
@@ -110,6 +112,10 @@ export async function POST(request: NextRequest) {
         deposit_amount: depositAmount,
         has_insurance: body.hasInsurance,
         has_flight_booking: body.hasFlightBooking,
+        stripe_payment_intent_id: null,
+        payment_method: selectedPaymentMethod,
+        payment_status: 'unpaid',
+        payment_paid_at: null,
         status: 'pending_verification',
         is_verified: false,
         verified_at: null,

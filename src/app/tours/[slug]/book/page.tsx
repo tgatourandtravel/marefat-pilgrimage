@@ -105,7 +105,7 @@ export default function TourBookingPage({ params }: Props) {
     flightBooking: false,
   });
 
-  const [paymentMethod, setPaymentMethod] = useState<"bank">("bank");
+  const [paymentMethod, setPaymentMethod] = useState<"bank" | "card">("bank");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Scroll to top of form fields when step changes
@@ -327,6 +327,7 @@ export default function TourBookingPage({ params }: Props) {
           basePricePerPerson: tour.basePrice,
           insuranceCostPerPerson: 99,
           flightCostPerPerson: 450,
+          paymentMethod,
         }),
       });
 
@@ -1066,12 +1067,17 @@ export default function TourBookingPage({ params }: Props) {
                   <div className="space-y-3">
                     <button
                       type="button"
-                      disabled
-                      className="flex w-full items-start gap-3 rounded-xl border border-charcoal/7 bg-charcoal/3 p-4 opacity-40 cursor-not-allowed"
+                      onClick={() => setPaymentMethod("card")}
+                      className={`flex w-full items-start gap-3 rounded-xl border p-4 transition ${
+                        paymentMethod === "card"
+                          ? "border-gold bg-gold/5"
+                          : "border-charcoal/7 bg-ivory/90 hover:border-charcoal/15"
+                      }`}
                     >
                       <input
                         type="radio"
-                        disabled
+                        checked={paymentMethod === "card"}
+                        readOnly
                         className="mt-0.5"
                       />
                       <div className="flex-1 text-left">
@@ -1079,7 +1085,7 @@ export default function TourBookingPage({ params }: Props) {
                           Online Payment
                         </p>
                         <p className="text-xs text-charcoal/60">
-                          Credit/Debit card or PayPal • Coming soon
+                          Credit/debit card via Stripe (enabled after booking verification)
                         </p>
                       </div>
                     </button>
@@ -1150,11 +1156,26 @@ export default function TourBookingPage({ params }: Props) {
                     </div>
                   )}
 
+                  {paymentMethod === "card" && (
+                    <div className="rounded-xl border border-gold/30 bg-ivory/90 p-5">
+                      <p className="text-sm font-medium text-charcoal">Online card payment selected</p>
+                      <p className="mt-2 text-xs text-charcoal/70">
+                        For security and fraud prevention, card payment is available right after OTP
+                        verification on the confirmation page.
+                      </p>
+                    </div>
+                  )}
+
                   <div className="rounded-xl bg-gold/10 p-4">
                     <p className="text-xs leading-relaxed text-charcoal/75">
                       <strong className="font-semibold text-charcoal">Payment Terms:</strong> A 30% deposit
                       (${depositAmount.toLocaleString()}) is due now to confirm your booking. The remaining balance
                       is due 30 days before departure. Full payment details and invoice will be sent to your email.
+                      {" "}Please review our{" "}
+                      <a href="/refund-policy" target="_blank" className="font-medium underline">
+                        Refund Policy
+                      </a>
+                      {" "}before payment.
                     </p>
                   </div>
 

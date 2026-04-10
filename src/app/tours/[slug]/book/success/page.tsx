@@ -1,10 +1,15 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 import { generateBookingPDF, type BookingData } from "@/lib/pdf/booking-pdf";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import PaymentForm from "@/components/ui/PaymentForm";
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
 
 function SuccessContent() {
   const searchParams = useSearchParams();
@@ -12,6 +17,51 @@ function SuccessContent() {
   const verified = searchParams.get("verified") === "true";
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [isCreatingIntent, setIsCreatingIntent] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadPaymentState = async () => {
+      const { data } = await supabase
+        .from("bookings")
+        .select("payment_status, payment_method")
+        .eq("booking_ref", bookingRef)
+        .single();
+
+      if (data) {
+        setPaymentStatus((data as any).payment_status || null);
+        setPaymentMethod((data as any).payment_method || null);
+      }
+    };
+
+    loadPaymentState();
+  }, [bookingRef]);
+
+  const createPaymentIntent = async () => {
+    setIsCreatingIntent(true);
+    setPaymentError(null);
+    try {
+      const response = await fetch("/api/payments/create-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingRef }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to initialize online payment.");
+      }
+
+      setClientSecret(data.clientSecret);
+    } catch (error) {
+      setPaymentError(error instanceof Error ? error.message : "Payment initialization failed.");
+    } finally {
+      setIsCreatingIntent(false);
+    }
+  };
 
   const handleDownloadPDF = async () => {
     setIsDownloading(true);
@@ -200,6 +250,48 @@ function SuccessContent() {
                   Please complete the deposit payment by this date to secure your booking.
                 </p>
               </div>
+            </div>
+          )}
+
+          {verified && paymentStatus !== "paid" && (
+            <div className="mx-auto mt-6 max-w-md rounded-xl border border-charcoal/10 bg-ivory/90 p-6 text-left">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-charcoal/70">
+                Online Card Payment
+              </p>
+              <p className="mb-4 text-xs text-charcoal/70">
+                Pay your deposit securely via Stripe. Card data is handled by Stripe and never stored
+                on Marefat Pilgrimage servers.
+              </p>
+
+              {!clientSecret ? (
+                <button
+                  onClick={createPaymentIntent}
+                  disabled={isCreatingIntent}
+                  className="w-full rounded-full bg-charcoal px-6 py-2.5 text-sm font-medium text-ivory transition hover:bg-charcoal/90 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isCreatingIntent ? "Initializing..." : "Pay Deposit Online"}
+                </button>
+              ) : (
+                <Elements stripe={stripePromise} options={{ clientSecret }}>
+                  <PaymentForm bookingRef={bookingRef} />
+                </Elements>
+              )}
+
+              {paymentError && <p className="mt-3 text-xs text-danger">{paymentError}</p>}
+              {paymentMethod === "card" && (
+                <p className="mt-3 text-xs text-charcoal/60">
+                  Your booking is set to card payment mode.
+                </p>
+              )}
+            </div>
+          )}
+
+          {paymentStatus === "paid" && (
+            <div className="mx-auto mt-6 max-w-md rounded-xl border border-gold/30 bg-gold/10 p-4 text-left">
+              <p className="text-sm font-semibold text-charcoal">Online payment received</p>
+              <p className="mt-1 text-xs text-charcoal/70">
+                Your deposit has been paid successfully. Our team will contact you with the next steps.
+              </p>
             </div>
           )}
 
