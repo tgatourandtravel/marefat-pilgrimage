@@ -161,8 +161,8 @@ export async function sendBookingConfirmationEmail({
           </div>
 
           <h3>Payment Details</h3>
-          <p><strong>Deposit Due (30%):</strong> EUR ${depositAmount.toLocaleString()}<br>
-          <strong>Total Amount:</strong> EUR ${grandTotal.toLocaleString()}</p>
+          <p><strong>Deposit Due (30%):</strong> USD $${depositAmount.toLocaleString()}<br>
+          <strong>Total Amount:</strong> USD $${grandTotal.toLocaleString()}</p>
 
           <p><em>Your reservation is held until <strong>${formattedExpiry}</strong>. Please complete the deposit payment by this date.</em></p>
 

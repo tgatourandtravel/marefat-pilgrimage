@@ -11,6 +11,18 @@ export async function handleStripeWebhookEvent(event: Stripe.Event) {
       return;
     }
 
+    // Idempotency guard: if Stripe retries the webhook event after a transient
+    // failure, do not apply the update again on an already-paid booking.
+    const { data: existing } = await supabaseAdmin
+      .from("bookings")
+      .select("payment_status")
+      .eq("booking_ref", bookingRef)
+      .single();
+
+    if (existing?.payment_status === "paid") {
+      return;
+    }
+
     const { data: booking, error } = await supabaseAdmin
       .from("bookings")
       .update({

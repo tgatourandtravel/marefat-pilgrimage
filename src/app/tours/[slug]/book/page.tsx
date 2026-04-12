@@ -7,6 +7,7 @@ import { getTourBySlug } from "@/data/tours";
 import { validateTravelerFields, validateBookerFields } from "@/lib/utils/validation";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
+import { ONLINE_PAYMENT_ENABLED } from "@/lib/config/features";
 
 // Booker: The person making the reservation and payment
 type BookerInfo = {
@@ -985,12 +986,22 @@ export default function TourBookingPage({ params }: Props) {
                     <div className="mt-4 flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold/10">
                         <svg className="h-5 w-5 text-gold-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                          {paymentMethod === "card" ? (
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                          ) : (
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                          )}
                         </svg>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-charcoal">Bank Transfer</p>
-                        <p className="text-xs text-charcoal/60">Direct transfer to business account</p>
+                        <p className="text-sm font-medium text-charcoal">
+                          {paymentMethod === "card" ? "Online Card Payment" : "Bank Transfer"}
+                        </p>
+                        <p className="text-xs text-charcoal/60">
+                          {paymentMethod === "card"
+                            ? "Secure online payment via Stripe"
+                            : "Direct transfer to business account"}
+                        </p>
                       </div>
                     </div>
                   </Card>
@@ -1065,30 +1076,32 @@ export default function TourBookingPage({ params }: Props) {
                   </h2>
 
                   <div className="space-y-3">
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod("card")}
-                      className={`flex w-full items-start gap-3 rounded-xl border p-4 transition ${
-                        paymentMethod === "card"
-                          ? "border-gold bg-gold/5"
-                          : "border-charcoal/7 bg-ivory/90 hover:border-charcoal/15"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        checked={paymentMethod === "card"}
-                        readOnly
-                        className="mt-0.5"
-                      />
-                      <div className="flex-1 text-left">
-                        <p className="text-sm font-medium text-charcoal">
-                          Online Payment
-                        </p>
-                        <p className="text-xs text-charcoal/60">
-                          Credit/debit card via Stripe (enabled after booking verification)
-                        </p>
-                      </div>
-                    </button>
+                    {ONLINE_PAYMENT_ENABLED && (
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod("card")}
+                        className={`flex w-full items-start gap-3 rounded-xl border p-4 transition ${
+                          paymentMethod === "card"
+                            ? "border-gold bg-gold/5"
+                            : "border-charcoal/7 bg-ivory/90 hover:border-charcoal/15"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          checked={paymentMethod === "card"}
+                          readOnly
+                          className="mt-0.5"
+                        />
+                        <div className="flex-1 text-left">
+                          <p className="text-sm font-medium text-charcoal">
+                            Online Payment
+                          </p>
+                          <p className="text-xs text-charcoal/60">
+                            Credit/debit card via Stripe (enabled after booking verification)
+                          </p>
+                        </div>
+                      </button>
+                    )}
 
                     <button
                       type="button"

@@ -62,12 +62,32 @@ export async function POST(request: NextRequest) {
     }
 
     const amountInCents = Math.max(1, Math.round(booking.deposit_amount * 100));
+
+    // Reuse an existing PaymentIntent if one is still actionable — avoids
+    // orphaned intents and keeps the Stripe dashboard clean.
+    if (booking.stripe_payment_intent_id && booking.payment_status === "requires_action") {
+      try {
+        const existing = await stripe.paymentIntents.retrieve(booking.stripe_payment_intent_id);
+        const reusableStatuses = ["requires_payment_method", "requires_confirmation", "requires_action"];
+        if (reusableStatuses.includes(existing.status)) {
+          return NextResponse.json({
+            clientSecret: existing.client_secret,
+            paymentIntentId: existing.id,
+            amount: booking.deposit_amount,
+            currency: "USD",
+          });
+        }
+      } catch {
+        // Existing PI not found or cancelled; fall through to create a new one.
+      }
+    }
+
     const idempotencyKey = `deposit-${booking.booking_ref}-${amountInCents}`;
 
     const paymentIntent = await stripe.paymentIntents.create(
       {
         amount: amountInCents,
-        currency: "eur",
+        currency: "usd",
         automatic_payment_methods: { enabled: true },
         receipt_email: booking.contact_email,
         metadata: {
@@ -92,7 +112,7 @@ export async function POST(request: NextRequest) {
       clientSecret: paymentIntent.client_secret,
       paymentIntentId: paymentIntent.id,
       amount: booking.deposit_amount,
-      currency: "EUR",
+      currency: "USD",
     });
   } catch (error) {
     console.error("Create PaymentIntent error:", error);

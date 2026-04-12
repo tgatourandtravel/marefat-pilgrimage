@@ -8,6 +8,7 @@ import { generateBookingPDF, type BookingData } from "@/lib/pdf/booking-pdf";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import PaymentForm from "@/components/ui/PaymentForm";
+import { ONLINE_PAYMENT_ENABLED } from "@/lib/config/features";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
 
@@ -253,7 +254,7 @@ function SuccessContent() {
             </div>
           )}
 
-          {verified && paymentStatus !== "paid" && (
+          {ONLINE_PAYMENT_ENABLED && verified && paymentStatus !== "paid" && (
             <div className="mx-auto mt-6 max-w-md rounded-xl border border-charcoal/10 bg-ivory/90 p-6 text-left">
               <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-charcoal/70">
                 Online Card Payment

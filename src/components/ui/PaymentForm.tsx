@@ -40,8 +40,11 @@ export default function PaymentForm({ bookingRef }: PaymentFormProps) {
       return;
     }
 
+    // Payment succeeded without a redirect (e.g. no 3D Secure required).
+    // Navigate to the return URL with paid=true so the success page reflects
+    // the payment immediately, avoiding a race against the webhook.
     setIsSubmitting(false);
-    window.location.reload();
+    window.location.href = `${window.location.origin}${window.location.pathname}?ref=${encodeURIComponent(bookingRef)}&verified=true&paid=true`;
   };
 
   return (
