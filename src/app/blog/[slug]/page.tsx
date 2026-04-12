@@ -27,7 +27,7 @@ const POSTS: BlogPost[] = [
     author: "Marefat Team",
     date: "April 12, 2026",
     image:
-      "https://images.unsplash.com/photo-1591604129939-c1a9495d8ede?w=1200&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1770786106021-52580470e31e?w=1200&h=600&fit=crop",
     introduction:
       "Preparing for Umrah can feel overwhelming, especially if it is your first time. With the right preparation and a few steady habits, your journey can be much smoother and more comfortable. This guide focuses purely on **practical** steps — so you stay organized and avoid the most common problems pilgrims face.",
     sections: [
@@ -158,7 +158,7 @@ const POSTS: BlogPost[] = [
     author: "Marefat Team",
     date: "April 12, 2026",
     image:
-      "https://images.unsplash.com/photo-1526510747491-58f928c36975?w=1200&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1513072064285-240f87fa81e8?w=1200&h=600&fit=crop",
     introduction:
       "Preparing for Umrah is more than booking a flight — it is preparing your heart, your mind, and your actions. Whether it is your first time or you have performed Umrah before, understanding the journey properly can transform your experience. This guide covers **spiritual readiness**, **essential documents and packing**, and a **clear step-by-step outline of Umrah according to Shia jurisprudence** — including Tawaf al-Nisa. For detailed rulings and edge cases, always follow the guidance of your marja.",
     sections: [

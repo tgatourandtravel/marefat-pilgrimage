@@ -58,7 +58,7 @@ export default function AboutPage() {
           {/* Image */}
           <div className="relative h-64 overflow-hidden rounded-2xl bg-charcoal/10 shadow-soft lg:h-80">
             <img
-              src="https://images.unsplash.com/photo-1591604129939-c1a9495d8ede?w=840&h=640&fit=crop"
+              src="https://images.unsplash.com/photo-1770786106021-52580470e31e?w=840&h=640&fit=crop"
               alt="Masjid al-Haram, Makkah"
               className="h-full w-full object-cover"
             />
