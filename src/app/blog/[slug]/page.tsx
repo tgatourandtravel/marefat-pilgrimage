@@ -20,6 +20,266 @@ type BlogPost = {
 
 const POSTS: BlogPost[] = [
   {
+    slug: "practical-tips-umrah-every-pilgrim",
+    title: "Practical Tips for Umrah: What Every Pilgrim Should Know",
+    category: "Umrah Tips",
+    readingTime: "5 min read",
+    author: "Marefat Team",
+    date: "April 12, 2026",
+    image:
+      "https://images.unsplash.com/photo-1591604129939-c1a9495d8ede?w=1200&h=600&fit=crop",
+    introduction:
+      "Preparing for Umrah can feel overwhelming, especially if it is your first time. With the right preparation and a few steady habits, your journey can be much smoother and more comfortable. This guide focuses purely on **practical** steps — so you stay organized and avoid the most common problems pilgrims face.",
+    sections: [
+      {
+        title: "Before you travel",
+        content: [
+          "A calm, organized start makes everything that follows easier. Tend to documents and logistics well before your departure date — not the night before.",
+        ],
+        listItems: [
+          "**Double-check passport, visa, and all required documents** — confirm expiry dates and make sure names match exactly.",
+          "**Keep digital and printed copies** of every key document in separate places (phone, luggage, and with a trusted contact).",
+          "**Pack light but smart** — you will walk long distances every day; extra weight compounds quickly.",
+          "**Inform your bank about travel** so cards are not flagged or blocked abroad.",
+          "**Learn the Umrah steps in advance** — understanding what you are doing before you arrive removes significant pressure.",
+        ],
+      },
+      {
+        title: "Packing essentials",
+        content: [
+          "Prioritize comfort, hygiene, and daily-use items. Anything available locally can be bought there — do not overpack.",
+        ],
+        listItems: [
+          "**Comfortable shoes or sandals** that you have already broken in",
+          "**Ihram** and appropriate modest everyday clothing",
+          "**Unscented toiletries** — important while in the state of Ihram",
+          "**Personal medications** with prescriptions and sufficient supply",
+          "**Small backpack** for day visits",
+          "**Power bank** and the correct charging cables",
+          "**Reusable water bottle** — staying hydrated is non-negotiable",
+          "**Turba** (prayer tablet) if used for prostration in holy sites",
+        ],
+      },
+      {
+        title: "At the airport and on arrival",
+        content: [
+          "The first 24 hours set the tone. Keep documents accessible, follow your group, and resist the urge to rush.",
+        ],
+        listItems: [
+          "**Arrive early** — rushing causes simple mistakes",
+          "**Keep documents within easy reach** at immigration and security",
+          "**Stay hydrated** during and after long flights",
+          "**Follow your group leader's timing and instructions** — meeting points matter",
+        ],
+      },
+      {
+        title: "Managing crowds",
+        content: [
+          "The Haram and its surroundings are busy almost around the clock. Patience and predictable movement keep you safer and less fatigued.",
+        ],
+        listItems: [
+          "**Stay calm** — crowds move in waves; resist pushing",
+          "**Avoid peak hours** when you have flexibility in your schedule",
+          "**Stay close to your group** to prevent separation",
+          "**Move with the flow** — do not force your way against dense crowd movement",
+        ],
+      },
+      {
+        title: "Staying healthy",
+        content: [
+          "Small daily habits prevent the dehydration, blisters, and fatigue that turn a meaningful trip into a difficult one.",
+        ],
+        listItems: [
+          "**Drink water consistently** throughout the day, not just when thirsty",
+          "**Avoid heavy meals** before long walks or rituals",
+          "**Get adequate rest** between activities",
+          "**Wear footwear you trust** — do not test new shoes in Makkah",
+          "**Use hand sanitizer frequently**, especially after touching shared surfaces",
+        ],
+      },
+      {
+        title: "During Tawaf and Sa'i",
+        content: [
+          "These rites require focus and steady pacing. Secure your belongings and do not be afraid to take a moment.",
+        ],
+        listItems: [
+          "**Keep a steady, comfortable pace** — rushing adds nothing",
+          "**Take breaks** on the sidelines if you feel dizzy or exhausted",
+          "**Stay aware** of the people directly around you",
+          "**Secure your belongings** — a front-worn waist bag is ideal",
+        ],
+      },
+      {
+        title: "Communication tips",
+        content: [
+          "Staying reachable reassures your family and helps your group find you if separated.",
+        ],
+        listItems: [
+          "**Learn a few basic Arabic phrases** — directions, greetings, and polite requests",
+          "**Save your hotel's address offline** on your phone map",
+          "**Use a local SIM or roaming plan** that you have tested",
+          "**Share your general itinerary** with family or a trusted contact at home",
+        ],
+      },
+      {
+        title: "Money and safety",
+        content: [
+          "Carry just enough cash for daily needs; keep cards and documents protected at all times.",
+        ],
+        listItems: [
+          "**Carry moderate cash** for smaller purchases and markets",
+          "**Use a secure, concealed bag** — front-worn or under-clothing pouches work well",
+          "**Leave unnecessary valuables** in the hotel safe",
+          "**Remain alert in crowded markets** and near entry points",
+        ],
+      },
+      {
+        title: "Common mistakes to avoid",
+        content: [
+          "Most difficulties come from inadequate preparation or underestimating the physical demands of the trip.",
+        ],
+        listItems: [
+          "**Overpacking** — less is genuinely more on this journey",
+          "**Not preparing physically** for extensive walking and long standing periods",
+          "**Losing track of documents** — secure and double-check them daily",
+          "**Ignoring hydration** until feeling unwell",
+          "**Relying entirely on others** — know your own basics",
+        ],
+      },
+    ],
+    conclusion:
+      "With the right preparation, Umrah becomes much more manageable. Stay organized, be patient, and keep your focus on the worship itself — the logistics should be invisible by the time you arrive.",
+  },
+  {
+    slug: "umrah-journey-shia-guide",
+    title: "Everything You Need to Know Before Your Umrah Journey (Shia Guide)",
+    category: "Umrah Tips",
+    readingTime: "8 min read",
+    author: "Marefat Team",
+    date: "April 12, 2026",
+    image:
+      "https://images.unsplash.com/photo-1526510747491-58f928c36975?w=1200&h=600&fit=crop",
+    introduction:
+      "Preparing for Umrah is more than booking a flight — it is preparing your heart, your mind, and your actions. Whether it is your first time or you have performed Umrah before, understanding the journey properly can transform your experience. This guide covers **spiritual readiness**, **essential documents and packing**, and a **clear step-by-step outline of Umrah according to Shia jurisprudence** — including Tawaf al-Nisa. For detailed rulings and edge cases, always follow the guidance of your marja.",
+    sections: [
+      {
+        title: "One important reminder",
+        content: [
+          "Imam Jaʿfar al-Ṣādiq (AS) said: \u201cComplete your Hajj and Umrah as Allah has commanded.\u201d \u2014 Al-K\u0101f\u012b, Vol. 4, Book of Hajj",
+          "This is a simple but profound reminder: Umrah is not only about traveling — it is about performing it with knowledge, sincerity, and in the way Allah has commanded.",
+        ],
+      },
+      {
+        title: "Key considerations",
+        content: [
+          "Preparation works on two levels simultaneously: the inner and the outer. Both matter equally.",
+        ],
+        listItems: [
+          "**Spiritual preparation** — Begin weeks in advance. Increase your prayers, engage in tawbah (repentance), and set a sincere, clear intention (niyyah).",
+          "**Physical preparation** — There is a great deal of walking on uneven surfaces and in heat. Build your stamina and ensure you are in sound health before traveling.",
+          "**Documentation** — Double-check passport validity, visa, and all required papers well in advance — not the week before departure.",
+          "**Packing** — Keep it simple and purposeful. Avoid unnecessary weight.",
+        ],
+      },
+      {
+        title: "Before travel — essentials checklist",
+        content: [
+          "Use this as a starting reference and adjust according to your scholar's rulings and airline restrictions.",
+        ],
+        listItems: [
+          "**Ihram clothing** in the form specified by your marja",
+          "**Passport and visa** — plus copies stored separately",
+          "**Unscented toiletries** appropriate for the state of Ihram",
+          "**Personal medications** with sufficient supply for the whole trip",
+          "**A compact duʿāʾ book** you can carry comfortably",
+          "**Turba** for prostration on natural earth, as applicable to your practice",
+        ],
+      },
+      {
+        title: "Step 1 — Ihram (at Miqat)",
+        content: [
+          "Ihram is the sacred state of consecration entered at the prescribed miqāt for your travel route. Follow your marja's detailed guidance on clothing, the recommended prayers, and the form of talbiyah.",
+        ],
+        listItems: [
+          "Perform ghusl at or before the miqāt as recommended or required",
+          "Wear Ihram in the correct prescribed form",
+          "Make a clear, sincere **niyyah** specifically for Umrah al-Mufradah",
+          "Recite the **Talbiyah** as taught by your school of jurisprudence",
+        ],
+      },
+      {
+        title: "Step 2 — Tawaf",
+        content: [
+          "Perform seven complete circuits (ashwāt) around the Kaʿbah, beginning and ending at the Black Stone (Hajar al-Aswad). Maintain wuḍūʾ throughout and focus on the spiritual significance of each round.",
+        ],
+        listItems: [
+          "Complete **seven full circuits** with the correct starting and ending point",
+          "**Maintain wuḍūʾ** as required throughout",
+          "Stay calm and measured — avoid unnecessary rushing in crowded conditions",
+        ],
+      },
+      {
+        title: "Step 3 — Salat al-Tawaf",
+        content: [
+          "After completing Tawaf, perform the two rakʿahs of Ṣalāt al-Tawaf — ideally behind Maqām Ibrāhīm when the crowd allows, or anywhere in the Masjid al-Haram. This prayer is **obligatory** in the Umrah sequence.",
+        ],
+      },
+      {
+        title: "Step 4 — Sa'y (Safa and Marwa)",
+        content: [
+          "Walk seven times between the hills of Ṣafā and Marwah — starting at Ṣafā and ending at Marwah. Recite the appropriate duʿāʾ at each point as per your marja's guidance.",
+        ],
+      },
+      {
+        title: "Step 5 — Taqsir",
+        content: [
+          "After Sa'y, perform taqsīr: cut a small portion of hair from your head (for men and women as specified by your school of jurisprudence). This act marks the release from the state of Ihram for ʿUmrah al-Mufradah.",
+        ],
+      },
+      {
+        title: "Step 6 — Tawaf al-Nisa",
+        content: [
+          "In **Shia jurisprudence, Tawaf al-Nisāʾ is obligatory** for ʿUmrah al-Mufradah. After taqsīr, perform another seven circuits around the Kaʿbah with the same conditions as the first Tawaf. Skipping this step is a significant error — confirm all details with your marja.",
+        ],
+      },
+      {
+        title: "Step 7 — Salat of Tawaf al-Nisa",
+        content: [
+          "Complete the sequence with the two rakʿahs of Ṣalāt of Tawaf al-Nisāʾ, performed after the seventh circuit. With this prayer, the complete sequence of ʿUmrah al-Mufradah in Shia jurisprudence is fulfilled.",
+          "Always consult a qualified scholar for questions about specific circumstances — illness, inability to complete certain acts, or situations not covered by general guidance.",
+        ],
+      },
+      {
+        title: "Practical tips for the journey",
+        content: [
+          "Knowledge and preparation before you arrive frees your attention for the worship itself.",
+        ],
+        listItems: [
+          "**Learn all steps and the key duʿāʾs before you depart** — do not be learning from scratch in the Haram",
+          "**Be patient** in crowds and with your own pace",
+          "**Carry a compact duʿāʾ book** for reference",
+          "**Stay well hydrated** — especially in warm months",
+          "**Keep document copies** separate from originals",
+          "**Learn basic Arabic phrases** for common needs and courtesy",
+        ],
+      },
+      {
+        title: "Common mistakes to avoid",
+        content: [
+          "Most errors come from insufficient preparation or approaching Umrah too casually.",
+        ],
+        listItems: [
+          "**Skipping Tawaf al-Nisāʾ** or its obligatory prayer — in Shia fiqh, this invalidates the completion of Umrah",
+          "**Forgetting Ṣalāt al-Tawaf** after the first Tawaf",
+          "**Not learning the steps and sequence beforehand**",
+          "**Treating Umrah like ordinary tourism** — missing the adab (etiquette) and spiritual focus required",
+        ],
+      },
+    ],
+    conclusion:
+      "For many, Umrah is a once-in-a-lifetime journey. Prepare well, follow your marja's rulings carefully, and keep your heart present in every step. May your Umrah be accepted and full of blessings.",
+  },
+  {
     slug: "complete-guide-first-umrah",
     title: "Complete Guide to Your First Umrah",
     category: "Umrah Tips",

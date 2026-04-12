@@ -184,16 +184,61 @@ export default function RootLayout({
                   <p className="font-medium text-charcoal/80">
                     Direct assistance
                   </p>
-                  <p>Phone: +1 (950) 330-8904</p>
-                  <p>Email: info@marefatpilgrimage.com</p>
+                  <p>
+                    Phone:{" "}
+                    <a
+                      href="tel:+19543308904"
+                      className="text-charcoal/80 underline-offset-2 hover:underline"
+                    >
+                      +1 (954) 330-8904
+                    </a>
+                  </p>
+                  <p>
+                    Email:{" "}
+                    <a
+                      href="mailto:info@marefatpilgrimage.com"
+                      className="text-charcoal/80 underline-offset-2 hover:underline"
+                    >
+                      info@marefatpilgrimage.com
+                    </a>
+                  </p>
                 </div>
               </div>
-              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-charcoal/5 pt-4">
+              <div className="flex flex-col gap-4 border-t border-charcoal/5 pt-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
                 <p>© {new Date().getFullYear()} Marefat Pilgrimage. All rights reserved.</p>
-                <p className="flex gap-4">
-                  <span>Privacy</span>
-                  <span>Terms</span>
-                </p>
+                <nav
+                  className="flex max-w-xl flex-col gap-2 text-charcoal/70 sm:items-end"
+                  aria-label="Legal"
+                >
+                  <div className="flex flex-wrap gap-x-4 gap-y-2">
+                    <Link href="/privacy" className="hover:text-charcoal hover:underline">
+                      Privacy Policy
+                    </Link>
+                    <Link href="/terms" className="hover:text-charcoal hover:underline">
+                      Terms &amp; Conditions
+                    </Link>
+                    <Link href="/refund-policy" className="hover:text-charcoal hover:underline">
+                      Refund Policy
+                    </Link>
+                    <Link href="/cookie-policy" className="hover:text-charcoal hover:underline">
+                      Cookie Policy
+                    </Link>
+                  </div>
+                  <div className="flex flex-wrap gap-x-4 gap-y-2">
+                    <Link href="/legal-notice" className="hover:text-charcoal hover:underline">
+                      Legal Notice
+                    </Link>
+                    <Link
+                      href="/insurance-disclaimer"
+                      className="hover:text-charcoal hover:underline"
+                    >
+                      Insurance Disclaimer
+                    </Link>
+                    <Link href="/transparency" className="hover:text-charcoal hover:underline">
+                      Transparency
+                    </Link>
+                  </div>
+                </nav>
               </div>
             </div>
           </footer>

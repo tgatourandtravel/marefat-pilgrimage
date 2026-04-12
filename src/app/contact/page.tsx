@@ -103,7 +103,10 @@ export default function ContactPage() {
                   Direct contacts
                 </h2>
                 <p className="mt-3 text-sm">
-                  Phone: <span className="font-medium">+1 (950) 330-8904</span>
+                  Phone:{" "}
+                    <a href="tel:+19543308904" className="font-medium text-charcoal underline-offset-2 hover:underline">
+                      +1 (954) 330-8904
+                    </a>
                 </p>
                 <p className="mt-1 text-sm">
                   Email:{" "}

@@ -15,6 +15,28 @@ const CATEGORIES = [
 
 const POSTS = [
   {
+    slug: "practical-tips-umrah-every-pilgrim",
+    title: "Practical Tips for Umrah: What Every Pilgrim Should Know",
+    category: "Umrah Tips",
+    readingTime: "5 min read",
+    author: "Marefat Team",
+    excerpt:
+      "Smart habits for documents, packing, crowds, and health — so your Umrah stays organized and less stressful.",
+    image:
+      "https://images.unsplash.com/photo-1591604129939-c1a9495d8ede?w=800&h=600&fit=crop",
+  },
+  {
+    slug: "umrah-journey-shia-guide",
+    title: "Everything You Need to Know Before Your Umrah Journey (Shia Guide)",
+    category: "Umrah Tips",
+    readingTime: "8 min read",
+    author: "Marefat Team",
+    excerpt:
+      "Spiritual and practical preparation, an essentials checklist, and step-by-step Umrah according to Shia jurisprudence — including Tawaf al-Nisa.",
+    image:
+      "https://images.unsplash.com/photo-1526510747491-58f928c36975?w=800&h=600&fit=crop",
+  },
+  {
     slug: "complete-guide-first-umrah",
     title: "Complete Guide to Your First Umrah",
     category: "Umrah Tips",
