@@ -15,6 +15,17 @@ const CATEGORIES = [
 
 const POSTS = [
   {
+    slug: "umrah-essentials-seamless-journey",
+    title: "Umrah Essentials: What You Truly Need for a Seamless Journey",
+    category: "Packing",
+    readingTime: "6 min read",
+    author: "Marefat Team",
+    excerpt:
+      "A refined essentials checklist for Umrah: what to carry, what to skip, and how to stay light, organized, and spiritually focused.",
+    image:
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&h=600&fit=crop",
+  },
+  {
     slug: "practical-tips-umrah-every-pilgrim",
     title: "Practical Tips for Umrah: What Every Pilgrim Should Know",
     category: "Umrah Tips",

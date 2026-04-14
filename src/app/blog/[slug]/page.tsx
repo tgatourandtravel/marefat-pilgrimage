@@ -20,6 +20,101 @@ type BlogPost = {
 
 const POSTS: BlogPost[] = [
   {
+    slug: "umrah-essentials-seamless-journey",
+    title: "Umrah Essentials: What You Truly Need for a Seamless Journey",
+    category: "Packing",
+    readingTime: "6 min read",
+    author: "Marefat Team",
+    date: "April 13, 2026",
+    image:
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=1200&h=600&fit=crop",
+    introduction:
+      "Umrah is not a journey of excess; it is a journey of refinement. Real preparation means taking only what supports your worship, your comfort, and your peace of mind. As Imam Ali ibn Abi Talib (AS) taught, the best provision is what is sufficient.",
+    sections: [
+      {
+        title: "Refined clothing for comfort and focus",
+        content: [
+          "Choose clothing that combines simplicity, comfort, and quality. When your body is comfortable, your attention naturally returns to worship.",
+        ],
+        listItems: [
+          "**Men:** Two breathable, high-quality Ihram sets",
+          "**Women:** Modest, loose abayas with comfortable hijabs",
+          "**Footwear:** Supportive walking shoes or sandals that are already broken in",
+        ],
+      },
+      {
+        title: "Essential documents, perfectly organized",
+        content: [
+          "A seamless journey starts with clean document management. Keep both physical and digital backups so you are never under pressure at airports, checkpoints, or hotels.",
+        ],
+        listItems: [
+          "**Passport and visa** with checked expiry dates",
+          "**Flight and hotel confirmations** in one place",
+          "**Printed and digital copies** stored separately",
+          "**Travel wallet or pouch** for quick and secure access",
+        ],
+      },
+      {
+        title: "Personal care, thoughtfully selected",
+        content: [
+          "Take only what you will actually use. In Ihram, avoid scented products and keep your kit compact and practical.",
+        ],
+        listItems: [
+          "**Unscented soap and shampoo** suitable for Ihram",
+          "**Toothbrush and daily hygiene essentials**",
+          "**Compact towel** that dries quickly",
+        ],
+      },
+      {
+        title: "Health and wellbeing essentials",
+        content: [
+          "Simple health habits protect your energy throughout the journey. Physical ease allows deeper spiritual presence.",
+        ],
+        listItems: [
+          "**Personal medication** with enough supply for the full trip",
+          "**Small first-aid kit** for minor issues",
+          "**Reusable water bottle** to stay hydrated",
+        ],
+      },
+      {
+        title: "Your daily companion: a light carry bag",
+        content: [
+          "Use one compact day bag for your phone, documents, and small essentials. Lightweight organization reduces stress during long days.",
+        ],
+        listItems: [
+          "**Keep only daily essentials** in your carry bag",
+          "**Choose lightweight materials** for comfort",
+          "**Avoid overloading** so movement remains easy",
+        ],
+      },
+      {
+        title: "Spiritual essentials: the heart of your journey",
+        content: [
+          "The spiritual tools you bring should help you remember Allah consistently, not distract you with excess.",
+        ],
+        listItems: [
+          "**Qur'an** (or a trusted mobile app)",
+          "**Dua book** inspired by Ahlulbayt teachings",
+          "**Tasbih** for regular dhikr",
+          "**Turbah** for prayer when needed",
+        ],
+      },
+      {
+        title: "Power and connectivity, managed simply",
+        content: [
+          "A reliable phone setup keeps you connected to your group and family without unnecessary hassle.",
+        ],
+        listItems: [
+          "**Mobile phone and charging cable**",
+          "**Power bank** for long days outside the hotel",
+          "**Universal travel adapter** (Saudi Type G plug)",
+        ],
+      },
+    ],
+    conclusion:
+      "Luxury in Umrah is not in what you carry, but in how you travel: light, organized, and intentional. Bring what supports your worship and your comfort, and leave space for reflection, peace, and transformation.",
+  },
+  {
     slug: "practical-tips-umrah-every-pilgrim",
     title: "Practical Tips for Umrah: What Every Pilgrim Should Know",
     category: "Umrah Tips",
