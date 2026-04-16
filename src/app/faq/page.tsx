@@ -3,76 +3,161 @@
 import { useState, useMemo } from "react";
 
 const FAQ_CATEGORIES = [
-  {
-    id: "all",
-    label: "All",
-  },
-  {
-    id: "umrah",
-    label: "Umrah & general",
-  },
-  {
-    id: "visa",
-    label: "Visa & documents",
-  },
-  {
-    id: "rituals",
-    label: "Ihram & rituals",
-  },
-  {
-    id: "practical",
-    label: "Practical & packing",
-  },
+  { id: "all", label: "All" },
+  { id: "general", label: "General & trust" },
+  { id: "first-time", label: "First-time travelers" },
+  { id: "ziyarat", label: "Ziyarat & experience" },
+  { id: "logistics", label: "Travel & logistics" },
+  { id: "preparation", label: "Preparation & support" },
+  { id: "accommodation", label: "Accommodation" },
+  { id: "payment", label: "Payment & booking" },
 ];
 
 const FAQ_ITEMS = [
+  // General & Trust
   {
-    category: "umrah",
-    question: "Are you a licensed agency for Umrah and Ziyarat tours?",
+    category: "general",
+    question: "Why choose Marefat Pilgrimage?",
     answer:
-      "Yes. Marefat Pilgrimage operates with full licensing and works exclusively with accredited partners in Saudi Arabia and Iraq. Copies of licenses can be provided on request.",
+      "We plan every journey the way we would want someone to plan ours — with attention to the details that actually matter. Our focus is on giving you the space to be present, while we take care of everything around you.",
   },
   {
-    category: "umrah",
+    category: "general",
+    question: "Are you a licensed travel provider?",
+    answer:
+      "Yes. Marefat Pilgrimage is a certified and registered travel company based in Florida, and we work exclusively with accredited partners in Saudi Arabia and Iraq. Documentation is available upon request.",
+  },
+  {
+    category: "general",
     question: "How large are your groups?",
     answer:
-      "Most of our scheduled groups are kept intentionally small to maintain a calm atmosphere and allow space for individual questions. Private family-only programs are also available.",
+      "Group sizes vary by season and program. During peak periods, groups tend to be larger — but we scale our on-ground team accordingly, so every traveler still has access to personal support and clear guidance throughout.",
   },
   {
-    category: "visa",
-    question: "Do you assist with e‑visas and other documentation?",
+    category: "general",
+    question: "Do you offer private or family tours?",
     answer:
-      "Yes. Our team will guide you through the visa process step‑by‑step, including required documents, photos, and any health or vaccination confirmations needed at the time of travel.",
+      "Yes. Private and family-only programs are available and can be tailored to your schedule and preferences.",
+  },
+
+  // First-Time Travelers
+  {
+    category: "first-time",
+    question: "Are your tours suitable for first-time pilgrims?",
+    answer:
+      "Yes, and many of our travelers are making this journey for the first time. We walk you through each step — before you leave and once you arrive — so you feel prepared rather than overwhelmed.",
   },
   {
-    category: "visa",
-    question: "How early should I begin the visa process?",
+    category: "first-time",
+    question: "Will I have support throughout the journey?",
     answer:
-      "For most departures, we recommend starting preparations at least 6–8 weeks in advance. For peak seasons such as Ramadan and Hajj, earlier is strongly advised.",
+      "Yes. Our team and guides are with you throughout — not just for the ziyarat itself, but for the practical moments in between. You will always have someone nearby to ask.",
+  },
+
+  // Ziyarat & Experience
+  {
+    category: "ziyarat",
+    question: "Do you provide guidance for ziyarat and rituals?",
+    answer:
+      "Yes. Our guides share the historical context, the significance of each site, and practical guidance for the rituals. The goal is for you to leave each place understanding why it matters, not just where you stood.",
   },
   {
-    category: "rituals",
-    question: "Will there be guidance for rituals in my language?",
+    category: "ziyarat",
+    question: "How physically demanding are the journeys?",
     answer:
-      "Yes. Our scholars and guides provide explanations in English, Persian, and Arabic on most departures. German support can be arranged on selected programs or privately.",
+      "Some portions involve extended walking, particularly in busier environments or during peak seasons. We plan the pace carefully, but it is worth preparing physically beforehand — especially for older travelers or those with mobility considerations.",
   },
   {
-    category: "rituals",
-    question: "Can you accommodate first‑time pilgrims?",
+    category: "ziyarat",
+    question: "Is Ziyarat in Iraq safe?",
     answer:
-      "Absolutely. Many of our guests are performing Umrah or Hajj for the first time. We provide gentle, step‑by‑step guidance to ensure you feel prepared and reassured.",
+      "Yes. We work with experienced local partners and follow a structured itinerary throughout. Our team remains with the group at all times, and all logistics are coordinated in advance to ensure a secure and well-managed stay.",
+  },
+
+  // Travel & Logistics
+  {
+    category: "logistics",
+    question: "What is included in your packages?",
+    answer:
+      "Most programs include carefully selected accommodation, meals (breakfast and dinner in Saudi Arabia; full-board in Iraq), visa assistance, all local transportation, and guided ziyarat. Full details are always shared before you book.",
   },
   {
-    category: "practical",
-    question: "Do you provide packing lists and practical guidance?",
+    category: "logistics",
+    question: "Are flights included?",
     answer:
-      "Yes. Before departure you will receive a concise packing list, climate notes, and tips for staying comfortable and healthy during the journey.",
+      "Flights are not automatically included but can be arranged on request. Many travelers prefer to book independently, and we are happy to coordinate with whichever option works best for you.",
   },
   {
-    category: "practical",
-    question: "Can you handle special needs or mobility considerations?",
+    category: "logistics",
+    question: "Do you arrange airport transfers?",
     answer:
-      "Please inform us early of any medical needs or mobility limitations. We work with local partners to arrange appropriate rooms, wheelchairs, and support where possible.",
+      "Yes. Transfers to and from the airport, as well as all movement between sites, are arranged as part of the program.",
+  },
+  {
+    category: "logistics",
+    question: "Can I join from a different country?",
+    answer:
+      "Yes. We accommodate travelers joining from various locations and coordinate arrival logistics to align with the group schedule.",
+  },
+  {
+    category: "logistics",
+    question: "Will there be free time during the trip?",
+    answer:
+      "Yes. Each journey is structured, but not rigid. Time is set aside for personal ziyarat, rest, and quiet reflection.",
+  },
+
+  // Preparation & Support
+  {
+    category: "preparation",
+    question: "Do you assist with visa and documentation?",
+    answer:
+      "Yes. Our team guides you through the full process — required documents, photos, and any confirmations needed for entry. We will let you know exactly what to prepare and when.",
+  },
+  {
+    category: "preparation",
+    question: "How early should I begin preparing?",
+    answer:
+      "We recommend starting at least 6–8 weeks before your departure date. For Ramadan or Hajj season, earlier preparation is strongly advised.",
+  },
+  {
+    category: "preparation",
+    question: "Do you provide packing and preparation guidance?",
+    answer:
+      "Yes. Before departure, you will receive a packing guide with practical recommendations tailored to the season and destination.",
+  },
+
+  // Accommodation & Comfort
+  {
+    category: "accommodation",
+    question: "What type of accommodation do you provide?",
+    answer:
+      "We choose hotels based on location, cleanliness, and overall comfort — prioritizing proximity to key sites so you are not spending unnecessary time in transit.",
+  },
+
+  // Payment & Booking
+  {
+    category: "payment",
+    question: "How can I pay for my trip?",
+    answer:
+      "We accept bank transfer and other secure payment methods. Full details are provided during the booking process.",
+  },
+  {
+    category: "payment",
+    question: "Do you offer payment plans?",
+    answer:
+      "Yes. For selected programs, structured payment plans are available. Our team will walk you through the options for your chosen program.",
+  },
+  {
+    category: "payment",
+    question: "Is my payment secure?",
+    answer:
+      "Yes. All payments are processed through verified channels, and we are transparent about every transaction from deposit to final balance.",
+  },
+  {
+    category: "payment",
+    question: "When is full payment required?",
+    answer:
+      "A deposit secures your booking, with the remaining balance due before departure. We will communicate the exact timeline clearly when you confirm your place.",
   },
 ];
 
@@ -83,12 +168,10 @@ export default function FAQPage() {
   const filteredItems = useMemo(() => {
     let items = FAQ_ITEMS;
 
-    // Filter by category
     if (selectedCategory !== "all") {
       items = items.filter((item) => item.category === selectedCategory);
     }
 
-    // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       items = items.filter(
@@ -101,7 +184,6 @@ export default function FAQPage() {
     return items;
   }, [searchQuery, selectedCategory]);
 
-  // Group filtered items by category
   const groupedItems = useMemo(() => {
     const grouped: Record<string, typeof FAQ_ITEMS> = {};
     filteredItems.forEach((item) => {
@@ -124,9 +206,9 @@ export default function FAQPage() {
             Questions before your journey
           </h1>
           <p className="mt-3 text-sm text-charcoal/75">
-            A selection of common questions about visas, rituals, and practical
-            details. For anything more specific, you are welcome to contact us
-            directly.
+            A selection of common questions about planning, rituals, logistics,
+            and practical details. For anything more specific, you are welcome
+            to contact us directly.
           </p>
         </div>
       </section>
@@ -175,7 +257,6 @@ export default function FAQPage() {
         ) : (
           <div className="space-y-6">
             {selectedCategory === "all" ? (
-              // Show grouped by category when "All" is selected
               FAQ_CATEGORIES.filter((cat) => cat.id !== "all").map((cat) => {
                 const categoryItems = groupedItems[cat.id] || [];
                 if (categoryItems.length === 0) return null;
@@ -209,7 +290,6 @@ export default function FAQPage() {
                 );
               })
             ) : (
-              // Show flat list when a specific category is selected
               <div className="space-y-2">
                 {filteredItems.map((item) => (
                   <details
@@ -238,5 +318,3 @@ export default function FAQPage() {
     </main>
   );
 }
-
-
