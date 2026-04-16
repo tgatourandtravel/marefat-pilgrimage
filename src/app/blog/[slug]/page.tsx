@@ -14,11 +14,328 @@ type BlogPost = {
     title: string;
     content: string[];
     listItems?: string[];
+    visuals?: Array<{
+      src: string;
+      alt: string;
+      caption?: string;
+      layout?: "full" | "half" | "third";
+    }>;
   }>;
   conclusion: string;
 };
 
 const POSTS: BlogPost[] = [
+  {
+    slug: "ziyarat-iraq-packing-guide",
+    title: "Ziyarat Iraq: A Refined Packing Guide for a Sacred Journey",
+    category: "Packing",
+    readingTime: "6 min read",
+    author: "Marefat Team",
+    date: "April 16, 2026",
+    image: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-1.jpeg",
+    introduction:
+      "A journey to Iraq is not defined by distance, but by devotion. From Najaf to Karbala, from Kadhimayn to Samarra, every step is a return to the presence of those who gave everything. Prepare your belongings with care, but prepare your heart with greater intention. What you carry should serve the journey, not weigh it down.",
+    sections: [
+      {
+        title: "Clothing: simplicity with dignity",
+        content: [
+          "The shrines call for humility above all. Choose clothing that allows ease of movement, keeps you comfortable in varied temperatures, and reflects the purpose of the trip.",
+        ],
+        listItems: [
+          "**Loose, modest clothing** in simple, understated tones",
+          "**Comfortable walking shoes** that are already broken in — long distances between shrine sites add up quickly",
+          "**A light scarf or head covering** for women, and as sun protection for all",
+          "**Extra socks** — more useful than they sound on a long ziyarat day",
+        ],
+        visuals: [
+          {
+            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-1.jpeg",
+            alt: "Pilgrims dressed modestly walking toward a shrine in Iraq",
+            caption: "Simple, dignified clothing keeps you comfortable throughout long days of walking and worship.",
+            layout: "full",
+          },
+          {
+            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-2.jpeg",
+            alt: "Comfortable footwear resting near shrine entrance",
+            caption: "Well-chosen footwear matters more than almost anything else you pack.",
+            layout: "half",
+          },
+          {
+            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-3.jpeg",
+            alt: "Modest travel attire laid out for a ziyarat journey",
+            caption: "Light, modest layers prepared for the shrine visit.",
+            layout: "half",
+          },
+        ],
+      },
+      {
+        title: "Essential documents and security",
+        content: [
+          "Clean document organization removes one of the most common sources of stress at airports and border crossings. Sort everything before you leave home, not at the airport.",
+        ],
+        listItems: [
+          "**Passport and visa** — check expiry dates well in advance",
+          "**Copies of all ID documents**, both printed and stored digitally",
+          "**A small, secure pouch** worn close to the body for valuables at all times",
+        ],
+      },
+      {
+        title: "Health and wellbeing",
+        content: [
+          "Long walks, crowded spaces, and warm weather can drain energy faster than expected. A small amount of preparation here protects your body so your attention stays on the ziyarat itself.",
+        ],
+        listItems: [
+          "**Personal medication** with a sufficient supply for the full trip",
+          "**A compact first-aid kit** for blisters and minor issues",
+          "**Foot care essentials** such as blister protection and small bandages",
+          "**A reusable water bottle** — staying hydrated is not optional",
+          "**Light snacks** such as dates or energy bars for long days between meals",
+        ],
+        visuals: [
+          {
+            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-4.jpeg",
+            alt: "Dates and light snacks arranged for travel",
+            caption: "Simple provisions that sustain energy through long days of worship and movement.",
+            layout: "third",
+          },
+          {
+            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-5.jpeg",
+            alt: "Reusable water bottle and travel health essentials",
+            caption: "Consistent hydration is one of the simplest and most important habits on this journey.",
+            layout: "third",
+          },
+          {
+            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-6.jpeg",
+            alt: "Compact first-aid kit and foot care items",
+            caption: "A small kit for blisters and minor issues is all you need — keep it light.",
+            layout: "third",
+          },
+        ],
+      },
+      {
+        title: "Spiritual essentials: your true companions",
+        content: [
+          "These are not extras to fit in if there is space. They are the purpose of the journey.",
+          "As narrated from Imam Ja'far al-Sadiq (AS): \"Our Shia are those whose hearts are connected to us.\" Your dua book and tasbih are the tools through which that connection finds expression.",
+        ],
+        listItems: [
+          "**Qur'an** or a trusted app with offline access",
+          "**A dua book** containing the ziyarat texts of the Ahlulbayt",
+          "**Tasbih** for dhikr between visits",
+        ],
+      },
+      {
+        title: "Your daily carry bag",
+        content: [
+          "Choose a small bag that stays on your person throughout the day. Shrines require removing shoes, navigating crowds, and sometimes waiting for extended periods. A light, organized bag makes all of this easier.",
+        ],
+        listItems: [
+          "**A small backpack or crossbody bag** — secure and easy to carry",
+          "**Phone, money, and documents** within easy reach",
+          "**Daily essentials only** — resist the urge to overload it",
+        ],
+        visuals: [
+          {
+            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-7.jpeg",
+            alt: "Compact crossbody bag prepared for shrine visit",
+            caption: "A small, organized bag keeps your essentials accessible without slowing you down.",
+            layout: "half",
+          },
+          {
+            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-8.jpeg",
+            alt: "Day bag contents laid out simply",
+            caption: "Phone, documents, a small snack, and your dua book — that is enough.",
+            layout: "half",
+          },
+          {
+            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-9.jpeg",
+            alt: "Pilgrim carrying a small bag through shrine courtyard",
+            caption: "Traveling light through the courtyards keeps the focus on the ziyarat, not the luggage.",
+            layout: "full",
+          },
+        ],
+      },
+      {
+        title: "Technology and connectivity",
+        content: [
+          "Reliable phone access keeps you connected to your group, your family, and navigation in unfamiliar areas. On a full day at the shrines, battery drains quickly, so plan for it.",
+        ],
+        listItems: [
+          "**Mobile phone** with offline maps and key contacts saved",
+          "**Power bank** — highly recommended for long days away from the hotel",
+          "**Charging cables** and a travel adapter if needed",
+        ],
+        visuals: [
+          {
+            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-10.jpeg",
+            alt: "Power bank and charging cables for travel",
+            caption: "A fully charged power bank is one of the most practical items you can carry.",
+            layout: "third",
+          },
+          {
+            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-11.jpeg",
+            alt: "Mobile phone showing map and navigation",
+            caption: "Offline maps and saved contact details remove a great deal of uncertainty while abroad.",
+            layout: "third",
+          },
+          {
+            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-12.jpeg",
+            alt: "Travel adapter and cables organized for the journey",
+            caption: "Keep cables and adapters together so they are easy to find each morning.",
+            layout: "third",
+          },
+        ],
+      },
+      {
+        title: "Practical additions worth remembering",
+        content: [
+          "A few small items that are easy to overlook but make a genuine difference on long days at the shrines.",
+        ],
+        listItems: [
+          "**Slippers or slip-on shoes** for quick removal at shrine entrances",
+          "**A small towel or wet wipes** for freshening up between visits",
+          "**A plastic bag for shoes** — required at several shrine entrances",
+          "**A travel prayer mat** if you prefer your own",
+        ],
+      },
+      {
+        title: "What to leave behind",
+        content: [
+          "Ziyarat calls you toward simplicity. Heavy luggage, expensive valuables, and items with no clear purpose shift your attention away from what matters. If you are unsure whether to bring something, leave it at home.",
+        ],
+        listItems: [
+          "**Heavy or oversized luggage** that slows movement between cities",
+          "**Expensive jewelry or valuables** that create unnecessary worry",
+          "**Items readily available locally** — buy them there if needed",
+          "**Excess clothing** — you will use far less than you expect",
+        ],
+      },
+    ],
+    conclusion:
+      "Ziyarat in Iraq is not about what you carry; it is about what you become. Leave behind distraction, attachment, and excess. Carry with you love for the Imams, humility, and presence. Travel light, so your heart has room for what this journey was always meant to give.",
+  },
+  {
+    slug: "ziyarat-imam-ali-al-ridha-divine-generosity",
+    title: "Ziyarat of Imam Ali al-Ridha (AS): A Journey into Divine Generosity",
+    category: "Spiritual",
+    readingTime: "7 min read",
+    author: "Marefat Team",
+    date: "April 16, 2026",
+    image: "/images/blog/ziyarat-imam-ali-al-ridha/ziyarat-imam-ali-al-ridha-1.jpeg",
+    introduction:
+      "Some journeys begin with planning, and some begin with longing. The journey to Mashhad, to the resting place of Imam Ali al-Ridha (AS), feels like an invitation. It leads the heart toward an Imam known for generosity, wisdom, and mercy. In a narration attributed to Imam al-Ridha (AS), we read: \"Whoever visits me, knowing my right, I will intercede for him on the Day of Judgment.\" This is more than a visit. It is an encounter with grace.",
+    sections: [
+      {
+        title: "Imam Ali al-Ridha (AS): The Imam of compassion and knowledge",
+        content: [
+          "In the sacred precinct of his shrine rests Imam Ali al-Ridha (AS), the eighth Imam and a living source of guidance for countless believers.",
+          "His life reflects dignity in hardship, clarity in knowledge, and generosity in every encounter.",
+        ],
+        listItems: [
+          "**Known for:** Vast and illuminating knowledge",
+          "**Known for:** Unbounded generosity toward people",
+          "**Known for:** Patience and steadiness under oppression",
+        ],
+        visuals: [
+          {
+            src: "/images/blog/ziyarat-imam-ali-al-ridha/ziyarat-imam-ali-al-ridha-1.jpeg",
+            alt: "Panoramic view of Imam Reza shrine in Mashhad",
+            caption:
+              "A wide view of the shrine complex that reflects the scale and serenity of the ziyarat experience.",
+            layout: "full",
+          },
+          {
+            src: "/images/blog/ziyarat-imam-ali-al-ridha/ziyarat-imam-ali-al-ridha-2.jpeg",
+            alt: "Architectural details inside Imam Reza shrine",
+            caption:
+              "Intricate geometry and ornamentation that frame the spiritual atmosphere of the haram.",
+            layout: "half",
+          },
+          {
+            src: "/images/blog/ziyarat-imam-ali-al-ridha/ziyarat-imam-ali-al-ridha-3.jpeg",
+            alt: "Pilgrims gathering at Imam Reza shrine",
+            caption:
+              "Pilgrims from different places gathering in one space of devotion and remembrance.",
+            layout: "half",
+          },
+        ],
+      },
+      {
+        title: "Entering the haram: Adab of presence",
+        content: [
+          "Approach the shrine with awareness, not haste. The etiquette of ziyarat is not ceremonial formality; it is a way of preparing the heart.",
+          "As taught in the tradition of Ahlulbayt, ziyarat begins with recognition and is completed with sincerity.",
+        ],
+        listItems: [
+          "**Begin with salam** and enter with humility",
+          "**Lower your gaze and voice** to preserve reverence",
+          "**Leave distractions behind** and arrive with presence",
+        ],
+      },
+      {
+        title: "What to do during ziyarat",
+        content: [
+          "Your moments in the shrine are precious, so keep your worship intentional and focused.",
+          "At times, quiet reflection carries more meaning than many words.",
+        ],
+        listItems: [
+          "**Recite the ziyarat text** of Imam Ali al-Ridha (AS)",
+          "**Offer personal duas** with honesty and hope",
+          "**Send abundant salawat** with a present heart",
+          "**Sit in silence** and reflect on your inner state",
+        ],
+      },
+      {
+        title: "The spiritual experience of Mashhad",
+        content: [
+          "Mashhad is not only a city; it is a sanctuary of mercy. The haram holds beauty without arrogance and grandeur without distance.",
+          "Many visitors describe the same feeling: hearts soften, tears come easily, and dua rises naturally.",
+        ],
+        listItems: [
+          "**Beauty with purpose** in every architectural detail",
+          "**Grandeur with humility** in the rhythm of the shrine",
+          "**Presence with peace** in spaces of worship and reflection",
+        ],
+        visuals: [
+          {
+            src: "/images/blog/ziyarat-imam-ali-al-ridha/ziyarat-imam-ali-al-ridha-4.jpeg",
+            alt: "Pilgrims moving through the courtyards of Mashhad shrine",
+            caption:
+              "The courtyards where movement, prayer, and reflection come together in one spiritual rhythm.",
+            layout: "third",
+          },
+          {
+            src: "/images/blog/ziyarat-imam-ali-al-ridha/ziyarat-imam-ali-al-ridha-5.jpeg",
+            alt: "Interior calligraphy and sacred space at Imam Reza shrine",
+            caption:
+              "Interior calligraphy and sacred light that deepen the contemplative atmosphere of ziyarat.",
+            layout: "third",
+          },
+          {
+            src: "/images/blog/ziyarat-imam-ali-al-ridha/ziyarat-imam-ali-al-ridha-6.jpeg",
+            alt: "Nighttime panoramic view of Imam Reza shrine",
+            caption:
+              "A final panoramic scene of the shrine, capturing the calm majesty of Mashhad at night.",
+            layout: "third",
+          },
+        ],
+      },
+      {
+        title: "Imam al-Ridha (AS) as Hujjatullah",
+        content: [
+          "Imam Ali al-Ridha (AS) is among the divine proofs of Allah. Through him, truth remains clear and guidance remains accessible.",
+          "To visit him is not only to honor his station. It is to renew your connection with divine direction.",
+        ],
+        listItems: [
+          "**Truth is preserved** through the guidance of the Imam",
+          "**Hearts are guided** toward Allah through his legacy",
+          "**Ziyarat becomes renewal** when it is lived with sincerity",
+        ],
+      },
+    ],
+    conclusion:
+      "Ziyarat of Imam Ali al-Ridha (AS) is not measured by how long you stay. It is measured by how present you are. Stand with humility, speak with sincerity, and let your heart receive what this journey was meant to give. In Mashhad, you are not simply visiting. You are being received.",
+  },
   {
     slug: "umrah-essentials-seamless-journey",
     title: "Umrah Essentials: What You Truly Need for a Seamless Journey",
@@ -844,7 +1161,6 @@ export default function BlogArticlePage({ params }: Props) {
                 {section.listItems && (
                   <ul className="mt-4 space-y-2.5 pl-5">
                     {section.listItems.map((item, itemIdx) => {
-                      const isBold = item.startsWith("**");
                       const parts = item.split("**");
                       return (
                         <li key={itemIdx} className="relative pl-2">
@@ -865,6 +1181,42 @@ export default function BlogArticlePage({ params }: Props) {
                       );
                     })}
                   </ul>
+                )}
+                {section.visuals && (
+                  <div className="mt-7 space-y-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
+                      {section.visuals.map((visual, visualIdx) => (
+                        <figure
+                          key={`${sectionIdx}-${visualIdx}`}
+                          className={`group overflow-hidden rounded-2xl border border-charcoal/10 bg-ivory shadow-sm shadow-charcoal/5 ${
+                            visual.layout === "full"
+                              ? "md:col-span-12"
+                              : visual.layout === "third"
+                              ? "md:col-span-4"
+                              : "md:col-span-6"
+                          }`}
+                        >
+                          <div
+                            className={`overflow-hidden ${
+                              visual.layout === "full" ? "aspect-[16/9]" : "aspect-[4/3]"
+                            }`}
+                          >
+                            <img
+                              src={visual.src}
+                              alt={visual.alt}
+                              className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+                              loading="lazy"
+                            />
+                          </div>
+                          {visual.caption && (
+                            <figcaption className="border-t border-charcoal/10 bg-ivory/80 px-4 py-3 text-xs leading-relaxed text-charcoal/65">
+                              {visual.caption}
+                            </figcaption>
+                          )}
+                        </figure>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
             </section>

@@ -15,6 +15,27 @@ const CATEGORIES = [
 
 const POSTS = [
   {
+    slug: "ziyarat-iraq-packing-guide",
+    title: "Ziyarat Iraq: A Refined Packing Guide for a Sacred Journey",
+    category: "Packing",
+    readingTime: "6 min read",
+    author: "Marefat Team",
+    excerpt:
+      "What to bring, what to leave behind, and how to prepare for the journey to Najaf, Karbala, Kadhimayn, and Samarra.",
+    image: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-1.jpeg",
+  },
+  {
+    slug: "ziyarat-imam-ali-al-ridha-divine-generosity",
+    title: "Ziyarat of Imam Ali al-Ridha (AS): A Journey into Divine Generosity",
+    category: "Spiritual",
+    readingTime: "7 min read",
+    author: "Marefat Team",
+    excerpt:
+      "A reflective guide to visiting Imam Ali al-Ridha (AS) in Mashhad, with practical adab, worship focus, and the spiritual meaning of ziyarat.",
+    image:
+      "/images/blog/ziyarat-imam-ali-al-ridha/ziyarat-imam-ali-al-ridha-1.jpeg",
+  },
+  {
     slug: "umrah-essentials-seamless-journey",
     title: "Umrah Essentials: What You Truly Need for a Seamless Journey",
     category: "Packing",
