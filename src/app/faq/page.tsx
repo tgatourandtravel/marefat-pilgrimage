@@ -214,28 +214,30 @@ export default function FAQPage() {
       </section>
 
       <section className="mx-auto max-w-4xl px-6 pb-16 pt-8 sm:px-8 lg:px-12">
-        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-6 space-y-3">
           <input
             type="search"
             placeholder="Search questions…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-full border border-charcoal/10 bg-ivory px-4 py-2 text-xs text-charcoal placeholder:text-charcoal/40 transition focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory sm:max-w-xs"
+            className="w-full rounded-full border border-charcoal/10 bg-ivory px-4 py-2 text-xs text-charcoal placeholder:text-charcoal/40 transition focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory sm:max-w-sm"
           />
-          <div className="flex flex-wrap gap-2 text-xs">
-            {FAQ_CATEGORIES.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`rounded-full border px-3 py-1 transition ${
-                  selectedCategory === cat.id
-                    ? "border-gold/60 bg-gold/10 text-charcoal shadow-sm"
-                    : "border-charcoal/10 bg-ivory text-charcoal/70 hover:border-gold/40 hover:text-charcoal"
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
+          <div className="-mx-6 sm:-mx-8 lg:-mx-12">
+            <div className="flex gap-2 overflow-x-auto px-6 pb-1 text-xs sm:px-8 lg:px-12 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              {FAQ_CATEGORIES.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`shrink-0 rounded-full border px-3 py-1.5 transition ${
+                    selectedCategory === cat.id
+                      ? "border-gold/60 bg-gold/10 text-charcoal shadow-sm"
+                      : "border-charcoal/10 bg-ivory text-charcoal/70 hover:border-gold/40 hover:text-charcoal"
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
