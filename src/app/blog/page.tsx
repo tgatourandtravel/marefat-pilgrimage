@@ -2,170 +2,14 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-
-const CATEGORIES = [
-  "All",
-  "Umrah Tips",
-  "Ihram & Rituals",
-  "Packing",
-  "Women's Guide",
-  "Visa & Documents",
-  "Spiritual",
-];
-
-const POSTS = [
-  {
-    slug: "ziyarat-iraq-packing-guide",
-    title: "Ziyarat Iraq: A Refined Packing Guide for a Sacred Journey",
-    category: "Packing",
-    readingTime: "6 min read",
-    author: "Marefat Team",
-    excerpt:
-      "What to bring, what to leave behind, and how to prepare for the journey to Najaf, Karbala, Kadhimayn, and Samarra.",
-    image: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-1.jpeg",
-  },
-  {
-    slug: "ziyarat-imam-ali-al-ridha-divine-generosity",
-    title: "Ziyarat of Imam Ali al-Ridha (AS): A Journey into Divine Generosity",
-    category: "Spiritual",
-    readingTime: "7 min read",
-    author: "Marefat Team",
-    excerpt:
-      "A reflective guide to visiting Imam Ali al-Ridha (AS) in Mashhad, with practical adab, worship focus, and the spiritual meaning of ziyarat.",
-    image:
-      "/images/blog/ziyarat-imam-ali-al-ridha/ziyarat-imam-ali-al-ridha-1.jpeg",
-  },
-  {
-    slug: "umrah-essentials-seamless-journey",
-    title: "Umrah Essentials: What You Truly Need for a Seamless Journey",
-    category: "Packing",
-    readingTime: "6 min read",
-    author: "Marefat Team",
-    excerpt:
-      "A refined essentials checklist for Umrah: what to carry, what to skip, and how to stay light, organized, and spiritually focused.",
-    image:
-      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&h=600&fit=crop",
-  },
-  {
-    slug: "practical-tips-umrah-every-pilgrim",
-    title: "Practical Tips for Umrah: What Every Pilgrim Should Know",
-    category: "Umrah Tips",
-    readingTime: "5 min read",
-    author: "Marefat Team",
-    excerpt:
-      "Smart habits for documents, packing, crowds, and health — so your Umrah stays organized and less stressful.",
-    image:
-      "https://images.unsplash.com/photo-1770786106021-52580470e31e?w=800&h=600&fit=crop",
-  },
-  {
-    slug: "umrah-journey-shia-guide",
-    title: "Everything You Need to Know Before Your Umrah Journey (Shia Guide)",
-    category: "Umrah Tips",
-    readingTime: "8 min read",
-    author: "Marefat Team",
-    excerpt:
-      "Spiritual and practical preparation, an essentials checklist, and step-by-step Umrah according to Shia jurisprudence — including Tawaf al-Nisa.",
-    image:
-      "https://images.unsplash.com/photo-1513072064285-240f87fa81e8?w=800&h=600&fit=crop",
-  },
-  {
-    slug: "complete-guide-first-umrah",
-    title: "Complete Guide to Your First Umrah",
-    category: "Umrah Tips",
-    readingTime: "7 min read",
-    author: "Sheikh Ahmad",
-    excerpt:
-      "Everything you need to know before embarking on your first Umrah journey. From spiritual preparation to practical tips.",
-    image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop",
-  },
-  {
-    slug: "understanding-ihram-rituals",
-    title: "Understanding the Ihram: Rules and Spiritual Significance",
-    category: "Ihram & Rituals",
-    readingTime: "8 min read",
-    author: "Ustadh Omar",
-    excerpt:
-      "A comprehensive guide to the state of Ihram, its requirements, and the deep spiritual meaning behind this sacred practice.",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop",
-  },
-  {
-    slug: "essential-packing-list-pilgrimage",
-    title: "Essential Packing List for Pilgrimage",
-    category: "Packing",
-    readingTime: "6 min read",
-    author: "Marefat Team",
-    excerpt:
-      "Don't forget these important items! A comprehensive packing guide for Umrah, Hajj, and Ziyarat trips.",
-    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&h=600&fit=crop",
-  },
-  {
-    slug: "womens-guide-pilgrimage",
-    title: "Women's Guide to Pilgrimage",
-    category: "Women's Guide",
-    readingTime: "7 min read",
-    author: "Dr. Aisha Khan",
-    excerpt:
-      "Special considerations, tips, and guidance for women traveling for Umrah, Hajj, and Ziyarat journeys.",
-    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop",
-  },
-  {
-    slug: "visa-requirements-countries",
-    title: "Visa Requirements: Saudi Arabia and Iraq",
-    category: "Visa & Documents",
-    readingTime: "4 min read",
-    author: "Marefat Team",
-    excerpt:
-      "An overview of visa requirements, documentation needed, and processing timelines for pilgrimage destinations.",
-    image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop",
-  },
-  {
-    slug: "spiritual-journey-maximizing-pilgrimage",
-    title: "The Spiritual Journey: Maximizing Your Pilgrimage",
-    category: "Spiritual",
-    readingTime: "9 min read",
-    author: "Sheikh Ibrahim",
-    excerpt:
-      "Deep insights into making the most of your spiritual journey, focusing on intention, presence, and reflection.",
-    image: "https://images.unsplash.com/photo-1515595968323-4964db3a2218?w=800&h=600&fit=crop",
-  },
-  {
-    slug: "preparing-for-your-first-umrah",
-    title: "Preparing for your first Umrah: a calm, practical guide",
-    category: "Umrah Tips",
-    readingTime: "7 min read",
-    author: "Sheikh Ahmad",
-    excerpt:
-      "From travel documents to spiritual intentions, this short guide helps you arrive in Makkah feeling prepared and at ease.",
-    image: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=800&h=600&fit=crop",
-  },
-  {
-    slug: "visa-checklist-for-pilgrims",
-    title: "Visa & document checklist for pilgrims",
-    category: "Visa & Documents",
-    readingTime: "5 min read",
-    author: "Marefat Team",
-    excerpt:
-      "An overview of the documents most commonly requested for Umrah, Hajj, and Ziyarat travel, in simple language.",
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&fit=crop",
-  },
-  {
-    slug: "what-to-pack-for-umrah",
-    title: "What to pack for Umrah without overpacking",
-    category: "Packing",
-    readingTime: "6 min read",
-    author: "Marefat Team",
-    excerpt:
-      "A minimal packing list that keeps you comfortable while avoiding unnecessary weight and clutter.",
-    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&h=600&fit=crop",
-  },
-];
+import { BLOG_CATEGORIES, BLOG_POSTS } from "./data";
 
 export default function BlogPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredPosts = useMemo(() => {
-    let posts = POSTS;
+    let posts = BLOG_POSTS;
 
     // Filter by category
     if (selectedCategory !== "All") {
@@ -206,7 +50,7 @@ export default function BlogPage() {
       <section className="mx-auto max-w-6xl px-6 pb-16 pt-8 sm:px-8 lg:px-12">
         {/* Category Filter Tabs */}
         <div className="mb-8 flex flex-wrap items-center gap-2 border-b border-charcoal/5 pb-4">
-          {CATEGORIES.map((cat) => (
+          {BLOG_CATEGORIES.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
