@@ -1,0 +1,19 @@
+---
+description: Marefat blog writing and image-layout standard
+globs: src/app/blog/**/*.*
+alwaysApply: false
+---
+
+# Marefat Blog Standard
+
+Use this rule whenever creating or updating blog content in `src/app/blog/`.
+
+- Keep the existing blog model in `data.ts`: `slug`, `title`, `category`, `readingTime`, `author`, `date`, `image`, `excerpt`, `introduction`, `sections`, `conclusion`.
+- Humanize imported text from AI/doc files: natural sentence flow, clear transitions, scannable paragraphs, no robotic repetition, and no em-dash punctuation.
+- Keep tone practical and readable: useful guidance first, concise wording, no exaggerated marketing language.
+- Structure each post for readability: strong intro, 3-5 focused sections, actionable bullet lists when relevant, and a clean conclusion.
+- Preserve the current image layout system in section visuals: `full`, `half`, `third` with meaningful captions.
+- Prefer reliable local image paths under `public/images/blog/...`; if using remote URLs, verify they load and replace broken ones.
+- Ensure `alt` text is descriptive and specific (not generic).
+- Before finalizing, verify: no broken image paths, no lint errors, category consistency, and matching list/detail rendering.
+
