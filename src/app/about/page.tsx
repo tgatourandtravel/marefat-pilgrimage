@@ -98,8 +98,8 @@ export default function AboutPage() {
           {/* Story image */}
           <div className="relative h-72 overflow-hidden rounded-2xl bg-charcoal/10 shadow-soft">
             <img
-              src="https://images.unsplash.com/photo-1564769662533-4f00a87b4056?w=840&h=640&fit=crop"
-              alt="Masjid al-Nabawi, Madinah"
+              src="https://images.unsplash.com/photo-1602769490455-36cf9734dbcb?w=840&h=640&fit=crop"
+              alt="Masjid al-Nabawi courtyard at sunset, Madinah"
               className="h-full w-full object-cover"
             />
             <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-charcoal/10" />
@@ -171,7 +171,7 @@ export default function AboutPage() {
             {/* Founder image placeholder */}
             <div className="relative mx-auto h-80 w-full max-w-xs overflow-hidden rounded-2xl bg-charcoal/40 shadow-soft ring-1 ring-inset ring-white/10 lg:mx-0">
               <img
-                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=680&h=800&fit=crop"
+                src="https://images.unsplash.com/photo-1575101261474-5cb5653bb416?w=680&h=800&fit=crop"
                 alt="Marefat Pilgrimage founder"
                 className="h-full w-full object-cover object-top opacity-80"
               />
@@ -292,8 +292,8 @@ export default function AboutPage() {
             {/* Image */}
             <div className="relative h-64 overflow-hidden rounded-2xl bg-charcoal/10 shadow-soft">
               <img
-                src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=680&h=480&fit=crop"
-                alt="Scholars and travel team at Marefat Pilgrimage"
+                src="https://images.unsplash.com/photo-1723512414375-45ff0ed80afd?w=680&h=480&fit=crop"
+                alt="Pilgrims in ihram walking together near Masjid al-Haram"
                 className="h-full w-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-charcoal/20 via-transparent to-transparent" />
