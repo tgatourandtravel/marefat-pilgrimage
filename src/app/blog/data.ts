@@ -643,7 +643,8 @@ export const BLOG_POSTS: BlogPost[] = [
     readingTime: "8 min read",
     author: "Marefat Team",
     date: "April 13, 2026",
-    image: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-5.jpeg",
+    image:
+      "/images/blog/health-wellbeing-docx/health-wellbeing-docx-04.jpeg",
     excerpt:
       "A complete health guide covering hydration, rest, foot care, infection prevention, and energy management for Umrah and Ziyarat.",
     introduction:
@@ -652,39 +653,27 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         title: "Understand the environment",
         content: [
-          "Pilgrimage environments are unique. Large crowds, long walking distances, heat and physical exertion, and close contact with thousands of people.",
-          "This increases the risk of dehydration, fatigue, and infections such as cold and flu. Awareness is your first protection.",
+          "Pilgrimage environments are unique. Large crowds, long walking distances, heat and physical exertion, and close contact with thousands of people increase the risk of dehydration, fatigue, and infections such as cold and flu.",
+          "Awareness is your first protection.",
         ],
         visuals: [
           {
-            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-4.jpeg",
+            src: "/images/blog/health-wellbeing-docx/health-wellbeing-docx-01.jpeg",
             alt: "Large crowd of pilgrims walking together",
             caption: "Dense crowds and long walks require real preparation.",
             layout: "full",
           },
           {
-            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-5.jpeg",
-            alt: "Pilgrims in hot weather conditions",
-            caption: "Heat and exertion test physical endurance.",
+            src: "/images/blog/health-wellbeing-docx/health-wellbeing-docx-02.jpeg",
+            alt: "Pilgrims walking in warm weather",
+            caption: "Heat and exertion make hydration and pacing essential.",
             layout: "half",
           },
           {
-            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-6.jpeg",
-            alt: "Pilgrims walking long distances",
-            caption: "Long walks are part of every pilgrimage journey.",
+            src: "/images/blog/health-wellbeing-docx/health-wellbeing-docx-03.jpeg",
+            alt: "Pilgrims taking short rest during journey",
+            caption: "Small rest breaks preserve energy for worship.",
             layout: "half",
-          },
-          {
-            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-7.jpeg",
-            alt: "Close contact in pilgrimage crowds",
-            caption: "Proximity increases infection risk without proper care.",
-            layout: "third",
-          },
-          {
-            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-8.jpeg",
-            alt: "Pilgrims resting during journey",
-            caption: "Rest is essential to sustain energy.",
-            layout: "third",
           },
         ],
       },
@@ -710,40 +699,22 @@ export const BLOG_POSTS: BlogPost[] = [
         ],
         visuals: [
           {
-            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-9.jpeg",
-            alt: "Hand sanitizer and hygiene items for travel",
+            src: "/images/blog/health-wellbeing-docx/health-wellbeing-docx-04.jpeg",
+            alt: "Hand sanitizer and hygiene items for pilgrimage",
             caption: "Small hygiene habits prevent big health setbacks.",
             layout: "full",
           },
           {
-            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-10.jpeg",
-            alt: "Pilgrim washing hands",
-            caption: "Frequent handwashing is essential protection.",
+            src: "/images/blog/health-wellbeing-docx/health-wellbeing-docx-05.jpeg",
+            alt: "Pilgrim cleaning hands in crowded area",
+            caption: "Frequent hand hygiene is one of the best protections.",
             layout: "half",
           },
           {
-            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-11.jpeg",
-            alt: "Masks and protective equipment",
-            caption: "Masks help in dense crowd situations.",
+            src: "/images/blog/health-wellbeing-docx/health-wellbeing-docx-06.jpeg",
+            alt: "Mask and protective essentials for travel",
+            caption: "Simple protective tools help in dense gatherings.",
             layout: "half",
-          },
-          {
-            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-12.jpeg",
-            alt: "Clean hygiene practices",
-            caption: "Prevention is far better than treatment.",
-            layout: "third",
-          },
-          {
-            src: "/images/blog/ziyarat-imam-ali-al-ridha/ziyarat-imam-ali-al-ridha-1.jpeg",
-            alt: "Tissue and wipes for personal hygiene",
-            caption: "Keep hygiene supplies always accessible.",
-            layout: "third",
-          },
-          {
-            src: "/images/blog/ziyarat-imam-ali-al-ridha/ziyarat-imam-ali-al-ridha-2.jpeg",
-            alt: "Medical kit for travelers",
-            caption: "A small kit addresses most minor issues.",
-            layout: "third",
           },
         ],
       },
@@ -762,40 +733,22 @@ export const BLOG_POSTS: BlogPost[] = [
         ],
         visuals: [
           {
-            src: "/images/blog/ziyarat-imam-ali-al-ridha/ziyarat-imam-al-ridha-3.jpeg",
-            alt: "Comfortable walking shoes for pilgrimage",
-            caption: "Well-chosen footwear is one of your best decisions.",
+            src: "/images/blog/health-wellbeing-docx/health-wellbeing-docx-07.jpeg",
+            alt: "Comfortable footwear prepared for pilgrimage",
+            caption: "Good shoes are one of the most practical health decisions.",
             layout: "full",
           },
           {
-            src: "/images/blog/ziyarat-imam-ali-al-ridha/ziyarat-imam-ali-al-ridha-4.jpeg",
-            alt: "Blister protection and foot care items",
-            caption: "Small preparation prevents major discomfort.",
+            src: "/images/blog/health-wellbeing-docx/health-wellbeing-docx-08.jpeg",
+            alt: "Foot care and blister protection items",
+            caption: "Treat small foot issues early to avoid bigger problems.",
             layout: "half",
           },
           {
-            src: "/images/blog/ziyarat-imam-ali-al-ridha/ziyarat-imam-ali-al-ridha-5.jpeg",
-            alt: "Socks and foot hygiene",
-            caption: "Change socks regularly for comfort.",
+            src: "/images/blog/health-wellbeing-docx/health-wellbeing-docx-09.jpeg",
+            alt: "Pilgrim resting feet after long walking",
+            caption: "Recovery each day helps you stay strong throughout the journey.",
             layout: "half",
-          },
-          {
-            src: "/images/blog/ziyarat-imam-ali-al-ridha/ziyarat-imam-ali-al-ridha-6.jpeg",
-            alt: "Foot bandages and treatment",
-            caption: "Be ready to address blisters immediately.",
-            layout: "third",
-          },
-          {
-            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-1.jpeg",
-            alt: "Comfortable sandals for shrine visits",
-            caption: "Easy-on footwear for frequent removal at shrines.",
-            layout: "third",
-          },
-          {
-            src: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-2.jpeg",
-            alt: "Foot soaking and recovery",
-            caption: "Care for your feet at the end of each day.",
-            layout: "third",
           },
         ],
       },
@@ -809,13 +762,13 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         title: "Recognize early signs of illness",
         content: [
-          "Do not ignore symptoms such as fever, dizziness, extreme fatigue, or persistent cough. Seek help early. Do not wait until it worsens.",
+          "Do not ignore symptoms such as fever, dizziness, extreme fatigue, or persistent cough. Seek help early, and do not wait until it worsens.",
         ],
       },
       {
         title: "Spiritual balance through physical care",
         content: [
-          "Caring for your health is part of your intention. You are preparing your body to stand longer in prayer, walk further in devotion, and focus deeper in Ziyarat.",
+          "Caring for your health is part of your intention. You are preparing your body to stand longer in prayer, walk further in devotion, and focus deeper in ziyarat.",
           "Health is not separate from spirituality. It supports it.",
         ],
       },
