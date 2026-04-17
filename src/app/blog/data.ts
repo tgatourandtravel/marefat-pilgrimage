@@ -1065,7 +1065,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingTime: "7 min read",
     author: "Marefat Team",
     date: "April 13, 2026",
-    image: "/images/blog/ziyarat-iraq-packing-guide/ziyarat-iraq-packing-1.jpeg",
+    image: "/images/blog/umrah-covers/umrah-essentials-cover.jpg",
     excerpt:
       "A refined essentials checklist for Umrah covering clothing, documents, spiritual items, and what to skip for a lighter journey.",
     introduction:
@@ -1126,7 +1126,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingTime: "8 min read",
     author: "Marefat Team",
     date: "April 12, 2026",
-    image: "/images/blog/ziyarat-imam-ali-al-ridha/ziyarat-imam-ali-al-ridha-5.jpeg",
+    image: "/images/blog/umrah-covers/umrah-practical-tips-cover.jpg",
     excerpt:
       "Essential practical habits for documents, packing, crowds, hydration, and safety so your Umrah stays organized and stress-free.",
     introduction:
@@ -1253,7 +1253,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingTime: "10 min read",
     author: "Marefat Team",
     date: "April 12, 2026",
-    image: "/images/blog/ziyarat-imam-ali-al-ridha/ziyarat-imam-ali-al-ridha-2.jpeg",
+    image: "/images/blog/umrah-covers/umrah-shia-guide-cover.jpg",
     excerpt:
       "Complete spiritual and practical preparation with a step-by-step Umrah guide according to Shia jurisprudence, including Tawaf al-Nisa.",
     introduction:
