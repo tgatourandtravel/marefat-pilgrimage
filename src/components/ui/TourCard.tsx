@@ -60,10 +60,10 @@ export function TourCard({ tour }: TourCardProps) {
               sizes="(max-width: 640px) 100vw, 800px"
               className="object-cover transition duration-700 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#1c1005]/97 via-[#1c1005]/82 to-charcoal/25" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#5c3300]/92 via-[#2a1600]/80 to-charcoal/20" />
           </div>
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-[#1c1005]/97 to-charcoal/70" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#5c3300]/92 to-charcoal/80" />
         )}
 
         {/* Content */}
