@@ -89,12 +89,6 @@ export function TourCard({ tour }: TourCardProps) {
           </div>
         </div>
 
-        {/* Decorative crescent — right side */}
-        <div className="relative z-10 hidden items-center pr-10 sm:flex">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full border border-gold/30 text-3xl opacity-50 transition group-hover:opacity-75">
-            ☪
-          </div>
-        </div>
       </Link>
     );
   }
