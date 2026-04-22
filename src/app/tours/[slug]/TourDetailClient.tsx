@@ -170,7 +170,7 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.8fr)_minmax(0,1.2fr)]">
           {/* Left Column: Content */}
           <div className="space-y-8">
-            {/* Info Cards */}
+            {/* Info Cards — always visible */}
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               <InfoCard
                 icon={<CalendarIcon />}
@@ -202,158 +202,205 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
               />
             </div>
 
-            {/* Tabs Navigation */}
-            <Suspense fallback={<div className="h-96 animate-pulse rounded-xl bg-charcoal/5" />}>
-              <Tabs defaultValue="overview" urlSync className="space-y-6">
-                <TabsList>
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="included">What's Included</TabsTrigger>
-                  <TabsTrigger value="documents">Documents</TabsTrigger>
-                </TabsList>
-
-              {/* Tab Content: Overview */}
-              <TabsContent value="overview" className="space-y-8">
-                {/* Highlights */}
-                <div>
-                  <h2 className="text-lg font-semibold text-charcoal">
-                    Highlights
+            {/* ── Exclusive Services Layout (Hajj / special tours) ── */}
+            {tour.exclusiveDisplay && tour.exclusiveServices ? (
+              <div className="space-y-8">
+                {/* Heading */}
+                <div className="space-y-1.5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">
+                    What We Offer
+                  </p>
+                  <h2 className="text-2xl font-semibold text-charcoal sm:text-3xl">
+                    {tour.exclusiveServices.heading}
                   </h2>
-                  <ul className="mt-4 grid gap-2 text-sm text-charcoal/80 md:grid-cols-2">
-                    {tour.highlights?.map((item) => (
-                      <li
-                        key={item}
-                        className="flex items-start gap-2 rounded-xl border border-charcoal/5 bg-ivory/90 px-3 py-2"
-                      >
-                        <span className="mt-[6px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-gold" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
                 </div>
 
-                {/* Itinerary */}
-                <div>
-                  <h2 className="text-lg font-semibold text-charcoal">
-                    Day-by-day itinerary
-                  </h2>
-                  <ol className="mt-4 space-y-3 border-l border-charcoal/10 pl-4 text-sm text-charcoal/80">
-                    {tour.itinerary.map((item, index) => (
-                      <li key={item} className="relative">
-                        <span className="absolute -left-[19px] mt-[4px] h-2.5 w-2.5 rounded-full border border-gold/60 bg-ivory" />
-                        <span className="mr-2 text-[11px] font-medium text-charcoal/60">
-                          Day {index + 1}
+                {/* Service Sections */}
+                <div className="space-y-5">
+                  {tour.exclusiveServices.sections.map((section, idx) => (
+                    <div
+                      key={section.title}
+                      className="rounded-2xl border border-charcoal/8 bg-ivory/80 p-6 shadow-sm"
+                    >
+                      {/* Section header */}
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gold/15 text-[11px] font-bold text-gold-dark">
+                          {idx + 1}
                         </span>
-                        {item}
-                      </li>
-                    ))}
-                  </ol>
-                </div>
+                        <h3 className="text-base font-semibold text-charcoal">
+                          {section.title}
+                        </h3>
+                      </div>
 
-                {/* Hotels & Flights */}
-                <div className="grid gap-4 md:grid-cols-2">
-                  <Card variant="elevated" padding="md">
-                    <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-charcoal/60">
-                      Hotels
-                    </h3>
-                    <p className="mt-2 text-sm text-charcoal/75">{tour.hotelInfo}</p>
-                  </Card>
-                  <Card variant="elevated" padding="md">
-                    <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-charcoal/60">
-                      Flights
-                    </h3>
-                    <p className="mt-2 text-sm text-charcoal/75">{tour.flightsInfo}</p>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              {/* Tab Content: What's Included */}
-              <TabsContent value="included" className="space-y-6">
-                <div className="grid gap-6 md:grid-cols-2">
-                  {/* Included */}
-                  <div>
-                    <div className="mb-4 flex items-center gap-2">
-                      <CheckIcon />
-                      <h3 className="text-sm font-semibold text-charcoal">
-                        Included
-                      </h3>
+                      {/* Items */}
+                      <ul className="mt-4 space-y-3 pl-10">
+                        {section.items.map((item) => (
+                          <li
+                            key={item}
+                            className="flex items-start gap-3 text-sm leading-relaxed text-charcoal/75"
+                          >
+                            <span className="mt-[7px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-gold" />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    <ul className="space-y-2 text-sm text-charcoal/75">
-                      {tour.included.map((item) => (
-                        <li key={item} className="flex items-start gap-2">
-                          <CheckIcon />
+                  ))}
+                </div>
+
+                {/* CTA note */}
+                <div className="rounded-xl border border-gold/20 bg-gold/5 px-5 py-4">
+                  <p className="text-sm text-charcoal/70">
+                    Seats for Hajj 2027 are extremely limited. Contact our team early to begin your application and secure your place.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              /* ── Standard Layout (all other tours) ── */
+              <Suspense fallback={<div className="h-96 animate-pulse rounded-xl bg-charcoal/5" />}>
+                <Tabs defaultValue="overview" urlSync className="space-y-6">
+                  <TabsList>
+                    <TabsTrigger value="overview">Overview</TabsTrigger>
+                    <TabsTrigger value="included">What's Included</TabsTrigger>
+                    <TabsTrigger value="documents">Documents</TabsTrigger>
+                  </TabsList>
+
+                {/* Tab Content: Overview */}
+                <TabsContent value="overview" className="space-y-8">
+                  {/* Highlights */}
+                  <div>
+                    <h2 className="text-lg font-semibold text-charcoal">
+                      Highlights
+                    </h2>
+                    <ul className="mt-4 grid gap-2 text-sm text-charcoal/80 md:grid-cols-2">
+                      {tour.highlights?.map((item) => (
+                        <li
+                          key={item}
+                          className="flex items-start gap-2 rounded-xl border border-charcoal/5 bg-ivory/90 px-3 py-2"
+                        >
+                          <span className="mt-[6px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-gold" />
                           <span>{item}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  {/* Not Included */}
+                  {/* Itinerary */}
                   <div>
-                    <div className="mb-4 flex items-center gap-2">
-                      <XIcon />
-                      <h3 className="text-sm font-semibold text-charcoal">
-                        Not Included
-                      </h3>
-                    </div>
-                    <ul className="space-y-2 text-sm text-charcoal/75">
-                      {tour.excluded.map((item) => (
-                        <li key={item} className="flex items-start gap-2">
-                          <XIcon />
-                          <span>{item}</span>
+                    <h2 className="text-lg font-semibold text-charcoal">
+                      Day-by-day itinerary
+                    </h2>
+                    <ol className="mt-4 space-y-3 border-l border-charcoal/10 pl-4 text-sm text-charcoal/80">
+                      {tour.itinerary.map((item, index) => (
+                        <li key={item} className="relative">
+                          <span className="absolute -left-[19px] mt-[4px] h-2.5 w-2.5 rounded-full border border-gold/60 bg-ivory" />
+                          <span className="mr-2 text-[11px] font-medium text-charcoal/60">
+                            Day {index + 1}
+                          </span>
+                          {item}
                         </li>
                       ))}
-                    </ul>
+                    </ol>
                   </div>
-                </div>
-              </TabsContent>
 
-              {/* Tab Content: Documents */}
-              <TabsContent value="documents" className="space-y-6">
-                <div>
-                  <h3 className="mb-4 text-sm font-semibold text-charcoal">
-                    Required Documents
-                  </h3>
-                  <ul className="grid gap-2 text-sm text-charcoal/75 md:grid-cols-2">
-                    {tour.documentsNeeded.map((doc) => (
-                      <li
-                        key={doc}
-                        className="flex items-center gap-2 rounded-xl border border-charcoal/5 bg-ivory/90 px-3 py-2"
-                      >
+                  {/* Hotels & Flights */}
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <Card variant="elevated" padding="md">
+                      <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-charcoal/60">
+                        Hotels
+                      </h3>
+                      <p className="mt-2 text-sm text-charcoal/75">{tour.hotelInfo}</p>
+                    </Card>
+                    <Card variant="elevated" padding="md">
+                      <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-charcoal/60">
+                        Flights
+                      </h3>
+                      <p className="mt-2 text-sm text-charcoal/75">{tour.flightsInfo}</p>
+                    </Card>
+                  </div>
+                </TabsContent>
+
+                {/* Tab Content: What's Included */}
+                <TabsContent value="included" className="space-y-6">
+                  <div className="grid gap-6 md:grid-cols-2">
+                    <div>
+                      <div className="mb-4 flex items-center gap-2">
                         <CheckIcon />
-                        {doc}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                        <h3 className="text-sm font-semibold text-charcoal">
+                          Included
+                        </h3>
+                      </div>
+                      <ul className="space-y-2 text-sm text-charcoal/75">
+                        {tour.included.map((item) => (
+                          <li key={item} className="flex items-start gap-2">
+                            <CheckIcon />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
 
-                <Card variant="elevated" padding="md">
-                  <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-charcoal/60">
-                    Important Notes
-                  </h3>
-                  <ul className="mt-3 space-y-2 text-sm text-charcoal/75">
-                    <li className="flex items-start gap-2">
-                      <span className="mt-[6px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-gold" />
-                      <span>
-                        Passport must be valid for at least 6 months from the tour start date
-                      </span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="mt-[6px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-gold" />
-                      <span>
-                        We assist with visa processing for all participants
-                      </span>
-                    </li>
-                  {/*<li className="flex items-start gap-2">
-                      <span className="mt-[6px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-gold" />
-                      <span>
-                        Please ensure vaccination certificates are up to date
-                      </span>
-                    </li>*/}
-                  </ul>
-                </Card>
-              </TabsContent>
-              </Tabs>
-            </Suspense>
+                    <div>
+                      <div className="mb-4 flex items-center gap-2">
+                        <XIcon />
+                        <h3 className="text-sm font-semibold text-charcoal">
+                          Not Included
+                        </h3>
+                      </div>
+                      <ul className="space-y-2 text-sm text-charcoal/75">
+                        {tour.excluded.map((item) => (
+                          <li key={item} className="flex items-start gap-2">
+                            <XIcon />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {/* Tab Content: Documents */}
+                <TabsContent value="documents" className="space-y-6">
+                  <div>
+                    <h3 className="mb-4 text-sm font-semibold text-charcoal">
+                      Required Documents
+                    </h3>
+                    <ul className="grid gap-2 text-sm text-charcoal/75 md:grid-cols-2">
+                      {tour.documentsNeeded.map((doc) => (
+                        <li
+                          key={doc}
+                          className="flex items-center gap-2 rounded-xl border border-charcoal/5 bg-ivory/90 px-3 py-2"
+                        >
+                          <CheckIcon />
+                          {doc}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <Card variant="elevated" padding="md">
+                    <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-charcoal/60">
+                      Important Notes
+                    </h3>
+                    <ul className="mt-3 space-y-2 text-sm text-charcoal/75">
+                      <li className="flex items-start gap-2">
+                        <span className="mt-[6px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-gold" />
+                        <span>
+                          Passport must be valid for at least 6 months from the tour start date
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="mt-[6px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-gold" />
+                        <span>
+                          We assist with visa processing for all participants
+                        </span>
+                      </li>
+                    </ul>
+                  </Card>
+                </TabsContent>
+                </Tabs>
+              </Suspense>
+            )}
 
             {/* Testimonials Section */}
             <div className="mt-12">

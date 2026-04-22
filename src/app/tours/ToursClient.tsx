@@ -452,12 +452,20 @@ export default function ToursClient({ tours }: ToursClientProps) {
               </div>
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-2">
-              {filteredTours.map((tour) => (
+            <div className="space-y-6">
+              {/* Exclusive tours — full-width, above the regular grid */}
+              {filteredTours.filter((t) => t.exclusiveDisplay).map((tour) => (
                 <TourCard key={tour.slug} tour={tour} />
               ))}
 
-              {filteredTours.length === 0 && (
+              {/* Regular tours — 2-column grid */}
+              <div className="grid gap-6 lg:grid-cols-2">
+              {filteredTours.filter((t) => !t.exclusiveDisplay).map((tour) => (
+                <TourCard key={tour.slug} tour={tour} />
+              ))}
+
+              {filteredTours.filter((t) => !t.exclusiveDisplay).length === 0 &&
+                filteredTours.filter((t) => t.exclusiveDisplay).length === 0 && (
                 <div className="rounded-2xl border border-charcoal/5 bg-ivory/90 p-6 text-sm text-charcoal/70">
                   No tours match the selected filters. You may adjust your
                   criteria or{" "}
@@ -470,6 +478,7 @@ export default function ToursClient({ tours }: ToursClientProps) {
                   for a tailored proposal.
                 </div>
               )}
+              </div>
             </div>
           </section>
         </div>

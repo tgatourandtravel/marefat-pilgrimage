@@ -43,6 +43,62 @@ export function TourCard({ tour }: TourCardProps) {
   // Normalize slug (handle both string and {current: string} formats)
   const tourSlug = typeof tour.slug === "string" ? tour.slug : tour.slug?.current || "";
 
+  // ── Exclusive display variant (Hajj / special tours) ──────────────────────
+  if (tour.exclusiveDisplay) {
+    return (
+      <Link
+        href={`/tours/${tourSlug}`}
+        className="group relative flex min-h-[200px] overflow-hidden rounded-2xl border border-gold/15 shadow-soft transition hover:border-gold/35 hover:shadow-[0_8px_40px_rgba(199,165,106,0.14)] sm:min-h-[220px]"
+      >
+        {/* Background image */}
+        {cardImage ? (
+          <div className="absolute inset-0">
+            <Image
+              src={cardImage}
+              alt={tour.title}
+              fill
+              sizes="(max-width: 640px) 100vw, 800px"
+              className="object-cover transition duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-charcoal/95 via-charcoal/85 to-charcoal/40" />
+          </div>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-charcoal/95 to-charcoal/70" />
+        )}
+
+        {/* Content */}
+        <div className="relative z-10 flex flex-1 flex-col justify-between p-8 sm:p-10">
+          <div className="space-y-3">
+            <span className="inline-block text-[10px] font-semibold uppercase tracking-[0.24em] text-gold">
+              Hajj · 1448 AH
+            </span>
+            <h2 className="text-2xl font-semibold text-ivory transition group-hover:text-gold sm:text-3xl">
+              {tour.title}
+            </h2>
+          </div>
+          <div className="mt-8 flex items-center gap-2 text-sm font-medium text-ivory/50 transition group-hover:text-gold">
+            <span>Explore this journey</span>
+            <svg
+              className="h-4 w-4 transition group-hover:translate-x-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Decorative crescent — right side */}
+        <div className="relative z-10 hidden items-center pr-10 sm:flex">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full border border-gold/20 text-3xl opacity-40 transition group-hover:opacity-60">
+            ☪
+          </div>
+        </div>
+      </Link>
+    );
+  }
+
   return (
     <Link
       href={`/tours/${tourSlug}`}

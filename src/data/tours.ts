@@ -79,6 +79,16 @@ export type Tour = {
 
   // Images (paths relative to /public)
   images?: string[];
+
+  // Exclusive display mode — title-only card + custom detail layout
+  exclusiveDisplay?: boolean;
+  exclusiveServices?: {
+    heading: string;
+    sections: {
+      title: string;
+      items: string[];
+    }[];
+  };
 };
 
 // ============================================
@@ -196,6 +206,31 @@ export const TOURS: Tour[] = [
     images: [
       "/images/tours/hajj-2026/hajj-thumbnail-3.png",
     ],
+
+    exclusiveDisplay: true,
+    exclusiveServices: {
+      heading: "Exclusive Hajj Services",
+      sections: [
+        {
+          title: "Before Your Journey",
+          items: [
+            "Personalized one-on-one consultation prior to registration",
+            "Priority assistance with your 2027 Hajj quota application",
+            "Expert guidance in selecting a premium, tailored package",
+            "Access to exclusive packages accompanied by our elite guides",
+            "Smooth, end-to-end booking experience with dedicated support",
+          ],
+        },
+        {
+          title: "During & After Booking",
+          items: [
+            "Private seminar on Hajj rituals and rulings in accordance with Shia Islam",
+            "Full-service (companionship) throughout your sacred journey in Saudi Arabia",
+            "Continuous, high-touch support from arrival to departure",
+          ],
+        },
+      ],
+    },
   },
 
   // ----------------------------------------
