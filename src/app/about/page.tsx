@@ -336,27 +336,52 @@ export default function AboutPage() {
       {/* ─── LICENSING & TRUST ─── */}
       <section className="border-t border-charcoal/5">
         <div className="mx-auto max-w-6xl px-6 py-14 sm:px-8 lg:px-12">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">
-                Licensing &amp; trust
-              </p>
-              <h2 className="text-lg font-semibold text-charcoal sm:text-xl">
-                Operating with full accountability
-              </h2>
-              <p className="max-w-lg text-sm leading-relaxed text-charcoal/70">
-                Marefat operates with accredited partners and in full accordance with all
-                regulatory requirements. Documentation is available upon request.
-              </p>
+          <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">
+                  Licensing &amp; trust
+                </p>
+                <h2 className="text-lg font-semibold text-charcoal sm:text-xl">
+                  Operating with full accountability
+                </h2>
+                <p className="max-w-lg text-sm leading-relaxed text-charcoal/70">
+                  Marefat operates with accredited partners and in full accordance with all
+                  regulatory requirements. Documentation is available upon request.
+                </p>
+              </div>
+              <div className="shrink-0">
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 rounded-full bg-charcoal px-6 py-3 text-xs font-medium text-ivory shadow-soft transition hover:bg-charcoal/90"
+                >
+                  Request information
+                  <span aria-hidden="true">→</span>
+                </Link>
+              </div>
             </div>
-            <div className="shrink-0">
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-2 rounded-full bg-charcoal px-6 py-3 text-xs font-medium text-ivory shadow-soft transition hover:bg-charcoal/90"
-              >
-                Request information
-                <span aria-hidden="true">→</span>
-              </Link>
+
+            {/* IATA accreditation badge */}
+            <div className="flex flex-col gap-4 rounded-2xl border border-charcoal/8 bg-ivory/60 px-6 py-5 sm:flex-row sm:items-center sm:gap-6">
+              <img
+                src="/images/iata-accredited.png"
+                alt="IATA Accredited Travel Agent"
+                className="h-20 w-auto object-contain self-start sm:self-center"
+                title="IATA Accredited Travel Agent — International Air Transport Association"
+              />
+              <div className="flex flex-col gap-1.5">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-charcoal/60">
+                  IATA Accredited Travel Agent
+                </p>
+                <p className="text-sm font-medium text-charcoal">
+                  International Air Transport Association
+                </p>
+                <p className="max-w-sm text-sm leading-relaxed text-charcoal/65">
+                  Marefat Pilgrimage is an IATA-accredited travel agency — a globally recognized
+                  certification that confirms our compliance with international aviation and
+                  travel industry standards.
+                </p>
+              </div>
             </div>
           </div>
         </div>
