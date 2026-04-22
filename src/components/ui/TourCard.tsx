@@ -60,12 +60,10 @@ export function TourCard({ tour }: TourCardProps) {
               sizes="(max-width: 640px) 100vw, 800px"
               className="object-cover transition duration-700 group-hover:scale-105"
             />
-            {/* Dark base for readability + warm amber tint on left */}
-            <div className="absolute inset-0 bg-charcoal/80" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#5c3300]/70 via-[#2a1600]/30 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#1e1205]/95 via-charcoal/90 to-charcoal/20" />
           </div>
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-charcoal/95 via-[#2a1600]/80 to-charcoal/70" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#1e1205]/95 to-charcoal/80" />
         )}
 
         {/* Content */}
@@ -74,11 +72,11 @@ export function TourCard({ tour }: TourCardProps) {
             <span className="inline-block text-[10px] font-semibold uppercase tracking-[0.24em] text-gold">
               Hajj · 1448 AH
             </span>
-            <h2 className="text-2xl font-semibold text-ivory transition group-hover:text-gold sm:text-3xl">
+            <h2 className="text-2xl font-semibold text-gold/90 transition group-hover:text-gold sm:text-3xl">
               {tour.title}
             </h2>
           </div>
-          <div className="mt-8 flex items-center gap-2 text-sm font-medium text-gold/70 transition group-hover:text-gold">
+          <div className="mt-8 flex items-center gap-2 text-sm font-medium text-gold/50 transition group-hover:text-gold">
             <span>Explore this journey</span>
             <svg
               className="h-4 w-4 transition group-hover:translate-x-1"
