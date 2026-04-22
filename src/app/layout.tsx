@@ -205,27 +205,20 @@ export default function RootLayout({
                 </div>
               </div>
               {/* ── Accreditations ── */}
-              <div className="flex flex-wrap items-center justify-between gap-4 border-t border-charcoal/5 pt-4">
-                <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4 border-t border-charcoal/5 pt-4">
+                <div className="h-px flex-1 bg-charcoal/5" />
+                <div className="flex items-center gap-2.5">
                   <img
                     src="/images/iata-accredited.png"
                     alt="IATA Accredited Travel Agent"
-                    className="h-14 w-auto object-contain opacity-90"
+                    className="h-11 w-auto object-contain opacity-80"
                     title="IATA Accredited Travel Agent — International Air Transport Association"
                   />
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-charcoal/70">
-                      IATA Accredited
-                    </span>
-                    <span className="text-[11px] text-charcoal/50 leading-snug max-w-[180px]">
-                      International Air Transport Association member
-                    </span>
-                  </div>
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/45">
+                    IATA Accredited Travel Agent
+                  </span>
                 </div>
-                <p className="text-[11px] text-charcoal/40 max-w-xs text-right leading-relaxed hidden sm:block">
-                  Marefat Pilgrimage holds active IATA accreditation,<br />
-                  verifying our status as a certified global travel agent.
-                </p>
+                <div className="h-px flex-1 bg-charcoal/5" />
               </div>
 
               <div className="flex flex-col gap-4 border-t border-charcoal/5 pt-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
