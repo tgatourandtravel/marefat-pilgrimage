@@ -87,19 +87,19 @@ export type Tour = {
 
 export const TOURS: Tour[] = [
   // ----------------------------------------
-  // TOUR 1: Hajj 2026/1447 (Economy) - MOST IMPORTANT
+  // TOUR 1: Hajj 2027/1448 (Economy) - MOST IMPORTANT
   // ----------------------------------------
   {
-    slug: "hajj-2026-1447",
-    title: "Hajj 2026/1447",
+    slug: "hajj-2027-1448",
+    title: "Hajj 2027/1448",
     subtitle: "Elevate Your Spiritual Journey",
     destination: "Makkah, Madinah, Mina & Arafat",
     region: "Makkah/Madinah",
     type: "Hajj",
     packageLevel: "Economy",
 
-    startDate: "2026-05-18",
-    endDate: "2026-05-31",
+    startDate: "2027-05-07",
+    endDate: "2027-05-20",
     durationDays: 14,
 
     priceFrom: 12000, // $12,000 USD
@@ -109,13 +109,13 @@ export const TOURS: Tour[] = [
     meals: "Full Board",
     transfer: true,
     spiritualGuide: true,
-    spiritualGuideName: "Sayed Jafar Qazwini & Sayed Jafar Qazwini",
+    spiritualGuideName: "Sayed Jafar Qazwini & Sayed M. Sadiq Qazwini",
 
     popularityScore: 99,
     isFeatured: true,
 
     specialNotes: {
-      deadline: "2026-01-27",
+      deadline: "2027-01-27",
       limitedSeats: true,
       customNote: "Under the religious guidance of Sayed Jafar Qazwini & Sayed M. Sadiq Qazwini",
     },
