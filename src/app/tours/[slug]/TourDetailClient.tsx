@@ -171,36 +171,38 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
           {/* Left Column: Content */}
           <div className="space-y-8">
             {/* Info Cards — hidden for exclusive display tours */}
-            {!tour.exclusiveDisplay && <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <InfoCard
-                icon={<CalendarIcon />}
-                label="Travel Dates"
-                value={`${new Date(tour.startDate).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                })} - ${new Date(tour.endDate).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                })}`}
-                subtitle={new Date(tour.startDate).getFullYear().toString()}
-              />
-              <InfoCard
-                icon={<ClockIcon />}
-                label="Duration"
-                value={`${tour.durationDays} days`}
-              />
-              <InfoCard
-                icon={<HotelIcon />}
-                label="Hotel"
-                value={`${tour.hotelStars}★`}
-                subtitle={tour.hotelInfo.split(",")[0]}
-              />
-              <InfoCard
-                icon={<UsersIcon />}
-                label="Available"
-                value="12 seats"
-              />
-            </div>}
+            {!tour.exclusiveDisplay && (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <InfoCard
+                  icon={<CalendarIcon />}
+                  label="Travel Dates"
+                  value={`${new Date(tour.startDate).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })} - ${new Date(tour.endDate).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })}`}
+                  subtitle={new Date(tour.startDate).getFullYear().toString()}
+                />
+                <InfoCard
+                  icon={<ClockIcon />}
+                  label="Duration"
+                  value={`${tour.durationDays} days`}
+                />
+                <InfoCard
+                  icon={<HotelIcon />}
+                  label="Hotel"
+                  value={`${tour.hotelStars}★`}
+                  subtitle={tour.hotelInfo.split(",")[0]}
+                />
+                <InfoCard
+                  icon={<UsersIcon />}
+                  label="Available"
+                  value="12 seats"
+                />
+              </div>
+            )}
 
             {/* ── Exclusive Services Layout (Hajj / special tours) ── */}
             {tour.exclusiveDisplay && tour.exclusiveServices ? (

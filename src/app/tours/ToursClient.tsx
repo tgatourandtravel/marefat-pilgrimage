@@ -20,6 +20,7 @@ type Tour = {
   hotelStars: 3 | 4 | 5;
   flightIncluded: boolean;
   images?: any[];
+  exclusiveDisplay?: boolean;
   [key: string]: any;
 };
 
