@@ -217,6 +217,22 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                   </h2>
                 </div>
 
+                {/* Intro — Nusuk + guide context */}
+                {tour.exclusiveServices.intro && (
+                  <div className="rounded-2xl border border-charcoal/8 bg-ivory/60 px-6 py-5">
+                    <p className="text-sm leading-relaxed text-charcoal/70">
+                      {tour.exclusiveServices.intro.split("Nusuk").map((part, i, arr) => (
+                        <span key={i}>
+                          {part}
+                          {i < arr.length - 1 && (
+                            <span className="font-semibold text-charcoal">Nusuk</span>
+                          )}
+                        </span>
+                      ))}
+                    </p>
+                  </div>
+                )}
+
                 {/* Service Sections */}
                 <div className="space-y-5">
                   {tour.exclusiveServices.sections.map((section, idx) => (
@@ -250,7 +266,24 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                   ))}
                 </div>
 
-                {/* CTA note */}
+                {/* Free of charge — trust signal */}
+                {tour.exclusiveServices.freeNote && (
+                  <div className="flex items-start gap-3 rounded-2xl border border-gold/25 bg-gold/8 px-5 py-4">
+                    <svg
+                      className="mt-0.5 h-4 w-4 flex-shrink-0 text-gold-dark"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-sm font-medium leading-relaxed text-charcoal">
+                      {tour.exclusiveServices.freeNote}
+                    </p>
+                  </div>
+                )}
+
+                {/* Limited seats — urgency note */}
                 <div className="rounded-xl border border-gold/20 bg-gold/5 px-5 py-4">
                   <p className="text-sm text-charcoal/70">
                     Seats for Hajj 2027 are extremely limited. Contact our team early to begin your application and secure your place.

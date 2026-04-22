@@ -84,6 +84,8 @@ export type Tour = {
   exclusiveDisplay?: boolean;
   exclusiveServices?: {
     heading: string;
+    intro?: string;
+    freeNote?: string;
     sections: {
       title: string;
       items: string[];
@@ -210,6 +212,8 @@ export const TOURS: Tour[] = [
     exclusiveDisplay: true,
     exclusiveServices: {
       heading: "Exclusive Hajj Services",
+      intro: "All stages of the Hajj process are conducted through Nusuk. We support you as your guide — assisting you before your journey with every step of the registration process, and accompanying you throughout the trip as your dedicated guide.",
+      freeNote: "Our service is completely free of charge, and you are under no obligation or commitment to us.",
       sections: [
         {
           title: "Before Your Journey",
