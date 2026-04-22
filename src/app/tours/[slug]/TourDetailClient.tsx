@@ -170,8 +170,8 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.8fr)_minmax(0,1.2fr)]">
           {/* Left Column: Content */}
           <div className="space-y-8">
-            {/* Info Cards — always visible */}
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {/* Info Cards — hidden for exclusive display tours */}
+            {!tour.exclusiveDisplay && <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               <InfoCard
                 icon={<CalendarIcon />}
                 label="Travel Dates"
@@ -200,7 +200,7 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                 label="Available"
                 value="12 seats"
               />
-            </div>
+            </div>}
 
             {/* ── Exclusive Services Layout (Hajj / special tours) ── */}
             {tour.exclusiveDisplay && tour.exclusiveServices ? (
@@ -513,23 +513,25 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                   </div>
                 )}
 
-                {/* Key Features */}
-                <div className="space-y-2 border-t border-charcoal/5 pt-4 text-sm text-charcoal/80">
-                  {tour.flightIncluded && (
+                {/* Key Features — hidden for exclusive display tours */}
+                {!tour.exclusiveDisplay && (
+                  <div className="space-y-2 border-t border-charcoal/5 pt-4 text-sm text-charcoal/80">
+                    {tour.flightIncluded && (
+                      <div className="flex items-center gap-2">
+                        <PlaneIcon />
+                        <span>Flights included</span>
+                      </div>
+                    )}
                     <div className="flex items-center gap-2">
-                      <PlaneIcon />
-                      <span>Flights included</span>
+                      <HotelIcon />
+                      <span>{tour.hotelStars}★ Hotel • {tour.hotelInfo.split(",")[0]}</span>
                     </div>
-                  )}
-                  <div className="flex items-center gap-2">
-                    <HotelIcon />
-                    <span>{tour.hotelStars}★ Hotel • {tour.hotelInfo.split(",")[0]}</span>
+                    <div className="flex items-center gap-2">
+                      <UsersIcon />
+                      <span>12 seats remaining</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <UsersIcon />
-                    <span>12 seats remaining</span>
-                  </div>
-                </div>
+                )}
 
                 {/* CTA Buttons */}
                 <div className="space-y-2 border-t border-charcoal/5 pt-4">
