@@ -10,6 +10,37 @@ import { Elements } from "@stripe/react-stripe-js";
 import PaymentForm from "@/components/ui/PaymentForm";
 import { ONLINE_PAYMENT_ENABLED } from "@/lib/config/features";
 
+function CopyDetailsButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText(text).then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        });
+      }}
+      className="flex items-center gap-1.5 rounded-lg bg-charcoal/5 px-3 py-1.5 text-xs font-medium text-charcoal transition hover:bg-charcoal/10"
+    >
+      {copied ? (
+        <>
+          <svg className="h-3.5 w-3.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+          </svg>
+          Copied
+        </>
+      ) : (
+        <>
+          <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          Copy
+        </>
+      )}
+    </button>
+  );
+}
+
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
 
 function SuccessContent() {
@@ -218,31 +249,92 @@ function SuccessContent() {
             )}
           </div>
 
-          {/* Bank Details - Only shown after verification */}
-          {verified && (
-            <div className="mx-auto mt-8 max-w-md rounded-xl border border-gold/30 bg-ivory/90 p-6 text-left">
-              <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-charcoal/70">
-                Bank Details for Deposit
-              </p>
-              <div className="space-y-2 text-sm text-charcoal">
-                <div className="flex">
-                  <span className="w-24 font-medium">Bank:</span>
-                  <span>Deutsche Bank</span>
+          {/* Payment Details - Only shown after verification */}
+          {verified && paymentMethod !== "card" && (
+            <div className="mx-auto mt-8 max-w-md text-left space-y-4">
+              {/* Wire Transfer Details */}
+              {(paymentMethod === "bank_transfer" || paymentMethod === "wire" || !paymentMethod) && (
+                <div className="rounded-xl border border-gold/30 bg-ivory/90 p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-charcoal/70">
+                      Wire Transfer Details
+                    </p>
+                    <CopyDetailsButton
+                      text={`Account Name: TGA Tour and Travel LLC\nBank: JPMorgan Chase Bank, N.A.\nRouting Number (Wire): 021000021\nAccount Number: 2906503801\nSWIFT/BIC: CHASUS33\nReference: ${bookingRef}`}
+                    />
+                  </div>
+                  <div className="space-y-2 text-sm text-charcoal">
+                    <div className="flex gap-2">
+                      <span className="w-36 shrink-0 font-medium text-charcoal/70">Account Name</span>
+                      <span>TGA Tour and Travel LLC</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="w-36 shrink-0 font-medium text-charcoal/70">Bank</span>
+                      <span>JPMorgan Chase Bank, N.A.</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="w-36 shrink-0 font-medium text-charcoal/70">Routing (Wire)</span>
+                      <span className="font-mono">021000021</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="w-36 shrink-0 font-medium text-charcoal/70">Account Number</span>
+                      <span className="font-mono">2906503801</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="w-36 shrink-0 font-medium text-charcoal/70">SWIFT / BIC</span>
+                      <span className="font-mono">CHASUS33</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="w-36 shrink-0 font-medium text-charcoal/70">Reference</span>
+                      <span className="font-mono font-semibold text-charcoal">{bookingRef}</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 rounded-lg bg-charcoal/5 p-3">
+                    <p className="text-xs leading-relaxed text-charcoal/70">
+                      <strong className="font-semibold text-charcoal">Important:</strong> Please send as a wire transfer (not ACH)
+                      and include your booking reference in the payment note.
+                    </p>
+                  </div>
                 </div>
-                <div className="flex">
-                  <span className="w-24 font-medium">IBAN:</span>
-                  <span className="font-mono">DE89 3704 0044 0532 0130 00</span>
+              )}
+
+              {/* Zelle Details */}
+              {paymentMethod === "zelle" && (
+                <div className="rounded-xl border border-gold/30 bg-ivory/90 p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-charcoal/70">
+                      Zelle Transfer Details
+                    </p>
+                    <CopyDetailsButton
+                      text={`Zelle Recipient: info@tgatourandtravel.com\nRecipient Name: TGA Tour and Travel LLC\nReference: ${bookingRef}`}
+                    />
+                  </div>
+                  <div className="space-y-2 text-sm text-charcoal">
+                    <div className="flex gap-2">
+                      <span className="w-36 shrink-0 font-medium text-charcoal/70">Recipient Email</span>
+                      <span className="font-mono">info@tgatourandtravel.com</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="w-36 shrink-0 font-medium text-charcoal/70">Recipient Name</span>
+                      <span>TGA Tour and Travel LLC</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="w-36 shrink-0 font-medium text-charcoal/70">Reference</span>
+                      <span className="font-mono font-semibold text-charcoal">{bookingRef}</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 rounded-lg bg-charcoal/5 p-3">
+                    <p className="text-xs leading-relaxed text-charcoal/70">
+                      <strong className="font-semibold text-charcoal">Verification:</strong> Before completing your transfer,
+                      confirm the recipient name in Zelle matches{" "}
+                      <strong className="text-charcoal">TGA Tour and Travel LLC</strong>.
+                    </p>
+                  </div>
                 </div>
-                <div className="flex">
-                  <span className="w-24 font-medium">BIC:</span>
-                  <span className="font-mono">COBADEFFXXX</span>
-                </div>
-                <div className="flex">
-                  <span className="w-24 font-medium">Reference:</span>
-                  <span className="font-mono font-medium">{bookingRef}</span>
-                </div>
-              </div>
-              <div className="mt-4 rounded-lg bg-gold/10 p-3">
+              )}
+
+              {/* Expiry Notice */}
+              <div className="rounded-xl bg-gold/10 p-4">
                 <p className="text-xs text-charcoal/70">
                   <strong className="font-semibold text-charcoal">Reservation expires:</strong>{" "}
                   {formattedExpiry}
@@ -332,7 +424,9 @@ function SuccessContent() {
                     2. Payment Transfer
                   </h3>
                   <p className="mt-1 text-xs leading-relaxed text-charcoal/70">
-                    Please transfer the 30% deposit to the bank account {verified ? "shown above" : "provided in your email"}. Use your booking reference ({bookingRef}) as the payment reference.
+                    Please transfer the deposit using the payment details{" "}
+                    {verified ? "shown above" : "provided in your confirmation email"}.
+                    Always include your booking reference <strong className="font-medium text-charcoal">{bookingRef}</strong> in the payment note.
                   </p>
                 </div>
               </div>

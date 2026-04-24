@@ -60,6 +60,124 @@ type Props = {
   params: { slug: string };
 };
 
+function CopyButton({ text, label = "Copy" }: { text: string; label?: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      className="flex items-center gap-1.5 rounded-lg bg-charcoal/5 px-3 py-1.5 text-xs font-medium text-charcoal transition hover:bg-charcoal/10"
+    >
+      {copied ? (
+        <>
+          <svg className="h-3.5 w-3.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+          </svg>
+          Copied
+        </>
+      ) : (
+        <>
+          <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          {label}
+        </>
+      )}
+    </button>
+  );
+}
+
+function WireTransferDetails({ copyText }: { copyText: string }) {
+  return (
+    <div className="space-y-3">
+      <div className="relative rounded-xl border border-gold/30 bg-ivory/90 p-5">
+        <div className="absolute right-4 top-4">
+          <CopyButton text={copyText} />
+        </div>
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-charcoal/70">
+          Wire Transfer Details
+        </p>
+        <div className="space-y-2.5 text-sm text-charcoal">
+          <div className="flex gap-2">
+            <span className="w-36 shrink-0 font-medium text-charcoal/70">Account Name</span>
+            <span>TGA Tour and Travel LLC</span>
+          </div>
+          <div className="flex gap-2">
+            <span className="w-36 shrink-0 font-medium text-charcoal/70">Bank</span>
+            <span>JPMorgan Chase Bank, N.A.</span>
+          </div>
+          <div className="flex gap-2">
+            <span className="w-36 shrink-0 font-medium text-charcoal/70">Routing (Wire)</span>
+            <span className="font-mono">021000021</span>
+          </div>
+          <div className="flex gap-2">
+            <span className="w-36 shrink-0 font-medium text-charcoal/70">Account Number</span>
+            <span className="font-mono">2906503801</span>
+          </div>
+          <div className="flex gap-2">
+            <span className="w-36 shrink-0 font-medium text-charcoal/70">SWIFT / BIC</span>
+            <span className="font-mono">CHASUS33</span>
+          </div>
+          <div className="flex gap-2">
+            <span className="w-36 shrink-0 font-medium text-charcoal/70">Reference</span>
+            <span className="italic text-charcoal/60">Your Booking Reference</span>
+          </div>
+        </div>
+      </div>
+      <div className="rounded-xl border border-charcoal/5 bg-ivory/60 p-4">
+        <p className="text-xs leading-relaxed text-charcoal/70">
+          <strong className="font-semibold text-charcoal">Important:</strong> Please send as a{" "}
+          <strong className="text-charcoal">wire transfer</strong> (not ACH) and include your booking reference
+          in the payment note to ensure smooth processing.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function ZelleDetails({ copyText }: { copyText: string }) {
+  return (
+    <div className="space-y-3">
+      <div className="relative rounded-xl border border-gold/30 bg-ivory/90 p-5">
+        <div className="absolute right-4 top-4">
+          <CopyButton text={copyText} />
+        </div>
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-charcoal/70">
+          Zelle Transfer Details
+        </p>
+        <div className="space-y-2.5 text-sm text-charcoal">
+          <div className="flex gap-2">
+            <span className="w-36 shrink-0 font-medium text-charcoal/70">Recipient Email</span>
+            <span className="font-mono">info@tgatourandtravel.com</span>
+          </div>
+          <div className="flex gap-2">
+            <span className="w-36 shrink-0 font-medium text-charcoal/70">Recipient Name</span>
+            <span>TGA Tour and Travel LLC</span>
+          </div>
+          <div className="flex gap-2">
+            <span className="w-36 shrink-0 font-medium text-charcoal/70">Reference</span>
+            <span className="italic text-charcoal/60">Your Booking Reference</span>
+          </div>
+        </div>
+      </div>
+      <div className="rounded-xl border border-charcoal/5 bg-ivory/60 p-4">
+        <p className="text-xs leading-relaxed text-charcoal/70">
+          <strong className="font-semibold text-charcoal">Verification:</strong> Before completing your transfer,
+          confirm the recipient name displayed in Zelle matches{" "}
+          <strong className="text-charcoal">TGA Tour and Travel LLC</strong>. Include your booking reference in the
+          payment note. Zelle is available for U.S. bank accounts only.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function TourBookingPage({ params }: Props) {
   const router = useRouter();
   const tour = getTourData(params.slug);
@@ -106,7 +224,7 @@ export default function TourBookingPage({ params }: Props) {
     flightBooking: false,
   });
 
-  const [paymentMethod, setPaymentMethod] = useState<"bank" | "card">("bank");
+  const [paymentMethod, setPaymentMethod] = useState<"wire" | "zelle" | "card">("wire");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Scroll to top of form fields when step changes
@@ -995,12 +1113,18 @@ export default function TourBookingPage({ params }: Props) {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-charcoal">
-                          {paymentMethod === "card" ? "Online Card Payment" : "Bank Transfer"}
+                          {paymentMethod === "card"
+                            ? "Online Card Payment"
+                            : paymentMethod === "zelle"
+                            ? "Zelle Transfer"
+                            : "Bank Wire Transfer"}
                         </p>
                         <p className="text-xs text-charcoal/60">
                           {paymentMethod === "card"
                             ? "Secure online payment via Stripe"
-                            : "Direct transfer to business account"}
+                            : paymentMethod === "zelle"
+                            ? "Zelle to info@tgatourandtravel.com (US only)"
+                            : "Wire transfer to JPMorgan Chase"}
                         </p>
                       </div>
                     </div>
@@ -1038,7 +1162,7 @@ export default function TourBookingPage({ params }: Props) {
                           <span className="font-semibold text-gold-dark">${depositAmount.toLocaleString()}</span>
                         </div>
                         <p className="mt-2 text-xs text-charcoal/60">
-                          Remaining balance of ${(grandTotal - depositAmount).toLocaleString()} due 30 days before departure
+                          Remaining balance of ${(grandTotal - depositAmount).toLocaleString()} due 45 days before departure
                         </p>
                       </div>
                     </div>
@@ -1071,11 +1195,70 @@ export default function TourBookingPage({ params }: Props) {
               {/* Step 3: Payment Method */}
               {step === 3 && (
                 <Card variant="elevated" padding="lg" className="space-y-6">
-                  <h2 className="font-display text-lg font-semibold text-charcoal">
-                    Payment Method
-                  </h2>
+                  <div>
+                    <h2 className="font-display text-lg font-semibold text-charcoal">
+                      Payment Method
+                    </h2>
+                    <p className="mt-1 text-xs text-charcoal/60">
+                      Select how you would like to pay your deposit
+                    </p>
+                  </div>
 
                   <div className="space-y-3">
+                    {/* Wire Transfer */}
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("wire")}
+                      className={`flex w-full items-start gap-3 rounded-xl border p-4 transition ${
+                        paymentMethod === "wire"
+                          ? "border-gold bg-gold/5"
+                          : "border-charcoal/7 bg-ivory/90 hover:border-charcoal/15"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        checked={paymentMethod === "wire"}
+                        readOnly
+                        className="mt-0.5"
+                      />
+                      <div className="flex-1 text-left">
+                        <p className="text-sm font-medium text-charcoal">Bank Wire Transfer</p>
+                        <p className="text-xs text-charcoal/60">
+                          Secure wire transfer via JPMorgan Chase Bank — US &amp; International
+                        </p>
+                      </div>
+                    </button>
+
+                    {/* Zelle */}
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("zelle")}
+                      className={`flex w-full items-start gap-3 rounded-xl border p-4 transition ${
+                        paymentMethod === "zelle"
+                          ? "border-gold bg-gold/5"
+                          : "border-charcoal/7 bg-ivory/90 hover:border-charcoal/15"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        checked={paymentMethod === "zelle"}
+                        readOnly
+                        className="mt-0.5"
+                      />
+                      <div className="flex-1 text-left">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium text-charcoal">Zelle</p>
+                          <span className="rounded-full bg-charcoal/5 px-2 py-0.5 text-[10px] font-medium text-charcoal/60">
+                            US Only
+                          </span>
+                        </div>
+                        <p className="text-xs text-charcoal/60">
+                          Instant bank-to-bank transfer for U.S. accounts
+                        </p>
+                      </div>
+                    </button>
+
+                    {/* Online Card Payment (Stripe) */}
                     {ONLINE_PAYMENT_ENABLED && (
                       <button
                         type="button"
@@ -1093,111 +1276,67 @@ export default function TourBookingPage({ params }: Props) {
                           className="mt-0.5"
                         />
                         <div className="flex-1 text-left">
-                          <p className="text-sm font-medium text-charcoal">
-                            Online Payment
-                          </p>
+                          <p className="text-sm font-medium text-charcoal">Online Card Payment</p>
                           <p className="text-xs text-charcoal/60">
-                            Credit/debit card via Stripe (enabled after booking verification)
+                            Credit or debit card via Stripe — available after booking verification
                           </p>
                         </div>
                       </button>
                     )}
-
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod("bank")}
-                      className={`flex w-full items-start gap-3 rounded-xl border p-4 transition ${
-                        paymentMethod === "bank"
-                          ? "border-gold bg-gold/5"
-                          : "border-charcoal/7 bg-ivory/90 hover:border-charcoal/15"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        checked={paymentMethod === "bank"}
-                        readOnly
-                        className="mt-0.5"
-                      />
-                      <div className="flex-1 text-left">
-                        <p className="text-sm font-medium text-charcoal">
-                          Bank Transfer
-                        </p>
-                        <p className="text-xs text-charcoal/60">
-                          Direct transfer to our business account
-                        </p>
-                      </div>
-                    </button>
                   </div>
 
-                  {paymentMethod === "bank" && (
-                    <div className="relative rounded-xl border border-gold/30 bg-ivory/90 p-5">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const bankDetails = `Bank: Deutsche Bank\nIBAN: DE89 3704 0044 0532 0130 00\nBIC: COBADEFFXXX\nReference: Your booking ID`;
-                          navigator.clipboard.writeText(bankDetails);
-                        }}
-                        className="absolute right-4 top-4 flex items-center gap-1.5 rounded-lg bg-charcoal/5 px-3 py-1.5 text-xs font-medium text-charcoal transition hover:bg-charcoal/10"
-                        title="Copy bank details"
-                      >
-                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  {/* Wire Transfer Details */}
+                  {paymentMethod === "wire" && (
+                    <WireTransferDetails copyText={`Account Name: TGA Tour and Travel LLC\nBank: JPMorgan Chase Bank, N.A.\nRouting Number (Wire): 021000021\nAccount Number: 2906503801\nSWIFT/BIC: CHASUS33\nReference: Your Booking Reference`} />
+                  )}
+
+                  {/* Zelle Details */}
+                  {paymentMethod === "zelle" && (
+                    <ZelleDetails copyText={`Zelle Recipient: info@tgatourandtravel.com\nRecipient Name: TGA Tour and Travel LLC\nReference: Your Booking Reference`} />
+                  )}
+
+                  {/* Online Card Payment Info */}
+                  {paymentMethod === "card" && (
+                    <div className="rounded-xl border border-charcoal/10 bg-ivory/80 p-5">
+                      <div className="flex items-start gap-3">
+                        <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-charcoal/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                         </svg>
-                        Copy
-                      </button>
-                      <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-charcoal/70">
-                        Bank Details
-                      </p>
-                      <div className="space-y-2 text-sm text-charcoal">
-                        <div className="flex">
-                          <span className="w-24 font-medium">Bank:</span>
-                          <span>Deutsche Bank</span>
-                        </div>
-                        <div className="flex">
-                          <span className="w-24 font-medium">IBAN:</span>
-                          <span className="font-mono">DE89 3704 0044 0532 0130 00</span>
-                        </div>
-                        <div className="flex">
-                          <span className="w-24 font-medium">BIC:</span>
-                          <span className="font-mono">COBADEFFXXX</span>
-                        </div>
-                        <div className="flex">
-                          <span className="w-24 font-medium">Reference:</span>
-                          <span>Your booking ID</span>
+                        <div>
+                          <p className="text-sm font-medium text-charcoal">Secure Online Payment via Stripe</p>
+                          <p className="mt-1.5 text-xs leading-relaxed text-charcoal/70">
+                            Card payment is processed securely by Stripe. Your card details are never stored on our servers.
+                            The payment link will be activated on your booking confirmation page after OTP verification.
+                          </p>
                         </div>
                       </div>
                     </div>
                   )}
 
-                  {paymentMethod === "card" && (
-                    <div className="rounded-xl border border-gold/30 bg-ivory/90 p-5">
-                      <p className="text-sm font-medium text-charcoal">Online card payment selected</p>
-                      <p className="mt-2 text-xs text-charcoal/70">
-                        For security and fraud prevention, card payment is available right after OTP
-                        verification on the confirmation page.
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="rounded-xl bg-gold/10 p-4">
+                  {/* Payment Terms */}
+                  <div className="rounded-xl bg-gold/10 p-4 space-y-2">
+                    <p className="text-xs font-semibold text-charcoal">Payment Terms</p>
                     <p className="text-xs leading-relaxed text-charcoal/75">
-                      <strong className="font-semibold text-charcoal">Payment Terms:</strong> A 30% deposit
-                      (${depositAmount.toLocaleString()}) is due now to confirm your booking. The remaining balance
-                      is due 30 days before departure. Full payment details and invoice will be sent to your email.
-                      {" "}Please review our{" "}
-                      <a href="/refund-policy" target="_blank" className="font-medium underline">
+                      A deposit of <strong className="text-charcoal">${depositAmount.toLocaleString()}</strong> (30% of total) is required to secure your booking.
+                      Please complete the deposit within <strong className="text-charcoal">7 days</strong> of your booking request.
+                      The remaining balance of <strong className="text-charcoal">${(grandTotal - depositAmount).toLocaleString()}</strong> is due no later than{" "}
+                      <strong className="text-charcoal">45 days</strong> prior to your travel date.
+                    </p>
+                    <p className="text-xs text-charcoal/60">
+                      Please review our{" "}
+                      <a href="/refund-policy" target="_blank" className="font-medium underline hover:text-charcoal">
                         Refund Policy
-                      </a>
-                      {" "}before payment.
+                      </a>{" "}
+                      before completing your payment.
                     </p>
                   </div>
 
                   <div className="flex items-start gap-2 rounded-xl bg-ivory/80 p-4">
-                    <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-charcoal/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-charcoal/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                     <p className="text-xs text-charcoal/70">
-                      Your payment information is secure and encrypted
+                      Your payment information is handled securely and never stored on our servers
                     </p>
                   </div>
                 </Card>
@@ -1339,7 +1478,7 @@ export default function TourBookingPage({ params }: Props) {
                     <span className="font-semibold text-charcoal">${depositAmount.toLocaleString()}</span>
                   </div>
                   <p className="mt-1.5 text-[10px] text-charcoal/60">
-                    Remaining balance due 30 days before departure
+                    Remaining balance due 45 days before departure
                   </p>
                 </div>
               </div>

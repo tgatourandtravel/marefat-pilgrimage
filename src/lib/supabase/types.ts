@@ -7,7 +7,7 @@ export type BookingStatus =
   | 'cancelled'
   | 'expired';
 
-export type PaymentMethod = 'bank_transfer' | 'card';
+export type PaymentMethod = 'wire' | 'zelle' | 'card';
 export type PaymentStatus = 'unpaid' | 'requires_action' | 'paid' | 'failed' | 'refunded';
 
 export interface Booking {

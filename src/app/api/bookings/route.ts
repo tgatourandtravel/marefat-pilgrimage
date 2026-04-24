@@ -41,7 +41,7 @@ interface CreateBookingRequest {
   basePricePerPerson: number;
   insuranceCostPerPerson: number;
   flightCostPerPerson: number;
-  paymentMethod?: 'bank' | 'card';
+  paymentMethod?: 'wire' | 'zelle' | 'card';
 }
 
 export async function POST(request: NextRequest) {
@@ -75,7 +75,12 @@ export async function POST(request: NextRequest) {
       : 0;
     const grandTotal = baseTotal + insuranceTotal + flightTotal;
     const depositAmount = Math.floor(grandTotal * 0.3);
-    const selectedPaymentMethod = body.paymentMethod === 'card' ? 'card' : 'bank_transfer';
+    const selectedPaymentMethod =
+      body.paymentMethod === 'card'
+        ? 'card'
+        : body.paymentMethod === 'zelle'
+        ? 'zelle'
+        : 'wire';
 
     // Generate unique booking reference
     let bookingRef = generateBookingRef();

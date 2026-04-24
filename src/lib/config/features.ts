@@ -6,4 +6,4 @@
  *   All Stripe infrastructure (API routes, webhook, DB columns) is already in place.
  */
 
-export const ONLINE_PAYMENT_ENABLED = false;
+export const ONLINE_PAYMENT_ENABLED = true;

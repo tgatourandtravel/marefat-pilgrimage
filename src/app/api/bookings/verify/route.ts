@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
 
     const primaryTraveler = travelerData as { first_name: string } | null;
 
-    // Send confirmation email with bank details
+    // Send confirmation email with payment details
     try {
       await sendBookingConfirmationEmail({
         to: booking.contact_email,
@@ -152,6 +152,7 @@ export async function POST(request: NextRequest) {
         depositAmount: booking.deposit_amount,
         grandTotal: booking.grand_total,
         expiresAt: expiresAt,
+        paymentMethod: (booking as any).payment_method ?? undefined,
       });
     } catch (emailError) {
       console.error('Confirmation email error:', emailError);
