@@ -64,6 +64,13 @@ export default function VerifyBookingPage({ params }: Props) {
     }
   }, [resendCooldown]);
 
+  useEffect(() => {
+    if (code.every((digit) => digit.length === 1) && !isVerifying) {
+      const form = document.getElementById("verify-booking-form") as HTMLFormElement | null;
+      form?.requestSubmit();
+    }
+  }, [code, isVerifying]);
+
   // Verify code
   const handleVerify = async (e: FormEvent) => {
     e.preventDefault();
@@ -166,7 +173,7 @@ export default function VerifyBookingPage({ params }: Props) {
             </p>
           </div>
 
-          <form onSubmit={handleVerify} className="mt-8">
+          <form id="verify-booking-form" onSubmit={handleVerify} className="mt-8">
             <div className="flex justify-center gap-3" onPaste={handlePaste}>
               {code.map((digit, index) => (
                 <input

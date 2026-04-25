@@ -1,8 +1,10 @@
+import { randomInt } from "crypto";
+
 /**
  * Generate a 4-digit OTP code
  */
 export function generateOTP(): string {
-  return Math.floor(1000 + Math.random() * 9000).toString();
+  return randomInt(1000, 10000).toString();
 }
 
 /**

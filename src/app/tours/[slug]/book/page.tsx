@@ -238,24 +238,6 @@ export default function TourBookingPage({ params }: Props) {
     }
   }, [step]);
 
-  // Initialize travelers array when number changes
-  const handleTravelerCountChange = (count: number) => {
-    setNumberOfTravelers(count);
-    const newTravelers: TravelerInfo[] = [];
-    for (let i = 0; i < count; i++) {
-      newTravelers.push({
-        id: `traveler-${i + 1}`,
-        firstName: "",
-        lastName: "",
-        passportNumber: "",
-        nationality: "",
-        passportExpiry: "",
-        dateOfBirth: "",
-      });
-    }
-    setTravelers(newTravelers);
-  };
-
   // Update booker field
   const updateBooker = (field: keyof BookerInfo, value: string) => {
     setBooker(prev => ({ ...prev, [field]: value }));

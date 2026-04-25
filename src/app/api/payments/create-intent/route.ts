@@ -24,6 +24,14 @@ export async function POST(request: NextRequest) {
     }
     recent.push(now);
     requestLog.set(ip, recent);
+    for (const [entryIp, timestamps] of requestLog.entries()) {
+      const validTimestamps = timestamps.filter((ts) => now - ts < rateLimitWindowMs);
+      if (validTimestamps.length === 0) {
+        requestLog.delete(entryIp);
+      } else {
+        requestLog.set(entryIp, validTimestamps);
+      }
+    }
 
     if (!isStripeConfigured || !stripe) {
       return NextResponse.json(
@@ -50,6 +58,13 @@ export async function POST(request: NextRequest) {
     if (!booking.is_verified) {
       return NextResponse.json(
         { error: "Booking must be verified before online payment." },
+        { status: 400 }
+      );
+    }
+
+    if (booking.payment_method !== "card") {
+      return NextResponse.json(
+        { error: "Online card payment is not enabled for this booking." },
         { status: 400 }
       );
     }

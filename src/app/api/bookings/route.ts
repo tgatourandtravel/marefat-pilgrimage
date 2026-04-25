@@ -3,10 +3,17 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { generateBookingRef } from '@/lib/utils/booking-ref';
 import { generateOTP, getOTPExpiry } from '@/lib/utils/otp';
 import { sendOTPEmail } from '@/lib/email/resend';
-import type { Booking } from '@/lib/supabase/types';
+import { getTourBySlug } from '@/data/tours';
+import {
+  validateBookerFields,
+  validateTravelerFields,
+} from '@/lib/utils/validation';
 
 // Force dynamic rendering to prevent static optimization at build time
 export const dynamic = 'force-dynamic';
+const rateLimitWindowMs = 60_000;
+const maxRequestsPerWindow = 10;
+const requestLog = new Map<string, number[]>();
 
 // Booker: Person making the reservation (has contact info)
 interface BookerInput {
@@ -29,23 +36,35 @@ interface TravelerInput {
 
 interface CreateBookingRequest {
   tourSlug: string;
-  tourTitle: string;
-  tourDestination: string;
-  tourStartDate?: string;
-  tourDurationDays?: number;
   booker: BookerInput;
   travelers: TravelerInput[];
   hasInsurance: boolean;
   hasFlightBooking: boolean;
-  flightIncludedInTour: boolean;
-  basePricePerPerson: number;
-  insuranceCostPerPerson: number;
-  flightCostPerPerson: number;
   paymentMethod?: 'wire' | 'zelle' | 'card';
 }
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const now = Date.now();
+    const recent = (requestLog.get(ip) || []).filter((ts) => now - ts < rateLimitWindowMs);
+    if (recent.length >= maxRequestsPerWindow) {
+      return NextResponse.json(
+        { error: 'Too many booking attempts. Please try again in one minute.' },
+        { status: 429 }
+      );
+    }
+    recent.push(now);
+    requestLog.set(ip, recent);
+    for (const [entryIp, timestamps] of requestLog.entries()) {
+      const validTimestamps = timestamps.filter((ts) => now - ts < rateLimitWindowMs);
+      if (validTimestamps.length === 0) {
+        requestLog.delete(entryIp);
+      } else {
+        requestLog.set(entryIp, validTimestamps);
+      }
+    }
+
     const body: CreateBookingRequest = await request.json();
 
     // Validate required fields
@@ -56,22 +75,58 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate booker has email
-    if (!body.booker.email) {
+    if (body.travelers.length > 10) {
       return NextResponse.json(
-        { error: 'Booker email is required' },
+        { error: 'Maximum 10 travelers are allowed per booking.' },
         { status: 400 }
       );
     }
 
-    // Calculate totals
+    const tour = getTourBySlug(body.tourSlug);
+    if (!tour) {
+      return NextResponse.json(
+        { error: 'Tour not found' },
+        { status: 404 }
+      );
+    }
+
+    const bookerErrors = validateBookerFields(body.booker);
+    if (Object.keys(bookerErrors).length > 0) {
+      return NextResponse.json(
+        { error: 'Invalid booker information', details: bookerErrors },
+        { status: 400 }
+      );
+    }
+
+    const travelerErrors = body.travelers
+      .map((traveler, index) => {
+        const skipNameValidation = index === 0 && body.booker.isTraveling;
+        const candidate = skipNameValidation
+          ? { ...traveler, firstName: body.booker.firstName, lastName: body.booker.lastName }
+          : traveler;
+        const errors = validateTravelerFields(candidate, tour.startDate, skipNameValidation);
+        return Object.keys(errors).length > 0 ? { travelerIndex: index, errors } : null;
+      })
+      .filter(Boolean);
+
+    if (travelerErrors.length > 0) {
+      return NextResponse.json(
+        { error: 'Invalid traveler information', details: travelerErrors },
+        { status: 400 }
+      );
+    }
+
+    // Calculate totals using authoritative server-side pricing.
     const numberOfTravelers = body.travelers.length;
-    const baseTotal = body.basePricePerPerson * numberOfTravelers;
+    const basePricePerPerson = tour.priceFrom;
+    const insuranceCostPerPerson = 99;
+    const flightCostPerPerson = 450;
+    const baseTotal = basePricePerPerson * numberOfTravelers;
     const insuranceTotal = body.hasInsurance
-      ? body.insuranceCostPerPerson * numberOfTravelers
+      ? insuranceCostPerPerson * numberOfTravelers
       : 0;
-    const flightTotal = body.hasFlightBooking && !body.flightIncludedInTour
-      ? body.flightCostPerPerson * numberOfTravelers
+    const flightTotal = body.hasFlightBooking && !tour.flightIncluded
+      ? flightCostPerPerson * numberOfTravelers
       : 0;
     const grandTotal = baseTotal + insuranceTotal + flightTotal;
     const depositAmount = Math.floor(grandTotal * 0.3);
@@ -102,14 +157,16 @@ export async function POST(request: NextRequest) {
       .from('bookings')
       .insert({
         booking_ref: bookingRef,
-        tour_slug: body.tourSlug,
-        tour_title: body.tourTitle,
-        tour_destination: body.tourDestination,
-        tour_start_date: body.tourStartDate || null,
-        tour_duration_days: body.tourDurationDays || null,
+        tour_slug: tour.slug,
+        tour_title: tour.title,
+        tour_destination: tour.destination,
+        tour_start_date: tour.startDate || null,
+        tour_duration_days: tour.durationDays || null,
+        contact_first_name: body.booker.firstName.trim(),
+        contact_last_name: body.booker.lastName.trim(),
         contact_email: body.booker.email.toLowerCase(),
         contact_phone: body.booker.phone,
-        base_price_per_person: body.basePricePerPerson,
+        base_price_per_person: basePricePerPerson,
         number_of_travelers: numberOfTravelers,
         insurance_total: insuranceTotal,
         flight_total: flightTotal,
@@ -144,8 +201,8 @@ export async function POST(request: NextRequest) {
     // Note: email/phone are stored at booking level (booker), not per traveler
     const travelersToInsert = body.travelers.map((traveler, index) => ({
       booking_id: booking.id,
-      first_name: traveler.firstName,
-      last_name: traveler.lastName,
+      first_name: index === 0 && body.booker.isTraveling ? body.booker.firstName : traveler.firstName,
+      last_name: index === 0 && body.booker.isTraveling ? body.booker.lastName : traveler.lastName,
       email: index === 0 && body.booker.isTraveling ? body.booker.email.toLowerCase() : '',
       phone: index === 0 && body.booker.isTraveling ? body.booker.phone : '',
       date_of_birth: traveler.dateOfBirth,

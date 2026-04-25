@@ -1,14 +1,14 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
-import { generateBookingPDF, type BookingData } from "@/lib/pdf/booking-pdf";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import PaymentForm from "@/components/ui/PaymentForm";
 import { ONLINE_PAYMENT_ENABLED } from "@/lib/config/features";
+import type { PaymentMethod, PaymentStatus } from "@/lib/supabase/types";
 
 function CopyDetailsButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -41,7 +41,11 @@ function CopyDetailsButton({ text }: { text: string }) {
   );
 }
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
+type BookingPaymentState = {
+  payment_status: PaymentStatus;
+  payment_method: PaymentMethod;
+  expires_at: string | null;
+};
 
 function SuccessContent() {
   const searchParams = useSearchParams();
@@ -52,21 +56,32 @@ function SuccessContent() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [isCreatingIntent, setIsCreatingIntent] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
-  const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
+  const [expiresAt, setExpiresAt] = useState<string | null>(null);
+  const [isLoadingPaymentState, setIsLoadingPaymentState] = useState(true);
+
+  const stripePromise = useMemo(() => {
+    if (paymentMethod !== "card") return null;
+    const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+    return key ? loadStripe(key) : null;
+  }, [paymentMethod]);
 
   useEffect(() => {
     const loadPaymentState = async () => {
+      setIsLoadingPaymentState(true);
       const { data } = await supabase
         .from("bookings")
-        .select("payment_status, payment_method")
+        .select("payment_status, payment_method, expires_at")
         .eq("booking_ref", bookingRef)
-        .single();
+        .single<BookingPaymentState>();
 
       if (data) {
-        setPaymentStatus((data as any).payment_status || null);
-        setPaymentMethod((data as any).payment_method || null);
+        setPaymentStatus(data.payment_status || null);
+        setPaymentMethod(data.payment_method || null);
+        setExpiresAt(data.expires_at || null);
       }
+      setIsLoadingPaymentState(false);
     };
 
     loadPaymentState();
@@ -100,62 +115,21 @@ function SuccessContent() {
     setDownloadError(null);
 
     try {
-      // Fetch booking data from Supabase
-      const { data: bookingData, error: bookingError } = await supabase
-        .from('bookings')
-        .select('*')
-        .eq('booking_ref', bookingRef)
-        .single();
-
-      if (bookingError || !bookingData) {
-        throw new Error('Booking not found');
+      const response = await fetch(`/api/bookings/pdf?ref=${encodeURIComponent(bookingRef)}`);
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        throw new Error(data?.error || "Failed to generate PDF.");
       }
 
-      // Fetch travelers data
-      const { data: travelersData, error: travelersError } = await supabase
-        .from('travelers')
-        .select('*')
-        .eq('booking_id', (bookingData as any).id)
-        .order('traveler_order', { ascending: true });
-
-      if (travelersError) {
-        throw new Error('Failed to fetch traveler information');
-      }
-
-      // Format data for PDF
-      const booking = bookingData as any;
-      const pdfData: BookingData = {
-        bookingRef: booking.booking_ref,
-        tourTitle: booking.tour_title,
-        tourDestination: booking.tour_destination,
-        tourStartDate: booking.tour_start_date,
-        tourDurationDays: booking.tour_duration_days,
-        numberOfTravelers: booking.number_of_travelers,
-        travelers: (travelersData || []).map((t: any) => ({
-          firstName: t.first_name,
-          lastName: t.last_name,
-          email: t.email,
-          phone: t.phone,
-          passportNumber: t.passport_number,
-          nationality: t.nationality,
-          passportExpiry: t.passport_expiry,
-          dateOfBirth: t.date_of_birth,
-        })),
-        basePricePerPerson: booking.base_price_per_person,
-        insuranceTotal: booking.insurance_total,
-        flightTotal: booking.flight_total,
-        grandTotal: booking.grand_total,
-        depositAmount: booking.deposit_amount,
-        hasInsurance: booking.has_insurance,
-        hasFlightBooking: booking.has_flight_booking,
-        contactEmail: booking.contact_email,
-        contactPhone: booking.contact_phone,
-        createdAt: booking.created_at,
-        expiresAt: booking.expires_at,
-      };
-
-      // Generate and download PDF
-      generateBookingPDF(pdfData);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `Marefat-Booking-${bookingRef}.pdf`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('PDF generation error:', error);
       setDownloadError(
@@ -166,9 +140,8 @@ function SuccessContent() {
     }
   };
 
-  // Calculate expiry date (1 week from now)
-  const expiryDate = new Date();
-  expiryDate.setDate(expiryDate.getDate() + 7);
+  // Use authoritative expiry date from DB if available.
+  const expiryDate = expiresAt ? new Date(expiresAt) : new Date();
   const formattedExpiry = expiryDate.toLocaleDateString("en-GB", {
     weekday: "long",
     day: "numeric",
@@ -250,10 +223,16 @@ function SuccessContent() {
           </div>
 
           {/* Payment Details - Only shown after verification */}
-          {verified && paymentMethod !== "card" && (
+          {verified && isLoadingPaymentState && (
+            <div className="mx-auto mt-8 max-w-md rounded-xl border border-charcoal/10 bg-ivory/90 p-5 text-left">
+              <p className="text-xs text-charcoal/60">Loading your payment details...</p>
+            </div>
+          )}
+
+          {verified && !isLoadingPaymentState && paymentMethod !== "card" && (
             <div className="mx-auto mt-8 max-w-md text-left space-y-4">
               {/* Wire Transfer Details */}
-              {(paymentMethod === "bank_transfer" || paymentMethod === "wire" || !paymentMethod) && (
+              {paymentMethod === "wire" && (
                 <div className="rounded-xl border border-gold/30 bg-ivory/90 p-6">
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-xs font-semibold uppercase tracking-wide text-charcoal/70">
@@ -346,7 +325,11 @@ function SuccessContent() {
             </div>
           )}
 
-          {ONLINE_PAYMENT_ENABLED && verified && paymentStatus !== "paid" && (
+          {ONLINE_PAYMENT_ENABLED &&
+            verified &&
+            !isLoadingPaymentState &&
+            paymentMethod === "card" &&
+            paymentStatus !== "paid" && (
             <div className="mx-auto mt-6 max-w-md rounded-xl border border-charcoal/10 bg-ivory/90 p-6 text-left">
               <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-charcoal/70">
                 Online Card Payment
@@ -364,10 +347,14 @@ function SuccessContent() {
                 >
                   {isCreatingIntent ? "Initializing..." : "Pay Deposit Online"}
                 </button>
-              ) : (
+              ) : stripePromise ? (
                 <Elements stripe={stripePromise} options={{ clientSecret }}>
                   <PaymentForm bookingRef={bookingRef} />
                 </Elements>
+              ) : (
+                <p className="text-xs text-danger">
+                  Online payment is temporarily unavailable. Please contact support.
+                </p>
               )}
 
               {paymentError && <p className="mt-3 text-xs text-danger">{paymentError}</p>}

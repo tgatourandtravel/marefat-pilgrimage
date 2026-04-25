@@ -47,7 +47,7 @@ const COLORS = {
 /**
  * Generate booking confirmation PDF
  */
-export function generateBookingPDF(data: BookingData): void {
+function buildBookingPDF(data: BookingData): jsPDF {
   // Create new PDF document (A4 size)
   const doc = new jsPDF({
     orientation: 'portrait',
@@ -430,6 +430,17 @@ export function generateBookingPDF(data: BookingData): void {
   // ============================================
   // SAVE PDF
   // ============================================
+  return doc;
+}
+
+export function generateBookingPDF(data: BookingData): void {
+  const doc = buildBookingPDF(data);
   const filename = `Marefat-Booking-${data.bookingRef}.pdf`;
   doc.save(filename);
+}
+
+export function generateBookingPDFBytes(data: BookingData): Uint8Array {
+  const doc = buildBookingPDF(data);
+  const arrayBuffer = doc.output('arraybuffer');
+  return new Uint8Array(arrayBuffer);
 }

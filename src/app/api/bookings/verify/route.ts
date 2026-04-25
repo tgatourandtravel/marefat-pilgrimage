@@ -132,27 +132,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get primary traveler for email
-    const { data: travelerData } = await supabaseAdmin
-      .from('travelers')
-      .select('first_name')
-      .eq('booking_id', booking.id)
-      .eq('is_primary_contact', true)
-      .single();
-
-    const primaryTraveler = travelerData as { first_name: string } | null;
-
     // Send confirmation email with payment details
     try {
       await sendBookingConfirmationEmail({
         to: booking.contact_email,
-        firstName: primaryTraveler?.first_name || 'Traveler',
+        firstName: booking.contact_first_name || 'Traveler',
         bookingRef: booking.booking_ref,
         tourTitle: booking.tour_title,
         depositAmount: booking.deposit_amount,
         grandTotal: booking.grand_total,
         expiresAt: expiresAt,
-        paymentMethod: (booking as any).payment_method ?? undefined,
+        paymentMethod: booking.payment_method ?? undefined,
       });
     } catch (emailError) {
       console.error('Confirmation email error:', emailError);

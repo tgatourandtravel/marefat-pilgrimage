@@ -18,6 +18,8 @@ export interface Booking {
   tour_destination: string | null;
   tour_start_date: string | null;
   tour_duration_days: number | null;
+  contact_first_name: string;
+  contact_last_name: string;
   contact_email: string;
   contact_phone: string;
   base_price_per_person: number;
