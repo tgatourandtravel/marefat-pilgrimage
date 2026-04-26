@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { forwardRef, useEffect, useRef } from "react";
+import React, { forwardRef, useEffect, useRef } from "react";
 
 type LegalConsentProps = {
   accepted: boolean;
@@ -12,7 +12,7 @@ type LegalConsentProps = {
 export const LegalConsent = forwardRef<HTMLDivElement, LegalConsentProps>(
   function LegalConsent({ accepted, error, onChange }, ref) {
     const prevErrorRef = useRef(false);
-    const containerRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
       if (error && !prevErrorRef.current) {
@@ -21,16 +21,18 @@ export const LegalConsent = forwardRef<HTMLDivElement, LegalConsentProps>(
       prevErrorRef.current = error;
     }, [error]);
 
+    const setRefs = (node: HTMLDivElement | null) => {
+      containerRef.current = node;
+      if (typeof ref === "function") {
+        ref(node);
+      } else if (ref) {
+        (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+      }
+    };
+
     return (
       <div
-        ref={(node) => {
-          containerRef.current = node;
-          if (typeof ref === "function") {
-            ref(node);
-          } else if (ref) {
-            ref.current = node;
-          }
-        }}
+        ref={setRefs}
         className={`rounded-2xl border p-5 transition-colors ${
           error
             ? "border-red-300 bg-red-50/60"
