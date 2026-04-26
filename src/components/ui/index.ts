@@ -24,3 +24,4 @@ export {
 } from "./Tabs";
 export { ImageGallery, type ImageGalleryProps } from "./ImageGallery";
 export { TourCard } from "./TourCard";
+export { FormErrorBanner } from "./FormErrorBanner";

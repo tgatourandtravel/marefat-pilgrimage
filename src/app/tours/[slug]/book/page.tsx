@@ -7,6 +7,9 @@ import { getTourBySlug } from "@/data/tours";
 import { validateTravelerFields, validateBookerFields } from "@/lib/utils/validation";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
+import { FormErrorBanner } from "@/components/ui/FormErrorBanner";
+import { StepProgress } from "@/components/booking/StepProgress";
+import { LegalConsent } from "@/components/booking/LegalConsent";
 import { ONLINE_PAYMENT_ENABLED } from "@/lib/config/features";
 
 // Booker: The person making the reservation and payment
@@ -183,7 +186,7 @@ export default function TourBookingPage({ params }: Props) {
   const tour = getTourData(params.slug);
   const fullTourData = getTourBySlug(params.slug);
   const formRef = useRef<HTMLDivElement>(null);
-  const fieldsStartRef = useRef<HTMLDivElement>(null);
+  const stepProgressRef = useRef<HTMLDivElement>(null);
 
   const [step, setStep] = useState<Step>(1);
 
@@ -231,11 +234,7 @@ export default function TourBookingPage({ params }: Props) {
 
   // Scroll to top of form fields when step changes
   useEffect(() => {
-    if (fieldsStartRef.current) {
-      const yOffset = -100; // Account for header
-      const y = fieldsStartRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      window.scrollTo({ top: y, behavior: "smooth" });
-    }
+    stepProgressRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [step]);
 
   // Update booker field
@@ -359,11 +358,7 @@ export default function TourBookingPage({ params }: Props) {
         
         // Scroll to first error field
         setTimeout(() => {
-          if (fieldsStartRef.current) {
-            const yOffset = -150;
-            const y = fieldsStartRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
-            window.scrollTo({ top: y, behavior: "smooth" });
-          }
+          stepProgressRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 100);
         
         return false;
@@ -496,40 +491,16 @@ export default function TourBookingPage({ params }: Props) {
           {/* Left: Form */}
           <div ref={formRef} className="space-y-6">
             {/* Progress Steps */}
-            <div className="flex items-center justify-between rounded-2xl border border-charcoal/5 bg-ivory/90 p-6">
-              {["Traveler Info", "Add-ons", "Payment", "Review"].map((label, idx) => {
-                const stepNum = (idx + 1) as Step;
-                const isActive = step === stepNum;
-                const isDone = step > stepNum;
-                return (
-                  <div key={label} className="flex items-center gap-3">
-                    <div
-                      className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium transition ${
-                        isDone
-                          ? "bg-charcoal text-ivory"
-                          : isActive
-                          ? "bg-gold text-charcoal"
-                          : "bg-charcoal/5 text-charcoal/40"
-                      }`}
-                    >
-                      {isDone ? "✓" : stepNum}
-                    </div>
-                    <span
-                      className={`hidden text-xs sm:inline ${
-                        isActive || isDone ? "font-medium text-charcoal" : "text-charcoal/50"
-                      }`}
-                    >
-                      {label}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+            <StepProgress
+              ref={stepProgressRef}
+              step={step}
+              steps={["Traveler Info", "Add-ons", "Payment", "Review"]}
+            />
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Step 1: Booker & Traveler Information */}
               {step === 1 && (
-                <div ref={fieldsStartRef} className="space-y-6">
+                <div className="space-y-6">
                   {/* Booker Information Card */}
                   <Card variant="elevated" padding="lg" className="space-y-4">
                     <div>
@@ -1158,102 +1129,14 @@ export default function TourBookingPage({ params }: Props) {
                   </Card>
 
                   {/* Legal Consent — must be the last element before submit */}
-                  <div
-                    className={`rounded-2xl border p-5 transition-colors ${
-                      termsError
-                        ? "border-red-300 bg-red-50/60"
-                        : termsAccepted
-                        ? "border-gold/40 bg-gold/5"
-                        : "border-charcoal/10 bg-ivory/80"
-                    }`}
-                  >
-                    <label
-                      htmlFor="legal-consent"
-                      className="flex cursor-pointer items-start gap-4"
-                    >
-                      {/* Checkbox */}
-                      <div className="mt-0.5 shrink-0">
-                        <input
-                          id="legal-consent"
-                          type="checkbox"
-                          checked={termsAccepted}
-                          onChange={(e) => {
-                            setTermsAccepted(e.target.checked);
-                            if (e.target.checked) setTermsError(false);
-                          }}
-                          className="h-4 w-4 rounded border-charcoal/30 text-charcoal accent-charcoal transition focus:ring-2 focus:ring-gold/50"
-                          aria-describedby="legal-consent-text"
-                        />
-                      </div>
-
-                      {/* Consent text */}
-                      <div id="legal-consent-text" className="space-y-2.5">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-charcoal/60">
-                          Booking Agreement &amp; Legal Consent
-                        </p>
-                        <ol className="list-decimal space-y-2 pl-4 text-xs leading-relaxed text-charcoal/75 marker:text-charcoal/40">
-                          <li>
-                            I confirm that all information provided in this booking is <strong className="font-semibold text-charcoal">accurate and complete</strong>.
-                          </li>
-                          <li>
-                            I have read, understood, and agree to the{" "}
-                            <a
-                              href="/terms"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="font-medium text-charcoal underline decoration-charcoal/30 underline-offset-2 hover:decoration-gold hover:text-gold"
-                            >
-                              Terms &amp; Conditions
-                            </a>
-                            ,{" "}
-                            <a
-                              href="/refund-policy"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="font-medium text-charcoal underline decoration-charcoal/30 underline-offset-2 hover:decoration-gold hover:text-gold"
-                            >
-                              Refund Policy
-                            </a>
-                            , and{" "}
-                            <a
-                              href="/privacy"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="font-medium text-charcoal underline decoration-charcoal/30 underline-offset-2 hover:decoration-gold hover:text-gold"
-                            >
-                              Privacy Policy
-                            </a>{" "}
-                            of <strong className="font-semibold text-charcoal">TGA Tour and Travel LLC</strong> (Marefat Pilgrimage).
-                          </li>
-                          <li>
-                            I acknowledge that certain travel services are provided by <strong className="font-semibold text-charcoal">independent third-party suppliers</strong> and are subject to their own terms and conditions, including cancellation and refund policies.
-                          </li>
-                          <li>
-                            I understand that all payments are subject to the Company's payment and refund terms.
-                          </li>
-                        </ol>
-                        <p className="pt-1 text-[11px] leading-relaxed text-charcoal/50">
-                          By confirming this booking, I enter into a <strong className="font-medium text-charcoal/60">legally binding agreement</strong> with TGA Tour and Travel LLC and agree to all applicable policies and conditions.
-                        </p>
-                      </div>
-                    </label>
-
-                    {/* Inline error — only appears when user tries to submit without checking */}
-                    {termsError && (
-                      <p
-                        role="alert"
-                        className="mt-3 flex items-center gap-1.5 text-xs font-medium text-red-600"
-                      >
-                        <svg className="h-3.5 w-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                        </svg>
-                        Please read and accept the booking agreement before confirming.
-                      </p>
-                    )}
-                  </div>
+                  <LegalConsent
+                    accepted={termsAccepted}
+                    error={termsError}
+                    onChange={(checked) => {
+                      setTermsAccepted(checked);
+                      if (checked) setTermsError(false);
+                    }}
+                  />
                 </div>
               )}
 
@@ -1408,11 +1291,7 @@ export default function TourBookingPage({ params }: Props) {
               )}
 
               {/* Error Display */}
-              {submitError && (
-                <div className="rounded-xl border border-danger-light bg-danger-light/20 p-4">
-                  <p className="text-sm text-danger">{submitError}</p>
-                </div>
-              )}
+              <FormErrorBanner message={submitError || null} />
 
               {/* Navigation */}
               <div className="flex items-center justify-between pt-4">
