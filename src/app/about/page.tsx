@@ -171,7 +171,7 @@ export default function AboutPage() {
             {/* Founder image placeholder */}
             <div className="relative mx-auto h-80 w-full max-w-xs overflow-hidden rounded-2xl bg-charcoal/40 shadow-soft ring-1 ring-inset ring-white/10 lg:mx-0">
               <img
-                src="https://images.unsplash.com/photo-1575101261474-5cb5653bb416?w=680&h=800&fit=crop"
+                src="/images/about/founder-ahmad-reshad-tajik.png"
                 alt="Marefat Pilgrimage founder"
                 className="h-full w-full object-cover object-top opacity-80"
               />
