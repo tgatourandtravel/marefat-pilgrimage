@@ -232,9 +232,9 @@ export default function TourBookingPage({ params }: Props) {
   const [termsError, setTermsError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Scroll to top of form fields when step changes
+  // Scroll to top of page when step changes
   useEffect(() => {
-    stepProgressRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, [step]);
 
   // Update booker field
@@ -356,9 +356,9 @@ export default function TourBookingPage({ params }: Props) {
           return updated;
         });
         
-        // Scroll to first error field
+        // Scroll to top so user sees errors from the beginning
         setTimeout(() => {
-          stepProgressRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          window.scrollTo({ top: 0, behavior: "smooth" });
         }, 100);
         
         return false;

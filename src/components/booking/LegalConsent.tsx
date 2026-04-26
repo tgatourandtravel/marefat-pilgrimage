@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import React, { forwardRef, useEffect, useRef } from "react";
 
 type LegalConsentProps = {
@@ -61,21 +60,45 @@ export const LegalConsent = forwardRef<HTMLDivElement, LegalConsentProps>(
             </ol>
             <p className="text-xs text-charcoal/70">
               By confirming, you agree to our{" "}
-              <Link className="underline decoration-charcoal/30 underline-offset-2 hover:decoration-charcoal" href="/terms">
+              <a
+                href="/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="font-medium text-charcoal underline decoration-charcoal/30 underline-offset-2 hover:decoration-gold hover:text-gold"
+              >
                 Terms
-              </Link>
+              </a>
               ,{" "}
-              <Link className="underline decoration-charcoal/30 underline-offset-2 hover:decoration-charcoal" href="/privacy">
+              <a
+                href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="font-medium text-charcoal underline decoration-charcoal/30 underline-offset-2 hover:decoration-gold hover:text-gold"
+              >
                 Privacy Policy
-              </Link>
+              </a>
               ,{" "}
-              <Link className="underline decoration-charcoal/30 underline-offset-2 hover:decoration-charcoal" href="/refund-policy">
+              <a
+                href="/refund-policy"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="font-medium text-charcoal underline decoration-charcoal/30 underline-offset-2 hover:decoration-gold hover:text-gold"
+              >
                 Refund Policy
-              </Link>
+              </a>
               , and{" "}
-              <Link className="underline decoration-charcoal/30 underline-offset-2 hover:decoration-charcoal" href="/cookie-policy">
+              <a
+                href="/cookie-policy"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="font-medium text-charcoal underline decoration-charcoal/30 underline-offset-2 hover:decoration-gold hover:text-gold"
+              >
                 Cookie Policy
-              </Link>
+              </a>
               .
             </p>
           </div>
