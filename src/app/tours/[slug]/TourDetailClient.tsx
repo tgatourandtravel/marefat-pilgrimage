@@ -1,6 +1,7 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
+import { useSetStickyBarOffset } from "@/contexts/StickyBarContext";
 import Link from "next/link";
 import { Tour } from "@/data/tours";
 import { Button, InfoCard, Tabs, TabsList, TabsTrigger, TabsContent, Card, ImageGallery, RoomSelector, RoomSelectorTrigger, buildRoomOptions, type RoomOption } from "@/components/ui";
@@ -58,6 +59,13 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
   const [selectedRoom, setSelectedRoom] = useState<RoomOption | null>(
     roomOptions.length > 0 ? roomOptions[0] : null
   );
+
+  // Tell FloatingWhatsApp to shift above the mobile sticky CTA bar (~72px)
+  const setStickyBarOffset = useSetStickyBarOffset();
+  useEffect(() => {
+    setStickyBarOffset(80);
+    return () => setStickyBarOffset(0);
+  }, [setStickyBarOffset]);
 
   const handleBookNow = () => {
     const params = selectedRoom

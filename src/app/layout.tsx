@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import "./globals.css";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
 import { PaymentBadges } from "@/components/layout/PaymentBadges";
+import { StickyBarProvider } from "@/contexts/StickyBarContext";
 
 const navItems: { href: string; label: string }[] = [
   { href: "/", label: "Home" },
@@ -161,6 +162,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/logo.png" />
       </head>
       <body className="bg-ivory text-charcoal antialiased">
+        <StickyBarProvider>
         <div className="flex min-h-screen flex-col">
           <HeaderContent />
 
@@ -266,6 +268,7 @@ export default function RootLayout({
             </div>
           </footer>
         </div>
+        </StickyBarProvider>
       </body>
     </html>
   );

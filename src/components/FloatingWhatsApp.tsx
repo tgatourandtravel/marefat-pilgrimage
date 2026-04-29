@@ -1,29 +1,39 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useStickyBarOffset } from "@/contexts/StickyBarContext";
+
+// Tailwind's `lg` breakpoint in px
+const LG_BREAKPOINT = 1024;
 
 export function FloatingWhatsApp() {
   const [isVisible, setIsVisible] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const stickyOffset = useStickyBarOffset();
   const phoneNumber = "19543308904"; // +1 (954) 330-8904
 
-  // Hide button when user scrolls to bottom (to avoid overlapping with footer/buttons)
+  // Track mobile breakpoint
+  useEffect(() => {
+    const update = () => setIsMobile(window.innerWidth < LG_BREAKPOINT);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  // Hide when near page bottom to avoid overlapping footer
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
-      const bottomThreshold = 200; // Hide when within 200px of bottom
-
-      if (documentHeight - scrollPosition < bottomThreshold) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
-      }
+      setIsVisible(documentHeight - scrollPosition >= 200);
     };
-
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // On mobile, shift above the sticky CTA bar (if any); on desktop always 24px
+  const bottomPx = (isMobile ? stickyOffset : 0) + 24;
 
   return (
     <div
@@ -32,10 +42,7 @@ export function FloatingWhatsApp() {
           ? "translate-y-0 opacity-100"
           : "translate-y-8 opacity-0 pointer-events-none"
       }`}
-      style={{
-        bottom: "24px",
-        right: "24px",
-      }}
+      style={{ bottom: `${bottomPx}px`, right: "24px" }}
     >
       {/* Pulse ring animation */}
       <div className="absolute inset-0 rounded-full">
