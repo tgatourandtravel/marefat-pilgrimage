@@ -1,70 +1,184 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 
 export interface ImageGalleryProps {
   images: string[];
   tourTitle: string;
+  autoplayInterval?: number; // ms, default 5000
 }
 
-export function ImageGallery({ images, tourTitle }: ImageGalleryProps) {
-  const [selectedIndex, setSelectedIndex] = useState(0);
+const AUTOPLAY_DELAY = 5000;
 
-  if (!images || images.length === 0) return null;
+export function ImageGallery({
+  images,
+  tourTitle,
+  autoplayInterval = AUTOPLAY_DELAY,
+}: ImageGalleryProps) {
+  const [current, setCurrent] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const displayImages = images.slice(0, 6); // Max 6 images
+  const displayImages = images.slice(0, 8);
+  const count = displayImages.length;
+
+  const prev = useCallback(
+    () => setCurrent((i) => (i - 1 + count) % count),
+    [count]
+  );
+
+  const next = useCallback(
+    () => setCurrent((i) => (i + 1) % count),
+    [count]
+  );
+
+  // Autoplay
+  useEffect(() => {
+    if (count <= 1 || isPaused) return;
+    const id = setInterval(next, autoplayInterval);
+    return () => clearInterval(id);
+  }, [count, isPaused, next, autoplayInterval]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") prev();
+      if (e.key === "ArrowRight") next();
+    };
+    el.addEventListener("keydown", onKey);
+    return () => el.removeEventListener("keydown", onKey);
+  }, [prev, next]);
+
+  // Touch swipe
+  const handleTouchStart = (e: React.TouchEvent) =>
+    setTouchStartX(e.touches[0].clientX);
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null) return;
+    const delta = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(delta) > 40) delta > 0 ? next() : prev();
+    setTouchStartX(null);
+  };
+
+  if (!images || count === 0) return null;
 
   return (
     <div className="space-y-4">
-      {/* Main Image Display */}
-      <div className="relative aspect-[16/9] overflow-hidden rounded-2xl bg-gradient-to-br from-charcoal/10 to-gold-soft/20 shadow-soft">
-        {displayImages[selectedIndex] ? (
-          <Image
-            src={displayImages[selectedIndex]}
-            alt={`${tourTitle} - Image ${selectedIndex + 1}`}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 60vw, 800px"
-            className="object-cover"
-            priority={selectedIndex === 0}
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center text-charcoal/40">
-            <p className="text-sm">Image coming soon</p>
+      {/* Main image + controls */}
+      <div
+        ref={containerRef}
+        tabIndex={0}
+        className="group relative aspect-[16/9] overflow-hidden rounded-2xl bg-gradient-to-br from-charcoal/10 to-gold-soft/20 shadow-soft outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* Slides */}
+        {displayImages.map((src, index) => (
+          <div
+            key={src}
+            className={`absolute inset-0 transition-opacity duration-700 ${
+              index === current ? "opacity-100" : "opacity-0"
+            }`}
+            aria-hidden={index !== current}
+          >
+            <Image
+              src={src}
+              alt={`${tourTitle} — photo ${index + 1}`}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 60vw, 800px"
+              className="object-cover"
+              priority={index === 0}
+            />
+          </div>
+        ))}
+
+        {/* Gradient overlays for arrow visibility */}
+        {count > 1 && (
+          <>
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-charcoal/20 to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-charcoal/20 to-transparent" />
+          </>
+        )}
+
+        {/* Prev / Next arrows */}
+        {count > 1 && (
+          <>
+            <button
+              onClick={prev}
+              aria-label="Previous image"
+              className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow-md backdrop-blur-sm transition hover:bg-white active:scale-95 sm:opacity-0 sm:group-hover:opacity-100"
+            >
+              <svg className="h-4 w-4 text-charcoal" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={next}
+              aria-label="Next image"
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow-md backdrop-blur-sm transition hover:bg-white active:scale-95 sm:opacity-0 sm:group-hover:opacity-100"
+            >
+              <svg className="h-4 w-4 text-charcoal" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </>
+        )}
+
+        {/* Slide counter badge (top-right) */}
+        {count > 1 && (
+          <div className="absolute right-3 top-3 rounded-full bg-charcoal/50 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+            {current + 1} / {count}
           </div>
         )}
       </div>
 
-      {/* Thumbnail Grid - Only show if multiple images */}
-      {displayImages.length > 1 && (
-        <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
+      {/* Dot indicators */}
+      {count > 1 && (
+        <div className="flex items-center justify-center gap-2" role="tablist" aria-label="Image navigation">
+          {displayImages.map((_, index) => (
+            <button
+              key={index}
+              role="tab"
+              aria-selected={index === current}
+              aria-label={`Go to image ${index + 1}`}
+              onClick={() => setCurrent(index)}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                index === current
+                  ? "w-6 bg-gold"
+                  : "w-1.5 bg-charcoal/25 hover:bg-charcoal/40"
+              }`}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Thumbnail strip — desktop only */}
+      {count > 1 && (
+        <div className="hidden sm:grid sm:grid-cols-6 sm:gap-3">
           {displayImages.map((img, index) => (
             <button
               key={index}
-              onClick={() => setSelectedIndex(index)}
-              className={`
-                relative aspect-[4/3] overflow-hidden rounded-xl transition
-                ${
-                  selectedIndex === index
-                    ? "ring-2 ring-gold ring-offset-2 ring-offset-ivory"
-                    : "opacity-70 hover:opacity-100 hover:ring-1 hover:ring-charcoal/20"
-                }
-              `}
+              onClick={() => setCurrent(index)}
+              className={`relative aspect-[4/3] overflow-hidden rounded-xl transition ${
+                index === current
+                  ? "ring-2 ring-gold ring-offset-2 ring-offset-ivory"
+                  : "opacity-60 hover:opacity-100 hover:ring-1 hover:ring-charcoal/20"
+              }`}
               aria-label={`View image ${index + 1}`}
             >
-              {img ? (
-                <Image
-                  src={img}
-                  alt={`${tourTitle} thumbnail ${index + 1}`}
-                  fill
-                  sizes="(max-width: 640px) 33vw, 120px"
-                  className="object-cover"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center bg-charcoal/5">
-                  <span className="text-xs text-charcoal/40">{index + 1}</span>
-                </div>
-              )}
+              <Image
+                src={img}
+                alt={`${tourTitle} thumbnail ${index + 1}`}
+                fill
+                sizes="120px"
+                className="object-cover"
+              />
             </button>
           ))}
         </div>
