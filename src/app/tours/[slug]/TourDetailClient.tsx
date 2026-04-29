@@ -142,7 +142,7 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                       <div className="flex-shrink-0 text-2xl">🕋</div>
                       <div className="flex-1">
                         <p className="text-xs font-medium uppercase tracking-wider text-charcoal/60">Included Tour 1</p>
-                        <p className="mt-0.5 text-sm font-semibold text-charcoal group-hover:text-gold">Umrah 2026 - Spring Break</p>
+                        <p className="mt-0.5 text-sm font-semibold text-charcoal group-hover:text-gold">Umrah 2026 - Thanksgiving</p>
                         <p className="mt-0.5 text-xs text-charcoal/60">March 29 - April 5 (7 days)</p>
                       </div>
                       <svg className="h-4 w-4 flex-shrink-0 text-charcoal/30 transition group-hover:text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">

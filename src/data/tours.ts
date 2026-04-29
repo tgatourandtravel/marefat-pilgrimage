@@ -13,7 +13,7 @@
 export type TourType = "Umrah" | "Hajj" | "Ziyarat" | "Combo";
 export type Region = "Makkah/Madinah" | "Iraq" | "Iran" | "Multi";
 export type PackageLevel = "Premium" | "Economy";
-export type MealsType = "Breakfast only" | "Breakfast & Dinner" | "Full Board";
+export type MealsType = "Breakfast only" | "Dinner" | "Breakfast & Dinner" | "Full Board";
 
 export type TourPackage = {
   name: string;
@@ -479,11 +479,11 @@ export const TOURS: Tour[] = [
   },
 
   // ----------------------------------------
-  // TOUR 4: Spring Break Umrah 2026 (Premium)
+  // TOUR 4: Thanksgiving Umrah 2026 (Premium)
   // ----------------------------------------
   {
     slug: "spring-break-umrah-2026",
-    title: "Umrah 2026 - Spring Break",
+    title: "Umrah 2026 - Thanksgiving",
     subtitle: "A Carefully Designed Spiritual Journey",
     destination: "Makkah & Madinah",
     region: "Makkah/Madinah",
@@ -505,7 +505,7 @@ export const TOURS: Tour[] = [
 
     hotelStars: 5,
     flightIncluded: false,
-    meals: "Breakfast & Dinner",
+    meals: "Dinner",
     transfer: true,
     spiritualGuide: true,
     spiritualGuideName: "Sayed Hossein Al Qazwini",
@@ -533,7 +533,7 @@ export const TOURS: Tour[] = [
       "5★ renowned hotels near the holy sites",
       "Premium full-course meals crafted fresh daily",
       "Seamless VIP city transfers in premium private vehicles",
-      "Ground package with accommodation, breakfast & lunch, visa and transportation",
+      "Ground package with accommodation, Dinner, visa and transportation",
     ],
 
     itinerary: [
