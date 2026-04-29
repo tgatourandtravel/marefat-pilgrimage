@@ -3,7 +3,7 @@
    No border, no background wrapper.
 ────────────────────────────────────────────────────────────────────────── */
 
-const ICON_CLASS = "h-5 w-auto" as const;
+const ICON_CLASS = "h-4 w-auto" as const;
 
 function VisaIcon() {
   return (
