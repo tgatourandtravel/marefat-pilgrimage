@@ -52,6 +52,15 @@ export type Tour = {
   // Pricing (Required)
   priceFrom: number; // Base price in USD, use 0 for "On request"
 
+  // Room-type pricing — optional. When set, a RoomSelector is shown on the tour detail page.
+  // priceFrom should equal roomPricing.quad (the base/default occupancy).
+  roomPricing?: {
+    quad: number;    // 4-person room — default occupancy
+    triple?: number; // 3-person room
+    double?: number; // 2-person room
+    single?: number; // 1-person room
+  };
+
   // Features (Required)
   hotelStars: 3 | 4 | 5;
   flightIncluded: boolean;
@@ -396,7 +405,7 @@ export const TOURS: Tour[] = [
       "Karbala is not just a destination. It is a journey of the heart. This Spring Break 2026, answer the call of Karbala with a pilgrimage designed for peace, comfort, and deep spiritual focus. Every step is taken with intention, reflection, and tranquility.",
 
     highlights: [
-      "Religious guidance by Sayed M. Sadiq Qazwini",
+      "Religious guidance by Sayed Hossein Al Qazwini",
       "5★ hotels steps from the holy shrines",
       "Visit to Imam Hussein (AS) and Hazrat Abbas (AS) shrines",
       "Visit to Imam Ali (AS) shrine in Najaf",
@@ -477,7 +486,14 @@ export const TOURS: Tour[] = [
     endDate: "2026-12-06",
     durationDays: 7,
 
-    priceFrom: 1599, // $1,599 USD
+    priceFrom: 1399, // $1,399 USD — Quad Occupancy (base price)
+
+    roomPricing: {
+      quad: 1399,
+      triple: 1599,
+      double: 1899,
+      single: 2999,
+    },
 
     hotelStars: 5,
     flightIncluded: false,
@@ -502,10 +518,10 @@ export const TOURS: Tour[] = [
     },
 
     description:
-      "This is not just a trip. It's a carefully designed spiritual journey — where comfort supports devotion, and every detail brings peace of mind. Experience the holiest sites with premium accommodations and religious guidance.",
+      "This is not just a trip. It's a carefully designed spiritual journey — where comfort supports devotion, and every detail brings peace of mind. Experience the holiest sites with premium accommodations and religious guidance. Pricing is based on Quad Occupancy; Triple, Double, and Single room upgrades are available.",
 
     highlights: [
-      "Religious guidance by Sayed M. Sadiq Qazwini",
+      "Religious guidance by Sayed Hossein Al Qazwini",
       "5★ renowned hotels near the holy sites",
       "Premium full-course meals crafted fresh daily",
       "Seamless VIP city transfers in premium private vehicles",

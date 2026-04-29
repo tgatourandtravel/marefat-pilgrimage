@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, FormEvent, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getTourBySlug } from "@/data/tours";
 import { validateTravelerFields, validateBookerFields } from "@/lib/utils/validation";
@@ -181,9 +181,28 @@ function ZelleDetails({ copyText }: { copyText: string }) {
   );
 }
 
+const ROOM_LABELS: Record<string, string> = {
+  quad: "Quad (4 per room)",
+  triple: "Triple (3 per room)",
+  double: "Double (2 per room)",
+  single: "Single (1 per room)",
+};
+
 export default function TourBookingPage({ params }: Props) {
   const router = useRouter();
-  const tour = getTourData(params.slug);
+  const searchParams = useSearchParams();
+
+  // Room type from tour detail page selection (passed as URL params)
+  const roomTypeParam = searchParams.get("room") || null;
+  const roomPriceParam = searchParams.get("price") ? Number(searchParams.get("price")) : null;
+
+  const baseTourData = getTourData(params.slug);
+  // Override base price with room-specific price if provided
+  const tour = {
+    ...baseTourData,
+    basePrice: roomPriceParam ?? baseTourData.basePrice,
+  };
+
   const fullTourData = getTourBySlug(params.slug);
   const formRef = useRef<HTMLDivElement>(null);
   const stepProgressRef = useRef<HTMLDivElement>(null);
@@ -428,6 +447,7 @@ export default function TourBookingPage({ params }: Props) {
           hasFlightBooking: addons.flightBooking,
           flightIncludedInTour: tour.flightIncluded,
           basePricePerPerson: tour.basePrice,
+          roomType: roomTypeParam || null,
           insuranceCostPerPerson: 99,
           flightCostPerPerson: 450,
           paymentMethod,
@@ -1340,9 +1360,16 @@ export default function TourBookingPage({ params }: Props) {
 
               {/* Tour Details */}
               <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-charcoal">
-                  {tour.title}
-                </h3>
+                <div className="flex flex-wrap items-start gap-2">
+                  <h3 className="text-sm font-semibold text-charcoal">
+                    {tour.title}
+                  </h3>
+                  {roomTypeParam && (
+                    <span className="inline-flex items-center rounded-full border border-gold/40 bg-gold/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gold-dark">
+                      {ROOM_LABELS[roomTypeParam] ?? roomTypeParam}
+                    </span>
+                  )}
+                </div>
                 <div className="space-y-2 text-xs">
                   <div className="flex justify-between">
                     <span className="text-charcoal/60">Destination</span>
@@ -1371,7 +1398,9 @@ export default function TourBookingPage({ params }: Props) {
               <div className="space-y-3 border-t border-charcoal/10 pt-4">
                 <div className="flex justify-between text-sm">
                   <span className="text-charcoal/70">
-                    Base Price × {numberOfTravelers}
+                    {roomTypeParam
+                      ? `${roomTypeParam.charAt(0).toUpperCase() + roomTypeParam.slice(1)} Room × ${numberOfTravelers}`
+                      : `Base Price × ${numberOfTravelers}`}
                   </span>
                   <span className="font-medium text-charcoal">
                     ${baseTotal.toLocaleString()}

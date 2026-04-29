@@ -1,9 +1,9 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import { Tour } from "@/data/tours";
-import { Button, InfoCard, Tabs, TabsList, TabsTrigger, TabsContent, Card, ImageGallery } from "@/components/ui";
+import { Button, InfoCard, Tabs, TabsList, TabsTrigger, TabsContent, Card, ImageGallery, RoomSelector, buildRoomOptions, type RoomOption } from "@/components/ui";
 
 // Icons
 const CalendarIcon = () => (
@@ -53,19 +53,29 @@ interface TourDetailClientProps {
 }
 
 export default function TourDetailClient({ tour }: TourDetailClientProps) {
+  // Build room options from tour data (if roomPricing is defined)
+  const roomOptions: RoomOption[] = tour.roomPricing ? buildRoomOptions(tour.roomPricing) : [];
+  const [selectedRoom, setSelectedRoom] = useState<RoomOption | null>(
+    roomOptions.length > 0 ? roomOptions[0] : null
+  );
+
   const handleBookNow = () => {
-    window.location.href = `/tours/${tour.slug}/book`;
+    const params = selectedRoom
+      ? `?room=${selectedRoom.type}&price=${selectedRoom.price}`
+      : "";
+    window.location.href = `/tours/${tour.slug}/book${params}`;
   };
 
   // Check if early bird discount is active
   const hasEarlyBird = tour.earlyBirdDiscount && new Date() <= new Date(tour.earlyBirdDiscount.deadline);
   const isOnRequest = tour.priceFrom === 0;
 
-  // Get the display price
-  const displayPrice = hasEarlyBird
+  // Get the display price — room selection overrides early bird / base price
+  const baseDisplayPrice = hasEarlyBird
     ? tour.earlyBirdDiscount!.discountedPrice
     : tour.priceFrom;
-  const originalPrice = hasEarlyBird
+  const displayPrice = selectedRoom ? selectedRoom.price : baseDisplayPrice;
+  const originalPrice = hasEarlyBird && !selectedRoom
     ? tour.earlyBirdDiscount!.originalPrice
     : null;
 
@@ -539,6 +549,17 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                   )}
                 </div>
 
+                {/* Room Type Selector — only shown when tour has roomPricing */}
+                {roomOptions.length > 0 && selectedRoom && (
+                  <div className="border-t border-charcoal/5 pt-4">
+                    <RoomSelector
+                      options={roomOptions}
+                      selected={selectedRoom}
+                      onChange={setSelectedRoom}
+                    />
+                  </div>
+                )}
+
                 {/* Special Note if exists */}
                 {tour.specialNotes?.customNote && (
                   <div className="rounded-xl bg-gold/10 p-3 text-center">
@@ -626,41 +647,54 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
       </section>
 
       {/* Mobile Sticky CTA Bar */}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-charcoal/10 bg-ivory/95 px-6 py-3 shadow-[0_-8px_30px_rgba(15,15,15,0.12)] backdrop-blur lg:hidden">
-        <div className="mx-auto flex max-w-6xl items-center gap-3">
-          <div className="flex-1">
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-charcoal/10 bg-ivory/95 px-4 py-2.5 shadow-[0_-8px_30px_rgba(15,15,15,0.12)] backdrop-blur lg:hidden">
+        <div className="mx-auto max-w-6xl space-y-2">
+          {/* Compact room selector — only shown when roomPricing is available */}
+          {roomOptions.length > 0 && selectedRoom && (
+            <RoomSelector
+              options={roomOptions}
+              selected={selectedRoom}
+              onChange={setSelectedRoom}
+              compact
+            />
+          )}
+          <div className="flex items-center gap-3">
+            <div className="flex-1">
+              {isOnRequest ? (
+                <p className="text-sm font-medium text-charcoal">Price on request</p>
+              ) : (
+                <>
+                  <p className="text-sm font-medium text-charcoal">
+                    ${displayPrice.toLocaleString()}{" "}
+                    <span className="text-xs font-normal text-charcoal/60">per person</span>
+                  </p>
+                  {selectedRoom && (
+                    <p className="text-[10px] text-charcoal/50">{selectedRoom.label} · {selectedRoom.occupancy}</p>
+                  )}
+                  {hasEarlyBird && !selectedRoom && (
+                    <p className="text-[10px] text-gold-dark">Early Bird Price</p>
+                  )}
+                </>
+              )}
+            </div>
             {isOnRequest ? (
-              <p className="text-sm font-medium text-charcoal">
-                Price on request
-              </p>
+              <a
+                href="https://wa.me/19543308904"
+                className="rounded-full bg-charcoal px-5 py-2 text-sm font-medium text-ivory shadow-soft transition hover:bg-charcoal/90"
+              >
+                Request Quote
+              </a>
             ) : (
-              <>
-                <p className="text-sm font-medium text-charcoal">
-                  ${displayPrice.toLocaleString()} <span className="text-xs font-normal text-charcoal/60">per person</span>
-                </p>
-                {hasEarlyBird && (
-                  <p className="text-[10px] text-gold-dark">Early Bird Price</p>
-                )}
-              </>
+              <Button onClick={handleBookNow} size="sm">
+                Book Now
+              </Button>
             )}
           </div>
-          {isOnRequest ? (
-            <a
-              href="https://wa.me/19543308904"
-              className="rounded-full bg-charcoal px-5 py-2 text-sm font-medium text-ivory shadow-soft transition hover:bg-charcoal/90"
-            >
-              Request Quote
-            </a>
-          ) : (
-            <Button onClick={handleBookNow} size="sm">
-              Book Now
-            </Button>
-          )}
         </div>
       </div>
 
       {/* Add padding at bottom for mobile CTA */}
-      <div className="h-20 lg:hidden" />
+      <div className="h-24 lg:hidden" />
     </>
   );
 }
