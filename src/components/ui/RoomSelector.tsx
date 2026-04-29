@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { BottomSheet } from "./BottomSheet";
+import { useSetFloatingHidden } from "@/contexts/StickyBarContext";
 
 export type RoomOption = {
   type: "quad" | "triple" | "double" | "single";
@@ -82,19 +83,23 @@ export function RoomSelectorTrigger({ options, selected, onChange }: RoomSelecto
   const [isOpen, setIsOpen] = useState(false);
   // Local pending selection — only committed on "Confirm"
   const [pending, setPending] = useState<RoomOption>(selected);
+  const setFloatingHidden = useSetFloatingHidden();
 
   const handleOpen = () => {
     setPending(selected);
     setIsOpen(true);
+    setFloatingHidden(true);
   };
 
   const handleConfirm = () => {
     onChange(pending);
     setIsOpen(false);
+    setFloatingHidden(false);
   };
 
   const handleClose = () => {
     setIsOpen(false);
+    setFloatingHidden(false);
   };
 
   return (

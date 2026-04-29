@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useStickyBarOffset } from "@/contexts/StickyBarContext";
+import { useStickyBarOffset, useFloatingHidden } from "@/contexts/StickyBarContext";
 
 // Tailwind's `lg` breakpoint in px
 const LG_BREAKPOINT = 1024;
@@ -11,6 +11,7 @@ export function FloatingWhatsApp() {
   const [isHovered, setIsHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const stickyOffset = useStickyBarOffset();
+  const floatingHidden = useFloatingHidden();
   const phoneNumber = "19543308904"; // +1 (954) 330-8904
 
   // Track mobile breakpoint
@@ -38,7 +39,7 @@ export function FloatingWhatsApp() {
   return (
     <div
       className={`fixed z-50 transition-all duration-500 ${
-        isVisible
+        isVisible && !floatingHidden
           ? "translate-y-0 opacity-100"
           : "translate-y-8 opacity-0 pointer-events-none"
       }`}
