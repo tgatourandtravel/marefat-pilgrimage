@@ -69,6 +69,14 @@ export type Tour = {
   spiritualGuide: boolean;
   spiritualGuideName?: string; // e.g., "Sayed M. Sadiq Qazwini"
 
+  // Flight city preference fields shown when "Flight booking request" is checked.
+  // Both fields are enabled by default (when the key is absent or true).
+  // Set a field to false to hide it for tours where it is not applicable.
+  flightCityOptions?: {
+    departureCity?: boolean; // default: true
+    returnCity?: boolean;    // default: true
+  };
+
   // Optional features
   popularityScore?: number; // 0-100, used for sorting
   earlyBirdDiscount?: EarlyBirdDiscount;
@@ -500,7 +508,7 @@ export const TOURS: Tour[] = [
     meals: "Breakfast & Dinner",
     transfer: true,
     spiritualGuide: true,
-    spiritualGuideName: "Sayed Jafar Qazwini",
+    spiritualGuideName: "Sayed Hossein Al Qazwini",
 
     popularityScore: 95,
     isFeatured: true,
@@ -514,7 +522,7 @@ export const TOURS: Tour[] = [
     specialNotes: {
       deadline: "2026-02-10",
       limitedSeats: true,
-      customNote: "Under the religious guidance of Sayed M. Sadiq Qazwini",
+      customNote: "Under the religious guidance of Sayed Hossein Al Qazwini",
     },
 
     description:
