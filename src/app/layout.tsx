@@ -210,13 +210,13 @@ export default function RootLayout({
                 {/* IATA accreditation */}
                 <div className="flex items-center gap-2.5">
                   <img
-                    src="/images/iata-accredited.png"
-                    alt="IATA Accredited Travel Agent"
-                    className="h-11 w-auto object-contain opacity-80"
-                    title="IATA Accredited Travel Agent — International Air Transport Association"
+                    src="/images/iata-ground-handling-partner.png"
+                    alt="IATA Ground Handling Partner"
+                    className="h-8 w-auto object-contain opacity-80"
+                    title="IATA Ground Handling Partner — International Air Transport Association"
                   />
                   <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/45">
-                    IATA Accredited Travel Agent
+                    IATA Ground Handling Partner
                   </span>
                 </div>
 
