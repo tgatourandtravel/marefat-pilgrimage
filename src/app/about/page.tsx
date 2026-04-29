@@ -58,8 +58,8 @@ export default function AboutPage() {
           {/* Image */}
           <div className="relative h-64 overflow-hidden rounded-2xl bg-charcoal/10 shadow-soft lg:h-80">
             <img
-              src="https://images.unsplash.com/photo-1770786106021-52580470e31e?w=840&h=640&fit=crop"
-              alt="Masjid al-Haram, Makkah"
+              src="https://images.unsplash.com/photo-1588987278192-09fd57dd55ad?w=840&h=640&fit=crop"
+              alt="Holy Kaaba floral decoration, Masjid al-Haram"
               className="h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal/30 via-transparent to-transparent" />
@@ -98,8 +98,8 @@ export default function AboutPage() {
           {/* Story image */}
           <div className="relative h-72 overflow-hidden rounded-2xl bg-charcoal/10 shadow-soft">
             <img
-              src="https://images.unsplash.com/photo-1602769490455-36cf9734dbcb?w=840&h=640&fit=crop"
-              alt="Masjid al-Nabawi courtyard at sunset, Madinah"
+              src="https://images.unsplash.com/photo-1724051526928-ae6f5d53bead?w=840&h=640&fit=crop"
+              alt="Pilgrims gathered at Imam Ali Shrine, Najaf"
               className="h-full w-full object-cover"
             />
             <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-charcoal/10" />
@@ -292,8 +292,8 @@ export default function AboutPage() {
             {/* Image */}
             <div className="relative h-64 overflow-hidden rounded-2xl bg-charcoal/10 shadow-soft">
               <img
-                src="https://images.unsplash.com/photo-1723512414375-45ff0ed80afd?w=680&h=480&fit=crop"
-                alt="Pilgrims in ihram walking together near Masjid al-Haram"
+                src="https://images.unsplash.com/photo-1572358899655-f63ece97bfa5?w=680&h=480&fit=crop"
+                alt="People walking outside Masjid al-Nabawi, Madinah"
                 className="h-full w-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-charcoal/20 via-transparent to-transparent" />

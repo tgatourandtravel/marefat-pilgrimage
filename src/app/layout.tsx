@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import "./globals.css";
 import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
+import { PaymentBadges } from "@/components/layout/PaymentBadges";
 
 const navItems: { href: string; label: string }[] = [
   { href: "/", label: "Home" },
@@ -204,9 +205,9 @@ export default function RootLayout({
                   </p>
                 </div>
               </div>
-              {/* ── Accreditations ── */}
-              <div className="flex items-center gap-4 border-t border-charcoal/5 pt-4">
-                <div className="h-px flex-1 bg-charcoal/5" />
+              {/* ── Trust Bar: Accreditations + Payments ── */}
+              <div className="flex flex-col items-center gap-5 border-t border-charcoal/5 pt-5 lg:flex-row lg:items-center lg:justify-between">
+                {/* IATA accreditation */}
                 <div className="flex items-center gap-2.5">
                   <img
                     src="/images/iata-accredited.png"
@@ -218,7 +219,12 @@ export default function RootLayout({
                     IATA Accredited Travel Agent
                   </span>
                 </div>
-                <div className="h-px flex-1 bg-charcoal/5" />
+
+                {/* Vertical divider — desktop only */}
+                <div className="hidden h-8 w-px shrink-0 bg-charcoal/10 lg:block" />
+
+                {/* Payment methods */}
+                <PaymentBadges />
               </div>
 
               <div className="flex flex-col gap-4 border-t border-charcoal/5 pt-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
