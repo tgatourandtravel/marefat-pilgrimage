@@ -25,4 +25,5 @@ export {
 export { ImageGallery, type ImageGalleryProps } from "./ImageGallery";
 export { TourCard } from "./TourCard";
 export { FormErrorBanner } from "./FormErrorBanner";
-export { RoomSelector, buildRoomOptions, type RoomOption } from "./RoomSelector";
+export { RoomSelector, RoomSelectorTrigger, buildRoomOptions, type RoomOption } from "./RoomSelector";
+export { BottomSheet } from "./BottomSheet";

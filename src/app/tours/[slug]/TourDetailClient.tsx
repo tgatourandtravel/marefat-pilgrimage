@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { Tour } from "@/data/tours";
-import { Button, InfoCard, Tabs, TabsList, TabsTrigger, TabsContent, Card, ImageGallery, RoomSelector, buildRoomOptions, type RoomOption } from "@/components/ui";
+import { Button, InfoCard, Tabs, TabsList, TabsTrigger, TabsContent, Card, ImageGallery, RoomSelector, RoomSelectorTrigger, buildRoomOptions, type RoomOption } from "@/components/ui";
 
 // Icons
 const CalendarIcon = () => (
@@ -647,18 +647,16 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
       </section>
 
       {/* Mobile Sticky CTA Bar */}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-charcoal/10 bg-ivory/95 px-4 py-2.5 shadow-[0_-8px_30px_rgba(15,15,15,0.12)] backdrop-blur lg:hidden">
-        <div className="mx-auto max-w-6xl space-y-2">
-          {/* Compact room selector — only shown when roomPricing is available */}
-          {roomOptions.length > 0 && selectedRoom && (
-            <RoomSelector
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-charcoal/10 bg-ivory/95 px-4 py-3 shadow-[0_-8px_30px_rgba(15,15,15,0.12)] backdrop-blur lg:hidden">
+        <div className="mx-auto flex max-w-6xl items-center gap-3">
+          {/* Room selector trigger pill — only shown when roomPricing is available */}
+          {roomOptions.length > 0 && selectedRoom ? (
+            <RoomSelectorTrigger
               options={roomOptions}
               selected={selectedRoom}
               onChange={setSelectedRoom}
-              compact
             />
-          )}
-          <div className="flex items-center gap-3">
+          ) : (
             <div className="flex-1">
               {isOnRequest ? (
                 <p className="text-sm font-medium text-charcoal">Price on request</p>
@@ -668,15 +666,15 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                     ${displayPrice.toLocaleString()}{" "}
                     <span className="text-xs font-normal text-charcoal/60">per person</span>
                   </p>
-                  {selectedRoom && (
-                    <p className="text-[10px] text-charcoal/50">{selectedRoom.label} · {selectedRoom.occupancy}</p>
-                  )}
-                  {hasEarlyBird && !selectedRoom && (
+                  {hasEarlyBird && (
                     <p className="text-[10px] text-gold-dark">Early Bird Price</p>
                   )}
                 </>
               )}
             </div>
+          )}
+
+          <div className="ml-auto shrink-0">
             {isOnRequest ? (
               <a
                 href="https://wa.me/19543308904"
@@ -694,7 +692,7 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
       </div>
 
       {/* Add padding at bottom for mobile CTA */}
-      <div className="h-24 lg:hidden" />
+      <div className="h-20 lg:hidden" />
     </>
   );
 }
