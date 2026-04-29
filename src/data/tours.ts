@@ -64,6 +64,7 @@ export type Tour = {
   popularityScore?: number; // 0-100, used for sorting
   earlyBirdDiscount?: EarlyBirdDiscount;
   isFeatured?: boolean; // Show on homepage
+  isArchived?: boolean; // If true, hidden from all listings. Keep data for reuse.
   specialNotes?: SpecialNotes; // Special notes, deadlines, limited seats
 
   // Detail Page Content (Required for detail page)
@@ -264,6 +265,7 @@ export const TOURS: Tour[] = [
 
     popularityScore: 98,
     isFeatured: true,
+    isArchived: true,
 
     earlyBirdDiscount: {
       discountedPrice: 2000, // $2,000 USD early bird
@@ -376,6 +378,7 @@ export const TOURS: Tour[] = [
 
     popularityScore: 90,
     isFeatured: true,
+    isArchived: true,
 
     earlyBirdDiscount: {
       discountedPrice: 999, // $999 USD early bird
@@ -470,8 +473,8 @@ export const TOURS: Tour[] = [
     type: "Umrah",
     packageLevel: "Premium",
 
-    startDate: "2026-03-29",
-    endDate: "2026-04-05",
+    startDate: "2026-11-29",
+    endDate: "2026-12-06",
     durationDays: 7,
 
     priceFrom: 1599, // $1,599 USD
@@ -572,17 +575,24 @@ export const TOURS: Tour[] = [
 // ============================================
 
 /**
- * Get all tours
+ * Get all active (non-archived) tours
  */
 export function getAllTours(): Tour[] {
-  return TOURS;
+  return TOURS.filter(tour => !tour.isArchived);
 }
 
 /**
- * Get featured tours (for homepage)
+ * Get featured tours (for homepage) — excludes archived
  */
 export function getFeaturedTours(): Tour[] {
-  return TOURS.filter(tour => tour.isFeatured);
+  return TOURS.filter(tour => tour.isFeatured && !tour.isArchived);
+}
+
+/**
+ * Get archived tours — for reuse or reference
+ */
+export function getArchivedTours(): Tour[] {
+  return TOURS.filter(tour => tour.isArchived);
 }
 
 /**
