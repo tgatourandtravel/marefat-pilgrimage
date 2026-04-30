@@ -53,6 +53,11 @@ interface TourDetailClientProps {
   tour: Tour;
 }
 
+// Temporary visibility flags (keep code in place, hide from UI).
+// Set to `true` whenever these sections should return.
+const SHOW_AVAILABLE_SEATS = false;
+const SHOW_FLIGHTS_INFO_CARD = false;
+
 export default function TourDetailClient({ tour }: TourDetailClientProps) {
   // Build room options from tour data (if roomPricing is defined)
   const roomOptions: RoomOption[] = tour.roomPricing ? buildRoomOptions(tour.roomPricing) : [];
@@ -214,11 +219,13 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                   value={`${tour.hotelStars}★`}
                   subtitle={tour.hotelInfo.split(",")[0]}
                 />
-                <InfoCard
-                  icon={<UsersIcon />}
-                  label="Available"
-                  value="12 seats"
-                />
+                {SHOW_AVAILABLE_SEATS && (
+                  <InfoCard
+                    icon={<UsersIcon />}
+                    label="Available"
+                    value="12 seats"
+                  />
+                )}
               </div>
             )}
 
@@ -316,6 +323,7 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="included">What's Included</TabsTrigger>
                     <TabsTrigger value="documents">Documents</TabsTrigger>
+                    <TabsTrigger value="cancellation">Cancellation</TabsTrigger>
                   </TabsList>
 
                 {/* Tab Content: Overview */}
@@ -338,38 +346,22 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                     </ul>
                   </div>
 
-                  {/* Itinerary */}
-                  <div>
-                    <h2 className="text-lg font-semibold text-charcoal">
-                      Day-by-day itinerary
-                    </h2>
-                    <ol className="mt-4 space-y-3 border-l border-charcoal/10 pl-4 text-sm text-charcoal/80">
-                      {tour.itinerary.map((item, index) => (
-                        <li key={item} className="relative">
-                          <span className="absolute -left-[19px] mt-[4px] h-2.5 w-2.5 rounded-full border border-gold/60 bg-ivory" />
-                          <span className="mr-2 text-[11px] font-medium text-charcoal/60">
-                            Day {index + 1}
-                          </span>
-                          {item}
-                        </li>
-                      ))}
-                    </ol>
-                  </div>
-
                   {/* Hotels & Flights */}
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <div className={`grid gap-4 ${SHOW_FLIGHTS_INFO_CARD ? "md:grid-cols-2" : ""}`}>
                     <Card variant="elevated" padding="md">
                       <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-charcoal/60">
                         Hotels
                       </h3>
                       <p className="mt-2 text-sm text-charcoal/75">{tour.hotelInfo}</p>
                     </Card>
-                    <Card variant="elevated" padding="md">
-                      <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-charcoal/60">
-                        Flights
-                      </h3>
-                      <p className="mt-2 text-sm text-charcoal/75">{tour.flightsInfo}</p>
-                    </Card>
+                    {SHOW_FLIGHTS_INFO_CARD && (
+                      <Card variant="elevated" padding="md">
+                        <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-charcoal/60">
+                          Flights
+                        </h3>
+                        <p className="mt-2 text-sm text-charcoal/75">{tour.flightsInfo}</p>
+                      </Card>
+                    )}
                   </div>
                 </TabsContent>
 
@@ -450,6 +442,73 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                       </li>
                     </ul>
                   </Card>
+                </TabsContent>
+
+                {/* Tab Content: Cancellation Policy */}
+                <TabsContent value="cancellation" className="space-y-5">
+                  {/* Refund tiers */}
+                  <div className="overflow-hidden rounded-2xl border border-charcoal/8">
+                    <div className="border-b border-charcoal/8 bg-charcoal/[0.03] px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-charcoal/60">
+                        Refund Schedule
+                      </p>
+                    </div>
+                    <ul className="divide-y divide-charcoal/5">
+                      {[
+                        { timing: "90+ days before departure", refund: "80% refund", note: "$200 admin fee may apply" },
+                        { timing: "60 – 89 days before departure", refund: "70% refund", note: null },
+                        { timing: "30 – 59 days before departure", refund: "50% refund", note: null },
+                        { timing: "Less than 30 days", refund: "No refund", note: null },
+                      ].map(({ timing, refund, note }) => (
+                        <li key={timing} className="flex items-start justify-between gap-4 px-4 py-3.5 text-sm">
+                          <span className="text-charcoal/70">{timing}</span>
+                          <div className="shrink-0 text-right">
+                            <span className={`font-semibold ${refund === "No refund" ? "text-charcoal/50" : "text-charcoal"}`}>
+                              {refund}
+                            </span>
+                            {note && (
+                              <p className="mt-0.5 text-[11px] text-charcoal/45">{note}</p>
+                            )}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Non-refundable note */}
+                  <Card variant="elevated" padding="md">
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-charcoal/60">
+                      Always Non-Refundable
+                    </p>
+                    <ul className="mt-3 space-y-2 text-sm text-charcoal/70">
+                      {[
+                        "Service & transaction fees",
+                        "Visa processing fees (once submitted)",
+                        "Government & supplier fees",
+                      ].map((item) => (
+                        <li key={item} className="flex items-center gap-2">
+                          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-charcoal/30" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </Card>
+
+                  {/* Force majeure note */}
+                  <div className="rounded-xl border border-gold/20 bg-gold/5 px-4 py-3.5 text-sm text-charcoal/70">
+                    Cancellations due to visa denial, government restrictions, or force majeure events are not guaranteed a refund.
+                  </div>
+
+                  {/* Link to full policy */}
+                  <Link
+                    href="/refund-policy"
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-gold transition hover:text-gold-dark"
+                  >
+                    Read full Refund Policy
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
                 </TabsContent>
                 </Tabs>
               </Suspense>
@@ -590,10 +649,12 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                       <HotelIcon />
                       <span>{tour.hotelStars}★ Hotel • {tour.hotelInfo.split(",")[0]}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <UsersIcon />
-                      <span>12 seats remaining</span>
-                    </div>
+                    {SHOW_AVAILABLE_SEATS && (
+                      <div className="flex items-center gap-2">
+                        <UsersIcon />
+                        <span>12 seats remaining</span>
+                      </div>
+                    )}
                   </div>
                 )}
 
