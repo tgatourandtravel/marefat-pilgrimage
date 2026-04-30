@@ -52,54 +52,54 @@ export const LegalConsent = forwardRef<HTMLDivElement, LegalConsentProps>(
             />
           </div>
           <div id="legal-consent-text" className="space-y-2.5">
-            <p className="text-sm font-medium text-charcoal">Required confirmation</p>
+            <p className="text-sm font-semibold uppercase tracking-wide text-charcoal">
+              Booking Agreement & Legal Consent
+            </p>
             <ol className="list-decimal space-y-1 pl-5 text-xs leading-relaxed text-charcoal/75">
-              <li>I understand this is a travel package booking request, not a final ticket issuance.</li>
-              <li>I confirm the traveler details I entered are accurate and exactly match official documents.</li>
-              <li>I have read and accept Marefat's policies and booking conditions.</li>
+              <li>I confirm that all information provided in this booking is accurate and complete.</li>
+              <li>
+                I have read, understood, and agree to the{" "}
+                <a
+                  href="/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="font-medium text-charcoal underline decoration-charcoal/30 underline-offset-2 hover:decoration-gold hover:text-gold"
+                >
+                  Terms & Conditions
+                </a>
+                ,{" "}
+                <a
+                  href="/refund-policy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="font-medium text-charcoal underline decoration-charcoal/30 underline-offset-2 hover:decoration-gold hover:text-gold"
+                >
+                  Refund Policy
+                </a>
+                , and{" "}
+                <a
+                  href="/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="font-medium text-charcoal underline decoration-charcoal/30 underline-offset-2 hover:decoration-gold hover:text-gold"
+                >
+                  Privacy Policy
+                </a>{" "}
+                of TGA Tour and Travel LLC (Marefat Pilgrimage).
+              </li>
+              <li>
+                I acknowledge that certain travel services are provided by independent third-party
+                suppliers and are subject to their own terms and conditions, including cancellation
+                and refund policies.
+              </li>
+              <li>I understand that all payments are subject to the Company's payment and refund terms.</li>
             </ol>
             <p className="text-xs text-charcoal/70">
-              By confirming, you agree to our{" "}
-              <a
-                href="/terms"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="font-medium text-charcoal underline decoration-charcoal/30 underline-offset-2 hover:decoration-gold hover:text-gold"
-              >
-                Terms
-              </a>
-              ,{" "}
-              <a
-                href="/privacy"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="font-medium text-charcoal underline decoration-charcoal/30 underline-offset-2 hover:decoration-gold hover:text-gold"
-              >
-                Privacy Policy
-              </a>
-              ,{" "}
-              <a
-                href="/refund-policy"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="font-medium text-charcoal underline decoration-charcoal/30 underline-offset-2 hover:decoration-gold hover:text-gold"
-              >
-                Refund Policy
-              </a>
-              , and{" "}
-              <a
-                href="/cookie-policy"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="font-medium text-charcoal underline decoration-charcoal/30 underline-offset-2 hover:decoration-gold hover:text-gold"
-              >
-                Cookie Policy
-              </a>
-              .
+              By confirming this booking, I enter into a legally binding agreement with TGA Tour and
+              Travel LLC and agree to all applicable policies and conditions.
             </p>
           </div>
         </label>
