@@ -1272,7 +1272,7 @@ export default function TourBookingPage({ params }: Props) {
                             ? "Online Card Payment"
                             : paymentMethod === "zelle"
                             ? "Zelle Transfer"
-                            : "Bank Wire Transfer"}
+                            : "Bank Transfer ( Wire Only )"}
                         </p>
                         <p className="text-xs text-charcoal/60">
                           {paymentMethod === "card"
@@ -1361,7 +1361,7 @@ export default function TourBookingPage({ params }: Props) {
                         className="mt-0.5"
                       />
                       <div className="flex-1 text-left">
-                        <p className="text-sm font-medium text-charcoal">Bank Wire Transfer</p>
+                        <p className="text-sm font-medium text-charcoal">Bank Transfer ( Wire Only )</p>
                         <p className="text-xs text-charcoal/60">
                           Secure wire transfer via JPMorgan Chase Bank — US &amp; International
                         </p>
