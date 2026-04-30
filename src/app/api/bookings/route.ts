@@ -8,6 +8,7 @@ import {
   validateBookerFields,
   validateTravelerFields,
 } from '@/lib/utils/validation';
+import { parseFlightBookingPreferences } from '@/lib/booking/flight-request';
 
 // Force dynamic rendering to prevent static optimization at build time
 export const dynamic = 'force-dynamic';
@@ -41,6 +42,8 @@ interface CreateBookingRequest {
   hasInsurance: boolean;
   hasFlightBooking: boolean;
   paymentMethod?: 'wire' | 'zelle' | 'card';
+  preferredDepartureCity?: string | null;
+  preferredReturnCity?: string | null;
 }
 
 export async function POST(request: NextRequest) {
@@ -116,18 +119,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const flightPrefs = parseFlightBookingPreferences({
+      tour,
+      hasFlightBooking: body.hasFlightBooking,
+      preferredDepartureCity: body.preferredDepartureCity,
+      preferredReturnCity: body.preferredReturnCity,
+    });
+    if (!flightPrefs.ok) {
+      return NextResponse.json({ error: flightPrefs.message }, { status: 400 });
+    }
+
     // Calculate totals using authoritative server-side pricing.
     const numberOfTravelers = body.travelers.length;
     const basePricePerPerson = tour.priceFrom;
     const insuranceCostPerPerson = 99;
-    const flightCostPerPerson = 450;
     const baseTotal = basePricePerPerson * numberOfTravelers;
     const insuranceTotal = body.hasInsurance
       ? insuranceCostPerPerson * numberOfTravelers
       : 0;
-    const flightTotal = body.hasFlightBooking && !tour.flightIncluded
-      ? flightCostPerPerson * numberOfTravelers
-      : 0;
+    /** Flight assistance is quoted separately — not part of invoiced totals. */
+    const flightTotal = 0;
     const grandTotal = baseTotal + insuranceTotal + flightTotal;
     const depositAmount = Math.floor(grandTotal * 0.3);
     const selectedPaymentMethod =
@@ -174,6 +185,8 @@ export async function POST(request: NextRequest) {
         deposit_amount: depositAmount,
         has_insurance: body.hasInsurance,
         has_flight_booking: body.hasFlightBooking,
+        preferred_departure_city: flightPrefs.departureCity,
+        preferred_return_city: flightPrefs.returnCity,
         stripe_payment_intent_id: null,
         payment_method: selectedPaymentMethod,
         payment_status: 'unpaid',

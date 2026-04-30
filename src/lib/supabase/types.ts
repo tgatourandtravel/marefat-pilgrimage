@@ -1,6 +1,7 @@
 export type BookingStatus =
   | 'pending_verification'
   | 'verified'
+  | 'awaiting_card_payment'
   | 'deposit_paid'
   | 'fully_paid'
   | 'confirmed'
@@ -30,6 +31,8 @@ export interface Booking {
   deposit_amount: number;
   has_insurance: boolean;
   has_flight_booking: boolean;
+  preferred_departure_city: string | null;
+  preferred_return_city: string | null;
   stripe_payment_intent_id: string | null;
   payment_method: PaymentMethod;
   payment_status: PaymentStatus;

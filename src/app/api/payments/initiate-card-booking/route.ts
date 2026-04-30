@@ -4,6 +4,7 @@ import { stripe, isStripeConfigured } from '@/lib/stripe/client';
 import { generateBookingRef } from '@/lib/utils/booking-ref';
 import { getTourBySlug } from '@/data/tours';
 import { validateBookerFields, validateTravelerFields } from '@/lib/utils/validation';
+import { parseFlightBookingPreferences } from '@/lib/booking/flight-request';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,6 +35,8 @@ interface InitiateCardBookingRequest {
   travelers: TravelerInput[];
   hasInsurance: boolean;
   hasFlightBooking: boolean;
+  preferredDepartureCity?: string | null;
+  preferredReturnCity?: string | null;
 }
 
 export async function POST(request: NextRequest) {
@@ -95,14 +98,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid traveler information', details: travelerErrors }, { status: 400 });
     }
 
+    const flightPrefs = parseFlightBookingPreferences({
+      tour,
+      hasFlightBooking: body.hasFlightBooking,
+      preferredDepartureCity: body.preferredDepartureCity,
+      preferredReturnCity: body.preferredReturnCity,
+    });
+    if (!flightPrefs.ok) {
+      return NextResponse.json({ error: flightPrefs.message }, { status: 400 });
+    }
+
     // ── Pricing (server-authoritative) ─────────────────────────────────────
     const numberOfTravelers = body.travelers.length;
     const basePricePerPerson = tour.priceFrom;
-    const flightCostPerPerson = 450;
     const baseTotal = basePricePerPerson * numberOfTravelers;
-    const flightTotal =
-      body.hasFlightBooking && !tour.flightIncluded ? flightCostPerPerson * numberOfTravelers : 0;
-    const grandTotal = baseTotal + flightTotal;
+    /** Flight assistance is quoted separately; never included in package totals here. */
+    const flightTotal = 0;
+    const grandTotal = baseTotal;
     const depositAmount = Math.floor(grandTotal * 0.3);
 
     // ── Unique booking reference ────────────────────────────────────────────
@@ -139,6 +151,8 @@ export async function POST(request: NextRequest) {
         deposit_amount: depositAmount,
         has_insurance: false,
         has_flight_booking: body.hasFlightBooking,
+        preferred_departure_city: flightPrefs.departureCity,
+        preferred_return_city: flightPrefs.returnCity,
         stripe_payment_intent_id: null,
         payment_method: 'card',
         payment_status: 'unpaid',
@@ -195,6 +209,8 @@ export async function POST(request: NextRequest) {
           tour_slug: tour.slug,
           contact_email: body.booker.email.toLowerCase(),
           flow: 'payment_first',
+          ...(flightPrefs.departureCity ? { flight_departure: flightPrefs.departureCity } : {}),
+          ...(flightPrefs.returnCity ? { flight_return: flightPrefs.returnCity } : {}),
         },
       },
       { idempotencyKey }

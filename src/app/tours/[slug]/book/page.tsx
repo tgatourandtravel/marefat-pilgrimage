@@ -8,7 +8,6 @@ import { Elements } from "@stripe/react-stripe-js";
 import { getTourBySlug } from "@/data/tours";
 import { validateTravelerFields, validateBookerFields } from "@/lib/utils/validation";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
 import { Card } from "@/components/ui/Card";
 import { FormErrorBanner } from "@/components/ui/FormErrorBanner";
 import { StepProgress } from "@/components/booking/StepProgress";
@@ -208,19 +207,6 @@ const ROOM_LABELS: Record<string, string> = {
   double: "Double (2 per room)",
   single: "Single (1 per room)",
 };
-
-const CITY_OPTIONS = [
-  { value: "", label: "Select city" },
-  { value: "New York (JFK)", label: "New York (JFK)" },
-  { value: "Washington, DC (IAD)", label: "Washington, DC (IAD)" },
-  { value: "Los Angeles (LAX)", label: "Los Angeles (LAX)" },
-  { value: "Chicago (ORD)", label: "Chicago (ORD)" },
-  { value: "Houston (IAH)", label: "Houston (IAH)" },
-  { value: "Atlanta (ATL)", label: "Atlanta (ATL)" },
-  { value: "Dallas (DFW)", label: "Dallas (DFW)" },
-  { value: "San Francisco (SFO)", label: "San Francisco (SFO)" },
-  { value: "Other", label: "Other (mention in notes after booking)" },
-];
 
 export default function TourBookingPage({ params }: Props) {
   const router = useRouter();
@@ -451,12 +437,12 @@ export default function TourBookingPage({ params }: Props) {
       const { departureCity, returnCity } = tour.flightCityOptions;
       const nextErrors = {
         preferredDepartureCity:
-          departureCity && !flightRequest.preferredDepartureCity
-            ? "Please select a departure city"
+          departureCity && flightRequest.preferredDepartureCity.trim().length < 2
+            ? "Please enter your preferred departure city (at least 2 characters)"
             : "",
         preferredReturnCity:
-          returnCity && !flightRequest.preferredReturnCity
-            ? "Please select a return city"
+          returnCity && flightRequest.preferredReturnCity.trim().length < 2
+            ? "Please enter your preferred return city (at least 2 characters)"
             : "",
       };
       setFlightRequestErrors(nextErrors);
@@ -507,6 +493,10 @@ export default function TourBookingPage({ params }: Props) {
           })),
           hasInsurance: false,
           hasFlightBooking: addons.flightBooking,
+          preferredDepartureCity:
+            addons.flightBooking && !tour.flightIncluded ? flightRequest.preferredDepartureCity : null,
+          preferredReturnCity:
+            addons.flightBooking && !tour.flightIncluded ? flightRequest.preferredReturnCity : null,
         }),
       });
 
@@ -575,7 +565,6 @@ export default function TourBookingPage({ params }: Props) {
           flightIncludedInTour: tour.flightIncluded,
           basePricePerPerson: tour.basePrice,
           roomType: roomTypeParam || null,
-          flightCostPerPerson: 450,
           paymentMethod,
         }),
       });
@@ -603,8 +592,8 @@ export default function TourBookingPage({ params }: Props) {
 
   // Calculate totals
   const baseTotal = tour.basePrice * numberOfTravelers;
-  const flightCost = addons.flightBooking ? 450 * numberOfTravelers : 0;
-  const grandTotal = baseTotal + flightCost;
+  // Flight assistance is quoted separately — never counted in totals here.
+  const grandTotal = baseTotal;
   const depositAmount = Math.floor(grandTotal * 0.3);
 
   return (
@@ -942,13 +931,10 @@ export default function TourBookingPage({ params }: Props) {
                         <p className="text-xs text-charcoal/60">
                           {tour.flightIncluded
                             ? "Round-trip flights are included in this package"
-                            : "Let us arrange your round-trip flights • $450 per traveler (estimated)"
+                            : "Request round-trip flight assistance. Our consultant will review your preferences and share pricing with you — it is not included in the package total below."
                           }
                         </p>
                       </div>
-                      {!tour.flightIncluded && (
-                        <span className="text-sm font-semibold text-charcoal">$450</span>
-                      )}
                     </label>
 
                     {!tour.flightIncluded && addons.flightBooking && (
@@ -958,10 +944,13 @@ export default function TourBookingPage({ params }: Props) {
                         </p>
                         <div className="grid gap-3 sm:grid-cols-2">
                           {tour.flightCityOptions.departureCity ? (
-                            <Select
+                            <Input
                               label="Preferred Departure City"
-                              options={CITY_OPTIONS}
+                              type="text"
+                              placeholder="e.g., New York (JFK) or Dallas"
                               value={flightRequest.preferredDepartureCity}
+                              maxLength={120}
+                              autoComplete="off"
                               onChange={(e) =>
                                 setFlightRequest((prev) => ({
                                   ...prev,
@@ -969,6 +958,11 @@ export default function TourBookingPage({ params }: Props) {
                                 }))
                               }
                               error={flightRequestErrors.preferredDepartureCity || undefined}
+                              helperText={
+                                flightRequestErrors.preferredDepartureCity
+                                  ? undefined
+                                  : "Type your preferred departure airport or city (we will confirm options with you)."
+                              }
                               required
                             />
                           ) : (
@@ -983,10 +977,13 @@ export default function TourBookingPage({ params }: Props) {
                           )}
 
                           {tour.flightCityOptions.returnCity ? (
-                            <Select
+                            <Input
                               label="Preferred Return City"
-                              options={CITY_OPTIONS}
+                              type="text"
+                              placeholder="e.g., Washington, DC or Los Angeles"
                               value={flightRequest.preferredReturnCity}
+                              maxLength={120}
+                              autoComplete="off"
                               onChange={(e) =>
                                 setFlightRequest((prev) => ({
                                   ...prev,
@@ -994,6 +991,11 @@ export default function TourBookingPage({ params }: Props) {
                                 }))
                               }
                               error={flightRequestErrors.preferredReturnCity || undefined}
+                              helperText={
+                                flightRequestErrors.preferredReturnCity
+                                  ? undefined
+                                  : "Type your preferred return airport or city."
+                              }
                               required
                             />
                           ) : (
@@ -1202,7 +1204,7 @@ export default function TourBookingPage({ params }: Props) {
                         </div>
                       ) : addons.flightBooking ? (
                         <div className="space-y-2 rounded-xl border border-charcoal/8 bg-ivory/70 p-3">
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-start justify-between gap-3">
                             <div className="flex items-center gap-2">
                               <div className="flex h-5 w-5 items-center justify-center rounded-full bg-gold/20">
                                 <svg className="h-3 w-3 text-gold-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1211,7 +1213,9 @@ export default function TourBookingPage({ params }: Props) {
                               </div>
                               <span className="text-charcoal">Flight booking request</span>
                             </div>
-                            <span className="font-medium text-charcoal">${flightCost}</span>
+                            <span className="text-right text-xs font-medium text-charcoal/60">
+                              Quoted separately by our consultant
+                            </span>
                           </div>
                           <div className="grid gap-1 text-xs text-charcoal/70 sm:grid-cols-2">
                             <p>
@@ -1292,9 +1296,11 @@ export default function TourBookingPage({ params }: Props) {
                         <span className="text-charcoal">${baseTotal.toLocaleString()}</span>
                       </div>
                       {addons.flightBooking && !tour.flightIncluded && (
-                        <div className="flex justify-between">
-                          <span className="text-charcoal/70">Flight booking request</span>
-                          <span className="text-charcoal">${flightCost.toLocaleString()}</span>
+                        <div className="flex justify-between text-xs leading-relaxed text-charcoal/70">
+                          <span>Flight booking request</span>
+                          <span className="max-w-[55%] text-right font-medium text-charcoal/60">
+                            Priced separately — our team will confirm with you before ticketing
+                          </span>
                         </div>
                       )}
                       <div className="border-t border-charcoal/10 pt-2.5">
@@ -1629,10 +1635,10 @@ export default function TourBookingPage({ params }: Props) {
                 </div>
 
                 {addons.flightBooking && !tour.flightIncluded && (
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between gap-3 text-sm">
                     <span className="text-charcoal/70">Flight booking request</span>
-                    <span className="font-medium text-charcoal">
-                      ${flightCost}
+                    <span className="max-w-[55%] text-right text-xs font-medium text-charcoal/60">
+                      Quoted separately
                     </span>
                   </div>
                 )}
