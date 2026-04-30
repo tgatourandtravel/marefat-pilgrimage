@@ -553,16 +553,16 @@ export const TOURS: Tour[] = [
 
     included: [
       "5★ accommodation near holy sites",
-      "Breakfast and lunch daily",
+      "Breakfast and dinner daily",
       "Umrah visa processing",
-      "VIP premium private vehicle transfers",
+      "Premium Transfers",
       "Guided Umrah with religious scholar",
       "24/7 support throughout journey",
     ],
 
     excluded: [
       "International flights",
-      "Dinner meals",
+      "Lunch meals",
       "Personal expenses",
       "Travel insurance (recommended)",
       "Optional site visits and upgrades",

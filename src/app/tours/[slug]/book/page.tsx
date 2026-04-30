@@ -1461,24 +1461,28 @@ export default function TourBookingPage({ params }: Props) {
                       The remaining balance of <strong className="text-charcoal">${(grandTotal - depositAmount).toLocaleString()}</strong> is due no later than{" "}
                       <strong className="text-charcoal">45 days</strong> prior to your travel date.
                     </p>
-                    <ul className="space-y-1 text-xs leading-relaxed text-charcoal/75">
-                      <li>
-                        A <strong className="text-charcoal">3.6% processing fee</strong> applies to credit card payments only.
-                      </li>
-                      <li>
-                        Debit and prepaid card payments do not incur any processing fee.
-                      </li>
-                      <li>
-                        Your final total will be shown clearly before payment confirmation.
-                      </li>
-                    </ul>
-                    <p className="text-xs text-charcoal/60">
-                      Please review our{" "}
-                      <a href="/refund-policy" target="_blank" className="font-medium underline hover:text-charcoal">
-                        Refund Policy
-                      </a>{" "}
-                      before completing your payment.
-                    </p>
+                    {paymentMethod === "card" && (
+                      <>
+                        <ul className="space-y-1 text-xs leading-relaxed text-charcoal/75">
+                          <li>
+                            A <strong className="text-charcoal">3.6% processing fee</strong> applies to credit card payments only.
+                          </li>
+                          <li>
+                            Debit and prepaid card payments do not incur any processing fee.
+                          </li>
+                          <li>
+                            Your final total will be shown clearly before payment confirmation.
+                          </li>
+                        </ul>
+                        <p className="text-xs text-charcoal/60">
+                          Please review our{" "}
+                          <a href="/refund-policy" target="_blank" className="font-medium underline hover:text-charcoal">
+                            Refund Policy
+                          </a>{" "}
+                          before completing your payment.
+                        </p>
+                      </>
+                    )}
                   </div>
 
                   <div className="flex items-start gap-2 rounded-xl bg-ivory/80 p-4">
