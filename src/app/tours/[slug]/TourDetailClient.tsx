@@ -352,7 +352,22 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                       <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-charcoal/60">
                         Hotels
                       </h3>
-                      <p className="mt-2 text-sm text-charcoal/75">{tour.hotelInfo}</p>
+                      {tour.hotelInfo.includes("\n") ? (
+                        <ul className="mt-3 space-y-2 text-sm text-charcoal/80">
+                          {tour.hotelInfo
+                            .split("\n")
+                            .map((line) => line.trim())
+                            .filter(Boolean)
+                            .map((line) => (
+                              <li key={line} className="flex items-start gap-2">
+                                <span className="mt-[7px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-gold/80" />
+                                <span className="leading-relaxed">{line}</span>
+                              </li>
+                            ))}
+                        </ul>
+                      ) : (
+                        <p className="mt-2 text-sm text-charcoal/75">{tour.hotelInfo}</p>
+                      )}
                     </Card>
                     {SHOW_FLIGHTS_INFO_CARD && (
                       <Card variant="elevated" padding="md">

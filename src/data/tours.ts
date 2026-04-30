@@ -546,8 +546,7 @@ export const TOURS: Tour[] = [
     ],
 
     hotelInfo:
-      "Madinah & Makkah",
-      /*"5★ renowned hotels steps from the holy sites. Madinah: Mövenpick (Anwar al Maddinah). Makkah: Address Jabal Omar. Walk with ease to the Haramain, day or night.",*/
+      "Makkah's Hotel: Address Jabal Omar\nMadinah's Hotel: Anwar Al Madina Mövenpick",
 
     flightsInfo:
       "Round-trip economy flights from major US cities included. Business class upgrades available upon request.",
