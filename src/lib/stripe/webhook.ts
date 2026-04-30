@@ -1,6 +1,6 @@
 import type Stripe from "stripe";
 import { supabaseAdmin } from "@/lib/supabase/server";
-import { sendPaymentSuccessAdminEmail } from "@/lib/email/resend";
+import { sendPaymentSuccessAdminEmail, sendBookingConfirmationEmail } from "@/lib/email/resend";
 
 export async function handleStripeWebhookEvent(event: Stripe.Event) {
   if (event.type === "payment_intent.succeeded") {
@@ -40,6 +40,7 @@ export async function handleStripeWebhookEvent(event: Stripe.Event) {
       throw new Error("Failed to update booking payment state");
     }
 
+    // Send admin notification
     try {
       await sendPaymentSuccessAdminEmail({
         bookingRef: booking.booking_ref,
@@ -50,6 +51,24 @@ export async function handleStripeWebhookEvent(event: Stripe.Event) {
       });
     } catch (emailError) {
       console.error("Admin payment email error:", emailError);
+    }
+
+    // Send booking confirmation to the traveler.
+    // For the payment-first card flow the booking was created pre-verified,
+    // so this is the first (and only) confirmation email the traveler receives.
+    try {
+      await sendBookingConfirmationEmail({
+        to: booking.contact_email,
+        firstName: booking.contact_first_name,
+        bookingRef: booking.booking_ref,
+        tourTitle: booking.tour_title,
+        depositAmount: booking.deposit_amount,
+        grandTotal: booking.grand_total,
+        expiresAt: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000), // balance due in 45 days
+        paymentMethod: "card",
+      });
+    } catch (emailError) {
+      console.error("Traveler confirmation email error:", emailError);
     }
   }
 

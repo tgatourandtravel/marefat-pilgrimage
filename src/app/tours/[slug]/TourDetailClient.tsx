@@ -417,7 +417,7 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                           className="flex items-center gap-2 rounded-xl border border-charcoal/5 bg-ivory/90 px-3 py-2"
                         >
                           <CheckIcon />
-                          {doc}
+                          {doc === "Residence permit" ? "Residence Permit ( if applicable )" : doc}
                         </li>
                       ))}
                     </ul>
@@ -432,6 +432,12 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                         <span className="mt-[6px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-gold" />
                         <span>
                           Passport must be valid for at least 6 months from the tour start date
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="mt-[6px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-gold" />
+                        <span>
+                          Visa Processing for Saudi ( Note. Only the visa application for the nationalities of USA, Canada and European Union included in Package. For other Nationalities an additional visa fee may apply )
                         </span>
                       </li>
                       <li className="flex items-start gap-2">

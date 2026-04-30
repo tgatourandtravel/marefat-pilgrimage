@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, FormEvent, useEffect, useRef } from "react";
+import { useState, FormEvent, useEffect, useRef, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
 import { getTourBySlug } from "@/data/tours";
 import { validateTravelerFields, validateBookerFields } from "@/lib/utils/validation";
 import { Input } from "@/components/ui/Input";
@@ -12,6 +14,7 @@ import { FormErrorBanner } from "@/components/ui/FormErrorBanner";
 import { StepProgress } from "@/components/booking/StepProgress";
 import { LegalConsent } from "@/components/booking/LegalConsent";
 import { ONLINE_PAYMENT_ENABLED } from "@/lib/config/features";
+import PaymentForm from "@/components/ui/PaymentForm";
 
 // Booker: The person making the reservation and payment
 type BookerInfo = {
@@ -289,6 +292,18 @@ export default function TourBookingPage({ params }: Props) {
   const [termsError, setTermsError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Card payment-first flow state
+  const [cardClientSecret, setCardClientSecret] = useState<string | null>(null);
+  const [cardBookingRef, setCardBookingRef] = useState<string | null>(null);
+  const [isInitiatingPayment, setIsInitiatingPayment] = useState(false);
+  const [cardInitError, setCardInitError] = useState<string | null>(null);
+
+  const stripePromise = useMemo(() => {
+    if (!ONLINE_PAYMENT_ENABLED) return null;
+    const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+    return key ? loadStripe(key) : null;
+  }, []);
+
   // Scroll to top of page when step changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -460,6 +475,52 @@ export default function TourBookingPage({ params }: Props) {
   };
 
   const [submitError, setSubmitError] = useState("");
+
+  // Initiates the payment-first card flow: creates booking + PaymentIntent in one call.
+  const initiateCardBooking = async () => {
+    if (!validateStep(step)) return;
+    if (!termsAccepted) { setTermsError(true); return; }
+
+    setIsInitiatingPayment(true);
+    setCardInitError(null);
+
+    try {
+      const response = await fetch("/api/payments/initiate-card-booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tourSlug: params.slug,
+          booker: {
+            firstName: booker.firstName,
+            lastName: booker.lastName,
+            email: booker.email,
+            phone: booker.phone,
+            isTraveling: isBookerTraveling,
+          },
+          travelers: travelers.map((t, index) => ({
+            firstName: (index === 0 && isBookerTraveling) ? booker.firstName : t.firstName,
+            lastName: (index === 0 && isBookerTraveling) ? booker.lastName : t.lastName,
+            passportNumber: t.passportNumber,
+            nationality: t.nationality,
+            passportExpiry: t.passportExpiry,
+            dateOfBirth: t.dateOfBirth,
+          })),
+          hasInsurance: false,
+          hasFlightBooking: addons.flightBooking,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to initiate payment.");
+
+      setCardClientSecret(data.clientSecret);
+      setCardBookingRef(data.bookingRef);
+    } catch (err) {
+      setCardInitError(err instanceof Error ? err.message : "Failed to initiate payment. Please try again.");
+    } finally {
+      setIsInitiatingPayment(false);
+    }
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -1350,7 +1411,7 @@ export default function TourBookingPage({ params }: Props) {
                         <div className="flex-1 text-left">
                           <p className="text-sm font-medium text-charcoal">Online Card Payment</p>
                           <p className="text-xs text-charcoal/60">
-                            Credit or debit card via Stripe — available after booking verification
+                            Credit or debit card via Stripe — pay securely in the next step
                           </p>
                         </div>
                       </button>
@@ -1377,8 +1438,8 @@ export default function TourBookingPage({ params }: Props) {
                         <div>
                           <p className="text-sm font-medium text-charcoal">Secure Online Payment via Stripe</p>
                           <p className="mt-1.5 text-xs leading-relaxed text-charcoal/70">
-                            Card payment is processed securely by Stripe. Your card details are never stored on our servers.
-                            The payment link will be activated on your booking confirmation page after OTP verification.
+                            Card payment is processed securely by Stripe. Your card details are never stored on our
+                            servers. You will complete your payment in the final review step — no verification email needed.
                           </p>
                         </div>
                       </div>
@@ -1394,6 +1455,17 @@ export default function TourBookingPage({ params }: Props) {
                       The remaining balance of <strong className="text-charcoal">${(grandTotal - depositAmount).toLocaleString()}</strong> is due no later than{" "}
                       <strong className="text-charcoal">45 days</strong> prior to your travel date.
                     </p>
+                    <ul className="space-y-1 text-xs leading-relaxed text-charcoal/75">
+                      <li>
+                        A <strong className="text-charcoal">3.6% processing fee</strong> applies to credit card payments only.
+                      </li>
+                      <li>
+                        Debit and prepaid card payments do not incur any processing fee.
+                      </li>
+                      <li>
+                        Your final total will be shown clearly before payment confirmation.
+                      </li>
+                    </ul>
                     <p className="text-xs text-charcoal/60">
                       Please review our{" "}
                       <a href="/refund-policy" target="_blank" className="font-medium underline hover:text-charcoal">
@@ -1414,6 +1486,51 @@ export default function TourBookingPage({ params }: Props) {
                 </Card>
               )}
 
+              {/* Step 4 — Card payment inline (payment-first flow) */}
+              {step === 4 && paymentMethod === "card" && ONLINE_PAYMENT_ENABLED && (
+                <Card variant="elevated" padding="md">
+                  <h3 className="border-b border-charcoal/5 pb-3 text-sm font-semibold text-charcoal">
+                    Secure Card Payment
+                  </h3>
+
+                  {!cardClientSecret ? (
+                    <div className="mt-4 space-y-4">
+                      <p className="text-xs leading-relaxed text-charcoal/70">
+                        Click below to proceed securely. Your booking will be created and the payment
+                        form will appear — no email verification needed.
+                      </p>
+                      {cardInitError && (
+                        <p className="text-xs text-danger">{cardInitError}</p>
+                      )}
+                      <button
+                        type="button"
+                        onClick={initiateCardBooking}
+                        disabled={isInitiatingPayment}
+                        className="w-full rounded-full bg-gold px-6 py-3 text-sm font-semibold text-charcoal shadow-soft transition hover:bg-gold-dark disabled:cursor-wait disabled:opacity-70"
+                      >
+                        {isInitiatingPayment ? "Preparing payment…" : `Pay Deposit — $${depositAmount.toLocaleString()}`}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="mt-4">
+                      <Elements
+                        stripe={stripePromise}
+                        options={{
+                          clientSecret: cardClientSecret,
+                          appearance: { theme: "stripe" },
+                        }}
+                      >
+                        <PaymentForm
+                          bookingRef={cardBookingRef!}
+                          successUrl={`${typeof window !== "undefined" ? window.location.origin : ""}/tours/${params.slug}/book/success?ref=${encodeURIComponent(cardBookingRef!)}&paid=true`}
+                          buttonLabel={`Pay Deposit — $${depositAmount.toLocaleString()}`}
+                        />
+                      </Elements>
+                    </div>
+                  )}
+                </Card>
+              )}
+
               {/* Error Display */}
               <FormErrorBanner message={submitError || null} />
 
@@ -1422,7 +1539,7 @@ export default function TourBookingPage({ params }: Props) {
                 <button
                   type="button"
                   onClick={handleBack}
-                  disabled={step === 1}
+                  disabled={step === 1 || (step === 4 && paymentMethod === "card" && !!cardClientSecret)}
                   className="text-sm font-medium text-charcoal/70 transition hover:text-charcoal disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   ← Back
@@ -1436,7 +1553,7 @@ export default function TourBookingPage({ params }: Props) {
                   >
                     Continue
                   </button>
-                ) : (
+                ) : paymentMethod !== "card" ? (
                   <button
                     type="submit"
                     disabled={isSubmitting}
@@ -1444,7 +1561,7 @@ export default function TourBookingPage({ params }: Props) {
                   >
                     {isSubmitting ? "Processing..." : "Confirm Booking"}
                   </button>
-                )}
+                ) : null}
               </div>
             </form>
           </div>
