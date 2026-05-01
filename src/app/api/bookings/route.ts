@@ -194,7 +194,9 @@ export async function POST(request: NextRequest) {
         status: 'pending_verification',
         is_verified: false,
         verified_at: null,
-        expires_at: null,
+        expires_at: selectedPaymentMethod !== 'card'
+        ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+        : null,
       })
       .select()
       .single();
