@@ -5,12 +5,13 @@ import { generateBookingRef } from '@/lib/utils/booking-ref';
 import { getTourBySlug } from '@/data/tours';
 import { validateBookerFields, validateTravelerFields } from '@/lib/utils/validation';
 import { parseFlightBookingPreferences } from '@/lib/booking/flight-request';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
-const rateLimitWindowMs = 60_000;
-const maxRequestsPerWindow = 10;
-const requestLog = new Map<string, number[]>();
+//const rateLimitWindowMs = 60_000;
+//const maxRequestsPerWindow = 10;
+//const requestLog = new Map<string, number[]>();
 
 interface BookerInput {
   firstName: string;
@@ -42,22 +43,14 @@ interface InitiateCardBookingRequest {
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    const now = Date.now();
-    const recent = (requestLog.get(ip) || []).filter((ts) => now - ts < rateLimitWindowMs);
-    if (recent.length >= maxRequestsPerWindow) {
-      return NextResponse.json(
-        { error: 'Too many payment attempts. Please try again in one minute.' },
-        { status: 429 }
-      );
-    }
-    recent.push(now);
-    requestLog.set(ip, recent);
-    for (const [entryIp, timestamps] of requestLog.entries()) {
-      const valid = timestamps.filter((ts) => now - ts < rateLimitWindowMs);
-      if (valid.length === 0) requestLog.delete(entryIp);
-      else requestLog.set(entryIp, valid);
-    }
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
+const { allowed } = await checkRateLimit(`card-booking:${ip}`);
+if (!allowed) {
+  return NextResponse.json(
+    { error: 'Too many payment attempts. Please try again in one minute.' },
+    { status: 429 }
+  );
+}
 
     if (!isStripeConfigured || !stripe) {
       return NextResponse.json({ error: 'Online payment is not configured.' }, { status: 503 });

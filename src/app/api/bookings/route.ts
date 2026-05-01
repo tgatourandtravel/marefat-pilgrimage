@@ -4,6 +4,7 @@ import { generateBookingRef } from '@/lib/utils/booking-ref';
 import { generateOTP, getOTPExpiry } from '@/lib/utils/otp';
 import { sendOTPEmail } from '@/lib/email/resend';
 import { getTourBySlug } from '@/data/tours';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 import {
   validateBookerFields,
   validateTravelerFields,
@@ -12,9 +13,9 @@ import { parseFlightBookingPreferences } from '@/lib/booking/flight-request';
 
 // Force dynamic rendering to prevent static optimization at build time
 export const dynamic = 'force-dynamic';
-const rateLimitWindowMs = 60_000;
-const maxRequestsPerWindow = 10;
-const requestLog = new Map<string, number[]>();
+//const rateLimitWindowMs = 60_000;
+//const maxRequestsPerWindow = 10;
+//const requestLog = new Map<string, number[]>();
 
 // Booker: Person making the reservation (has contact info)
 interface BookerInput {
@@ -48,25 +49,14 @@ interface CreateBookingRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    const now = Date.now();
-    const recent = (requestLog.get(ip) || []).filter((ts) => now - ts < rateLimitWindowMs);
-    if (recent.length >= maxRequestsPerWindow) {
-      return NextResponse.json(
-        { error: 'Too many booking attempts. Please try again in one minute.' },
-        { status: 429 }
-      );
-    }
-    recent.push(now);
-    requestLog.set(ip, recent);
-    for (const [entryIp, timestamps] of requestLog.entries()) {
-      const validTimestamps = timestamps.filter((ts) => now - ts < rateLimitWindowMs);
-      if (validTimestamps.length === 0) {
-        requestLog.delete(entryIp);
-      } else {
-        requestLog.set(entryIp, validTimestamps);
-      }
-    }
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
+const { allowed } = await checkRateLimit(`bookings:${ip}`);
+if (!allowed) {
+  return NextResponse.json(
+    { error: 'Too many booking attempts. Please try again in one minute.' },
+    { status: 429 }
+  );
+}
 
     const body: CreateBookingRequest = await request.json();
 
