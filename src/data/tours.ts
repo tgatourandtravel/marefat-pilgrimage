@@ -490,8 +490,8 @@ export const TOURS: Tour[] = [
     type: "Umrah",
     packageLevel: "Premium",
 
-    startDate: "2026-11-29",
-    endDate: "2026-12-06",
+    startDate: "2026-11-25",
+    endDate: "2026-12-01",
     durationDays: 7,
 
     priceFrom: 1399, // $1,399 USD — Quad Occupancy (base price)
@@ -541,8 +541,8 @@ export const TOURS: Tour[] = [
       "Day 2-3: Umrah rites with scholar guidance and spiritual preparation",
       "Day 4: Transfer to Madinah, check-in to 5★ hotel near Prophet's Mosque (Mövenpick)",
       "Day 5: Guided ziyarat in Madinah - Quba Mosque, Uhud, historical sites",
-      "Day 6: Return to Makkah (Jabal Omar area) for final prayers and reflection",
-      "Day 7: Farewell Tawaf and departure with full assistance",
+      "Day 6: Spiritual program and free worship time in Madinah",
+      "Day 7: Departure with full assistance",
     ],
 
     hotelInfo:
@@ -598,45 +598,85 @@ export const TOURS: Tour[] = [
 // ============================================
 // Helper Functions
 // ============================================
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+function toUtcMidnightFromIsoDate(isoDate: string): number | null {
+  const [yearStr, monthStr, dayStr] = isoDate.split("-");
+  const year = Number(yearStr);
+  const month = Number(monthStr);
+  const day = Number(dayStr);
+
+  if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) {
+    return null;
+  }
+
+  return Date.UTC(year, month - 1, day);
+}
+
+function getDurationDaysFromDates(startDate: string, endDate: string): number | null {
+  const startUtc = toUtcMidnightFromIsoDate(startDate);
+  const endUtc = toUtcMidnightFromIsoDate(endDate);
+  if (startUtc === null || endUtc === null) {
+    return null;
+  }
+
+  const diffDays = Math.round((endUtc - startUtc) / MS_PER_DAY);
+  if (diffDays < 1) {
+    return 1;
+  }
+  return diffDays;
+}
+
+function withComputedDuration(tour: Tour): Tour {
+  const computed = getDurationDaysFromDates(tour.startDate, tour.endDate);
+  if (computed === null) {
+    return tour;
+  }
+  return {
+    ...tour,
+    durationDays: computed,
+  };
+}
 
 /**
  * Get all active (non-archived) tours
  */
 export function getAllTours(): Tour[] {
-  return TOURS.filter(tour => !tour.isArchived);
+  return TOURS.filter(tour => !tour.isArchived).map(withComputedDuration);
 }
 
 /**
  * Get featured tours (for homepage) — excludes archived
  */
 export function getFeaturedTours(): Tour[] {
-  return TOURS.filter(tour => tour.isFeatured && !tour.isArchived);
+  return TOURS.filter(tour => tour.isFeatured && !tour.isArchived).map(withComputedDuration);
 }
 
 /**
  * Get archived tours — for reuse or reference
  */
 export function getArchivedTours(): Tour[] {
-  return TOURS.filter(tour => tour.isArchived);
+  return TOURS.filter(tour => tour.isArchived).map(withComputedDuration);
 }
 
 /**
  * Get tour by slug
  */
 export function getTourBySlug(slug: string): Tour | undefined {
-  return TOURS.find(tour => tour.slug === slug);
+  const tour = TOURS.find(tour => tour.slug === slug);
+  return tour ? withComputedDuration(tour) : undefined;
 }
 
 /**
  * Get tours by type
  */
 export function getToursByType(type: TourType): Tour[] {
-  return TOURS.filter(tour => tour.type === type);
+  return TOURS.filter(tour => tour.type === type).map(withComputedDuration);
 }
 
 /**
  * Get tours by region
  */
 export function getToursByRegion(region: Region): Tour[] {
-  return TOURS.filter(tour => tour.region === region);
+  return TOURS.filter(tour => tour.region === region).map(withComputedDuration);
 }
