@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { getBookingExpiry } from '@/lib/utils/booking-ref';
 import { isOTPExpired } from '@/lib/utils/otp';
-import { sendBookingConfirmationEmail } from '@/lib/email/resend';
+import { sendBookingConfirmationEmail, sendNewBookingAdminEmail } from '@/lib/email/resend';
 import type { Booking, VerificationCode } from '@/lib/supabase/types';
 
 // Force dynamic rendering to prevent static optimization at build time
@@ -146,6 +146,28 @@ export async function POST(request: NextRequest) {
       });
     } catch (emailError) {
       console.error('Confirmation email error:', emailError);
+    }
+
+    // Notify admin for Wire/Zelle bookings
+    if (booking.payment_method !== 'card') {
+      try {
+        await sendNewBookingAdminEmail({
+          bookingRef: booking.booking_ref,
+          customerName: `${booking.contact_first_name} ${booking.contact_last_name}`,
+          customerEmail: booking.contact_email,
+          customerPhone: booking.contact_phone,
+          tourTitle: booking.tour_title,
+          paymentMethod: booking.payment_method,
+          depositAmount: booking.deposit_amount,
+          grandTotal: booking.grand_total,
+          numberOfTravelers: booking.number_of_travelers,
+          hasFlightBooking: booking.has_flight_booking,
+          preferredDepartureCity: booking.preferred_departure_city,
+          preferredReturnCity: booking.preferred_return_city,
+        });
+      } catch (adminEmailError) {
+        console.error('Admin notification email error:', adminEmailError);
+      }
     }
 
     return NextResponse.json({

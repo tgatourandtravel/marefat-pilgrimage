@@ -297,3 +297,128 @@ export async function sendPaymentSuccessAdminEmail({
     `,
   });
 }
+
+interface SendNewBookingAdminEmailParams {
+  bookingRef: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  tourTitle: string;
+  paymentMethod: string;
+  depositAmount: number;
+  grandTotal: number;
+  numberOfTravelers: number;
+  hasFlightBooking: boolean;
+  preferredDepartureCity?: string | null;
+  preferredReturnCity?: string | null;
+}
+
+export async function sendNewBookingAdminEmail({
+  bookingRef,
+  customerName,
+  customerEmail,
+  customerPhone,
+  tourTitle,
+  paymentMethod,
+  depositAmount,
+  grandTotal,
+  numberOfTravelers,
+  hasFlightBooking,
+  preferredDepartureCity,
+  preferredReturnCity,
+}: SendNewBookingAdminEmailParams) {
+  const adminEmail = process.env.PAYMENT_ADMIN_EMAIL || 'info@marefatpilgrimage.com';
+
+  const flightHtml = hasFlightBooking ? `
+    <tr>
+      <td style="padding:8px 0; color:#777; font-weight:500; width:160px;">Flight Request</td>
+      <td style="padding:8px 0; color:#c7a56a; font-weight:600;">
+        ✈ ${preferredDepartureCity || '—'} → ${preferredReturnCity || '—'}
+      </td>
+    </tr>
+  ` : '';
+
+  return resend.emails.send({
+    from: 'Marefat Pilgrimage <noreply@marefatpilgrimage.com>',
+    to: adminEmail,
+    subject: `New ${paymentMethod.toUpperCase()} booking — ${bookingRef} | Action needed`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <body style="font-family:system-ui,sans-serif; color:#151515; margin:0; padding:0; background:#f5f5f5;">
+        <div style="max-width:600px; margin:0 auto; padding:40px 20px;">
+
+          <div style="background:#fff; border-radius:16px; padding:32px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
+              <div style="background:#fef9ee; border:1px solid #e5dcc8; border-radius:8px; padding:8px 14px; font-size:12px; font-weight:700; color:#a07830; text-transform:uppercase; letter-spacing:0.08em;">
+                Action Needed
+              </div>
+            </div>
+
+            <h2 style="margin:0 0 6px; font-size:22px; font-weight:700; color:#151515;">
+              New ${paymentMethod.toUpperCase()} Booking
+            </h2>
+            <p style="margin:0 0 24px; font-size:14px; color:#666;">
+              A new booking has been verified and is awaiting payment confirmation.
+            </p>
+
+            <div style="background:#f7f3eb; border-radius:12px; padding:20px 24px; margin-bottom:24px;">
+              <p style="margin:0 0 4px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:#777;">Booking Reference</p>
+              <p style="margin:0; font-size:24px; font-weight:800; letter-spacing:0.04em; color:#151515;">${bookingRef}</p>
+            </div>
+
+            <table style="width:100%; border-collapse:collapse; font-size:14px;">
+              <tr>
+                <td style="padding:8px 0; color:#777; font-weight:500; width:160px; border-bottom:1px solid #f0f0f0;">Customer</td>
+                <td style="padding:8px 0; font-weight:600; color:#151515; border-bottom:1px solid #f0f0f0;">${customerName}</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 0; color:#777; font-weight:500; border-bottom:1px solid #f0f0f0;">Email</td>
+                <td style="padding:8px 0; border-bottom:1px solid #f0f0f0;">
+                  <a href="mailto:${customerEmail}" style="color:#a07830; text-decoration:none;">${customerEmail}</a>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:8px 0; color:#777; font-weight:500; border-bottom:1px solid #f0f0f0;">Phone</td>
+                <td style="padding:8px 0; border-bottom:1px solid #f0f0f0;">${customerPhone}</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 0; color:#777; font-weight:500; border-bottom:1px solid #f0f0f0;">Tour</td>
+                <td style="padding:8px 0; font-weight:600; border-bottom:1px solid #f0f0f0;">${tourTitle}</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 0; color:#777; font-weight:500; border-bottom:1px solid #f0f0f0;">Travelers</td>
+                <td style="padding:8px 0; border-bottom:1px solid #f0f0f0;">${numberOfTravelers} person${numberOfTravelers > 1 ? 's' : ''}</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 0; color:#777; font-weight:500; border-bottom:1px solid #f0f0f0;">Payment Method</td>
+                <td style="padding:8px 0; font-weight:700; text-transform:uppercase; border-bottom:1px solid #f0f0f0;">${paymentMethod}</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 0; color:#777; font-weight:500; border-bottom:1px solid #f0f0f0;">Deposit Due</td>
+                <td style="padding:8px 0; font-size:18px; font-weight:800; color:#151515; border-bottom:1px solid #f0f0f0;">$${depositAmount.toLocaleString('en-US')}</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 0; color:#777; font-weight:500; border-bottom:1px solid #f0f0f0;">Grand Total</td>
+                <td style="padding:8px 0; border-bottom:1px solid #f0f0f0;">$${grandTotal.toLocaleString('en-US')}</td>
+              </tr>
+              ${flightHtml}
+            </table>
+
+            <div style="margin-top:24px; padding:16px; background:#fef9ee; border:1px solid #e5dcc8; border-radius:10px; font-size:13px; color:#555; line-height:1.6;">
+              Once you receive the ${paymentMethod} transfer, mark this booking as paid in the
+              <a href="https://marefatpilgrimage.com/admin/bookings" style="color:#a07830; font-weight:600; text-decoration:none;">Admin Dashboard</a>.
+            </div>
+
+          </div>
+
+          <div style="margin-top:24px; text-align:center; font-size:12px; color:#999;">
+            Marefat Pilgrimage — Internal Notification
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  });
+}
