@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import type { Booking, Traveler } from '@/lib/supabase/types';
+import ConfirmBookingModal from '@/components/admin/ConfirmBookingModal';
 
 // ─── Section Component ────────────────────────────────────────────────────────
 
@@ -56,6 +57,7 @@ export default function BookingDetailPage() {
   const [travelers, setTravelers] = useState<Traveler[]>([]);
   const [loading, setLoading] = useState(true);
   const [markingPaid, setMarkingPaid] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const fetchData = useCallback(async () => {
     const res = await fetch(`/api/admin/bookings/${id}`);
@@ -123,6 +125,21 @@ export default function BookingDetailPage() {
             <Button variant="secondary" size="sm" isLoading={markingPaid} onClick={handleMarkPaid}>
               Mark as Paid
             </Button>
+          </div>
+        )}
+
+        {booking.payment_status === 'paid' && booking.status !== 'confirmed' && (
+          <div className="bg-charcoal/5 border border-charcoal/10 rounded-xl px-5 py-4 flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-charcoal">Deposit received</p>
+              <p className="text-xs text-charcoal/50 mt-0.5">Ready to confirm this booking</p>
+            </div>
+            <button
+              onClick={() => setShowConfirmModal(true)}
+              className="rounded-xl bg-charcoal px-5 py-2.5 text-sm font-semibold text-white hover:bg-charcoal/80"
+            >
+              Confirm Booking
+            </button>
           </div>
         )}
 
@@ -198,6 +215,14 @@ export default function BookingDetailPage() {
         </Section>
 
       </div>
+
+      {showConfirmModal && (
+        <ConfirmBookingModal
+          bookingId={booking.id}
+          bookingRef={booking.booking_ref}
+          onClose={() => setShowConfirmModal(false)}
+        />
+      )}
     </div>
   );
 }
