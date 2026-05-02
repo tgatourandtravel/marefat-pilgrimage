@@ -422,3 +422,51 @@ export async function sendNewBookingAdminEmail({
     `,
   });
 }
+
+interface HotelDetails {
+  name: string;
+  checkIn: string;
+  checkOut: string;
+  roomType: string;
+  meal: string;
+  address?: string;
+}
+
+interface SendBookingConfirmedEmailParams {
+  to: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  bookingRef: string;
+  tourTitle: string;
+  grandTotal: number;
+  depositAmount: number;
+  paymentMethod: string;
+  balanceDueDate: string;
+  travelers: string[];
+  hotelMedina: HotelDetails;
+  hotelMecca: HotelDetails;
+  notes?: string;
+  pdfAttachment?: Buffer;
+}
+
+export async function sendBookingConfirmedEmail({
+  to, firstName, lastName, phone, email, bookingRef, tourTitle,
+  grandTotal, depositAmount, paymentMethod, balanceDueDate,
+  travelers, hotelMedina, hotelMecca, notes, pdfAttachment,
+}: SendBookingConfirmedEmailParams) {
+  const balanceDue = grandTotal - depositAmount;
+  const methodLabel = paymentMethod === 'zelle' ? 'Zelle' : paymentMethod === 'wire' ? 'Bank Transfer' : 'Credit Card';
+  const formatDate = (d: string) => { try { return new Date(d).toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' }); } catch { return d; } };
+  const travelersHtml = travelers.map((name, i) => { if (i % 2 !== 0) return ''; const right = travelers[i + 1]; return `<tr><td style="padding:5px 0;width:50%">${i+1}. ${name}</td><td style="padding:5px 0">${right ? `${i+2}. ${right}` : ''}</td></tr>`; }).filter(Boolean).join('');
+  const hotelBlock = (city: string, h: HotelDetails) => `<div style="margin-bottom:20px"><p style="margin:0 0 10px;font-size:15px;font-weight:700;color:#c7a56a">${city}</p><table style="width:100%;border-collapse:collapse;font-size:13px;border:1px solid #e5dcc8"><tr style="border-bottom:1px solid #e5dcc8"><td style="padding:9px 12px;color:#666;width:160px;background:#fdfbf7">Name of Hotel</td><td style="padding:9px 12px;font-weight:600">${h.name}</td><td style="padding:9px 12px;color:#666;width:140px;background:#fdfbf7">Check-in</td><td style="padding:9px 12px">${formatDate(h.checkIn)}</td></tr><tr style="border-bottom:1px solid #e5dcc8"><td style="padding:9px 12px;color:#666;background:#fdfbf7">Address</td><td style="padding:9px 12px">${h.address||'—'}</td><td style="padding:9px 12px;color:#666;background:#fdfbf7">Check-out</td><td style="padding:9px 12px">${formatDate(h.checkOut)}</td></tr><tr><td style="padding:9px 12px;color:#666;background:#fdfbf7">Meal</td><td style="padding:9px 12px">${h.meal||'—'}</td><td style="padding:9px 12px;color:#666;background:#fdfbf7">Room Type</td><td style="padding:9px 12px">${h.roomType||'—'}</td></tr></table></div>`;
+
+  return resend.emails.send({
+    from: 'Marefat Pilgrimage <noreply@marefatpilgrimage.com>',
+    to,
+    subject: `Registration Confirmation — ${bookingRef} | Marefat Pilgrimage`,
+    attachments: pdfAttachment ? [{ filename: `Marefat-Confirmation-${bookingRef}.pdf`, content: pdfAttachment }] : undefined,
+    html: `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/></head><body style="font-family:system-ui,sans-serif;color:#151515;margin:0;padding:0;background:#f5f5f5"><div style="max-width:650px;margin:0 auto;padding:32px 16px"><div style="background:#fff;border-radius:12px 12px 0 0;padding:28px 32px;border-bottom:3px solid #c7a56a"><p style="margin:0 0 2px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:#888">Marefat Pilgrimage</p><h1 style="margin:0;font-size:22px;font-weight:800;color:#c7a56a">Registration Confirmation</h1><p style="margin:4px 0 0;font-size:13px;color:#666">${tourTitle}</p></div><div style="background:#fff;padding:28px 32px;border:1px solid #e5e5e5;border-top:none;border-radius:0 0 12px 12px"><h3 style="margin:0 0 12px;font-size:13px;font-weight:700;text-transform:uppercase;color:#555">Booker Details</h3><table style="width:100%;border-collapse:collapse;font-size:13px;border:1px solid #e5dcc8;margin-bottom:24px"><tr style="border-bottom:1px solid #e5dcc8"><td style="padding:9px 12px;color:#666;width:120px;background:#fdfbf7">Full Name</td><td style="padding:9px 12px;font-weight:600">${firstName} ${lastName}</td><td style="padding:9px 12px;color:#666;width:120px;background:#fdfbf7">E-mail</td><td style="padding:9px 12px">${email}</td></tr><tr><td style="padding:9px 12px;color:#666;background:#fdfbf7">Phone</td><td style="padding:9px 12px" colspan="3">${phone}</td></tr></table><p style="margin:0 0 24px;font-size:14px;line-height:1.75;color:#444">Thank you for entrusting us to accompany you on this blessed journey. We're honored to guide you, and we pray to share in your spiritual rewards and blessings.</p><h3 style="margin:0 0 12px;font-size:13px;font-weight:700;text-transform:uppercase;color:#555">Travelers</h3><table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:28px">${travelersHtml}</table><h3 style="margin:0 0 16px;font-size:13px;font-weight:700;text-transform:uppercase;color:#555">Hotel</h3>${hotelBlock('Medina',hotelMedina)}${hotelBlock('Mecca',hotelMecca)}<div style="background:#f7f3eb;border-radius:8px;padding:14px 16px;margin-bottom:28px;font-size:13px;color:#555;line-height:1.6"><strong style="color:#151515">Transportation:</strong> Package transportation is available within Saudi Arabia for airport pickup and drop-off.</div><h3 style="margin:0 0 8px;font-size:13px;font-weight:700;text-transform:uppercase;color:#555">Payment Summary</h3><table style="width:100%;border-collapse:collapse;font-size:13px;border:1px solid #e5dcc8;margin-bottom:8px"><tr style="border-bottom:1px solid #e5dcc8"><td style="padding:9px 14px;color:#666;background:#fdfbf7">Total Price</td><td style="padding:9px 14px;font-weight:700">USD $${grandTotal.toLocaleString()}</td><td style="padding:9px 14px;color:#666;background:#fdfbf7">Amount Paid</td><td style="padding:9px 14px;font-weight:700;color:#16a34a">USD $${depositAmount.toLocaleString()}</td></tr><tr><td style="padding:9px 14px;color:#666;background:#fdfbf7">Balance Due</td><td style="padding:9px 14px;font-weight:700">USD $${balanceDue.toLocaleString()}</td><td style="padding:9px 14px;color:#666;background:#fdfbf7">Balance Due Date</td><td style="padding:9px 14px;font-weight:700">${formatDate(balanceDueDate)}</td></tr></table><p style="margin:0 0 6px;font-size:13px;color:#444"><strong>Payment Method:</strong> ${methodLabel}</p>${notes?`<div style="background:#fef9ee;border:1px solid #e5dcc8;border-radius:8px;padding:14px 16px;margin-bottom:24px;font-size:13px;color:#555"><strong style="color:#151515">Notes:</strong> ${notes}</div>`:''}<p style="margin:24px 0 4px;font-size:14px;color:#444;line-height:1.7">If you have any inquiries or require assistance before your trip, please feel free to contact us.</p><p style="margin:0 0 4px;font-size:14px;color:#444">Respectfully,</p><p style="margin:0;font-size:14px;font-weight:700;color:#151515">Marefat Pilgrimage Team</p></div><div style="margin-top:24px;background:#151515;border-radius:10px;padding:18px 28px"><a href="https://www.marefatpilgrimage.com" style="color:#c7a56a;text-decoration:none;font-size:13px;font-weight:600">www.marefatpilgrimage.com</a></div></div></body></html>`,
+  });
+}
