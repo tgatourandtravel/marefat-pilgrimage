@@ -196,10 +196,11 @@ if (!allowed) {
       .select()
       .single();
 
-    // If columns are missing (42703), apply migration then retry
-    if (bookingError?.code === '42703') {
-      console.warn('Schema migration needed, applying now…', bookingError.message);
-      // Attempt DDL via RPC (works if exec_sql function exists in the project)
+    // Handle missing columns: 42703 = PG-level, PGRST204 = PostgREST schema cache miss
+    if (bookingError?.code === '42703' || bookingError?.code === 'PGRST204') {
+      console.warn('Schema migration or cache reload needed:', bookingError.code, bookingError.message);
+
+      // 1. Attempt DDL via exec_sql RPC (works if the function exists in the project)
       try {
         await supabaseAdmin.rpc('exec_sql' as never, {
           sql: `ALTER TABLE public.bookings
@@ -210,7 +211,12 @@ if (!allowed) {
         } as never);
       } catch (_) { /* RPC may not exist */ }
 
-      // Retry with full payload
+      // 2. Reload PostgREST schema cache so new columns are visible
+      try {
+        await supabaseAdmin.rpc('pg_notify' as never, { channel: 'pgrst', payload: 'reload schema' } as never);
+      } catch (_) { /* ignore */ }
+
+      // 3. Retry full insert
       const retry = await supabaseAdmin
         .from('bookings')
         .insert({
@@ -226,9 +232,9 @@ if (!allowed) {
       booking = retry.data;
       bookingError = retry.error;
 
-      // If still failing (RPC not available), fall back to base payload only
-      if (bookingError?.code === '42703') {
-        console.warn('RPC unavailable, falling back to base payload');
+      // 4. If still failing, fall back to base payload (booking succeeds; names stored in travelers)
+      if (bookingError?.code === '42703' || bookingError?.code === 'PGRST204') {
+        console.warn('Falling back to base payload without new columns');
         const fallback = await supabaseAdmin
           .from('bookings')
           .insert(basePayload)
