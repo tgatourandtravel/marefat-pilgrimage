@@ -194,7 +194,7 @@ if (!allowed) {
     if (bookingError) {
       console.error('Booking creation error:', bookingError);
       return NextResponse.json(
-        { error: 'Failed to create booking' },
+        { error: 'Failed to create booking', details: `[DBG] code=${bookingError.code} msg=${bookingError.message}` },
         { status: 500 }
       );
     }
@@ -276,7 +276,7 @@ if (!allowed) {
   } catch (error) {
     console.error('API error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: `[DBG] ${error instanceof Error ? error.message : String(error)}` },
       { status: 500 }
     );
   }
