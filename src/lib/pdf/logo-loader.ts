@@ -1,46 +1,59 @@
 /**
- * Loads Marefat SVG logos and converts them to base64 PNGs for use in jsPDF.
- * Uses @resvg/resvg-js (pure WebAssembly — works in Node.js without native deps).
+ * Loads Marefat logo assets and returns base64 strings for use in jsPDF.
  *
- * Two variants:
- *   - Icon only  (public/logo.svg)          – square, ~402×405
- *   - Horizontal (public/logo-horizontal.svg) – full logo with wordmark, 400×140
+ * Horizontal logo (public/logo-horizontal.jpg) — 1024×358 JPEG
+ *   Full wordmark: circular icon + vertical rule + "MAREFAT / Pilgrimage" text
+ *   Loaded directly from disk as JPEG — no runtime SVG conversion needed.
+ *   Format for jsPDF addImage: 'JPEG'
+ *
+ * Icon only (public/logo.svg) — 402×405 SVG → PNG via @resvg/resvg-js
+ *   Used where only the icon medallion is needed.
+ *   Format for jsPDF addImage: 'PNG'
  */
 
 import { readFileSync } from 'fs';
 import path from 'path';
 
-let cachedIcon: string | null = null;
 let cachedHorizontal: string | null = null;
+let cachedIcon: string | null = null;
 
-async function convertSvg(svgPath: string, widthPx: number): Promise<string | null> {
+/**
+ * Full horizontal wordmark logo (JPEG).
+ * Aspect ratio ≈ 2.86 (1024 × 358 px).
+ * Returns a data URI with format "data:image/jpeg;base64,…"
+ */
+export async function getHorizontalLogoBase64(): Promise<string | null> {
+  if (cachedHorizontal) return cachedHorizontal;
   try {
-    const { Resvg } = await import('@resvg/resvg-js');
-    const svgBuffer = readFileSync(svgPath);
-    const resvg = new Resvg(svgBuffer, {
-      fitTo: { mode: 'width', value: widthPx },
-      background: 'rgba(0,0,0,0)',
-    });
-    const png = resvg.render().asPng();
-    return `data:image/png;base64,${Buffer.from(png).toString('base64')}`;
+    const filePath = path.join(process.cwd(), 'public', 'logo-horizontal.jpg');
+    const buf = readFileSync(filePath);
+    cachedHorizontal = `data:image/jpeg;base64,${buf.toString('base64')}`;
+    return cachedHorizontal;
   } catch (err) {
-    console.warn('Logo PNG conversion failed:', err);
+    console.warn('Horizontal logo load failed:', err);
     return null;
   }
 }
 
-/** Square icon (public/logo.svg) */
+/**
+ * Icon-only square logo (SVG → PNG via @resvg/resvg-js).
+ * Returns a data URI with format "data:image/png;base64,…"
+ */
 export async function getLogoBase64(): Promise<string | null> {
   if (cachedIcon) return cachedIcon;
-  const svgPath = path.join(process.cwd(), 'public', 'logo.svg');
-  cachedIcon = await convertSvg(svgPath, 400);
-  return cachedIcon;
-}
-
-/** Full horizontal logo with wordmark (public/logo-horizontal.svg) */
-export async function getHorizontalLogoBase64(): Promise<string | null> {
-  if (cachedHorizontal) return cachedHorizontal;
-  const svgPath = path.join(process.cwd(), 'public', 'logo-horizontal.svg');
-  cachedHorizontal = await convertSvg(svgPath, 600);
-  return cachedHorizontal;
+  try {
+    const { Resvg } = await import('@resvg/resvg-js');
+    const svgPath = path.join(process.cwd(), 'public', 'logo.svg');
+    const svgBuffer = readFileSync(svgPath);
+    const resvg = new Resvg(svgBuffer, {
+      fitTo: { mode: 'width', value: 400 },
+      background: 'rgba(0,0,0,0)',
+    });
+    const png = resvg.render().asPng();
+    cachedIcon = `data:image/png;base64,${Buffer.from(png).toString('base64')}`;
+    return cachedIcon;
+  } catch (err) {
+    console.warn('Icon logo PNG conversion failed:', err);
+    return null;
+  }
 }

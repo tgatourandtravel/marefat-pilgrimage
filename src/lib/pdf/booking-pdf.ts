@@ -138,9 +138,9 @@ async function buildPDF(data: BookingData): Promise<jsPDF> {
     if (logoB64) {
       // Horizontal logo: viewBox 400×140 → ratio 2.857
       const logoW = small ? 46 : 62;
-      const logoH = logoW / 2.857;
+      const logoH = logoW / 2.860;  // 1024×358 px
       const lx    = small ? W - MR - logoW : W / 2 - logoW / 2;
-      doc.addImage(logoB64, 'PNG', lx, small ? 8 : 10, logoW, logoH);
+      doc.addImage(logoB64, 'JPEG', lx, small ? 8 : 10, logoW, logoH);
     } else {
       // Fallback text logo
       doc.setFontSize(small ? 12 : 18); doc.setFont('helvetica', 'bold');
