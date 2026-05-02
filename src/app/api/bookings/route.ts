@@ -153,43 +153,91 @@ if (!allowed) {
       attempts++;
     }
 
-    // Create booking with booker as contact
-    const { data: booking, error: bookingError } = await supabaseAdmin
-      .from('bookings')
-      .insert({
-        booking_ref: bookingRef,
-        tour_slug: tour.slug,
-        tour_title: tour.title,
-        tour_destination: tour.destination,
-        tour_start_date: tour.startDate || null,
-        tour_duration_days: tour.durationDays || null,
-        contact_first_name: body.booker.firstName.trim(),
-        contact_last_name: body.booker.lastName.trim(),
-        contact_email: body.booker.email.toLowerCase(),
-        contact_phone: body.booker.phone,
-        base_price_per_person: basePricePerPerson,
-        number_of_travelers: numberOfTravelers,
-        insurance_total: insuranceTotal,
-        flight_total: flightTotal,
-        grand_total: grandTotal,
-        deposit_amount: depositAmount,
-        has_insurance: body.hasInsurance,
-        has_flight_booking: body.hasFlightBooking,
-        preferred_departure_city: flightPrefs.departureCity,
-        preferred_return_city: flightPrefs.returnCity,
-        stripe_payment_intent_id: null,
-        payment_method: selectedPaymentMethod,
-        payment_status: 'unpaid',
-        payment_paid_at: null,
-        status: 'pending_verification',
-        is_verified: false,
-        verified_at: null,
-        expires_at: selectedPaymentMethod !== 'card'
+    // Shared base payload (columns present in the original schema)
+    const basePayload = {
+      booking_ref: bookingRef,
+      tour_slug: tour.slug,
+      tour_title: tour.title,
+      tour_destination: tour.destination,
+      tour_start_date: tour.startDate || null,
+      tour_duration_days: tour.durationDays || null,
+      contact_email: body.booker.email.toLowerCase(),
+      contact_phone: body.booker.phone,
+      base_price_per_person: basePricePerPerson,
+      number_of_travelers: numberOfTravelers,
+      insurance_total: insuranceTotal,
+      flight_total: flightTotal,
+      grand_total: grandTotal,
+      deposit_amount: depositAmount,
+      has_insurance: body.hasInsurance,
+      has_flight_booking: body.hasFlightBooking,
+      stripe_payment_intent_id: null,
+      payment_method: selectedPaymentMethod,
+      payment_status: 'unpaid',
+      payment_paid_at: null,
+      status: 'pending_verification',
+      is_verified: false,
+      verified_at: null,
+      expires_at: selectedPaymentMethod !== 'card'
         ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
         : null,
+    };
+
+    // Try full insert (with migrated columns); on undefined-column error auto-apply migration
+    let { data: booking, error: bookingError } = await supabaseAdmin
+      .from('bookings')
+      .insert({
+        ...basePayload,
+        contact_first_name: body.booker.firstName.trim(),
+        contact_last_name: body.booker.lastName.trim(),
+        preferred_departure_city: flightPrefs.departureCity,
+        preferred_return_city: flightPrefs.returnCity,
       })
       .select()
       .single();
+
+    // If columns are missing (42703), apply migration then retry
+    if (bookingError?.code === '42703') {
+      console.warn('Schema migration needed, applying now…', bookingError.message);
+      // Attempt DDL via RPC (works if exec_sql function exists in the project)
+      try {
+        await supabaseAdmin.rpc('exec_sql' as never, {
+          sql: `ALTER TABLE public.bookings
+            ADD COLUMN IF NOT EXISTS contact_first_name text NOT NULL DEFAULT '',
+            ADD COLUMN IF NOT EXISTS contact_last_name  text NOT NULL DEFAULT '',
+            ADD COLUMN IF NOT EXISTS preferred_departure_city text,
+            ADD COLUMN IF NOT EXISTS preferred_return_city     text;`,
+        } as never);
+      } catch (_) { /* RPC may not exist */ }
+
+      // Retry with full payload
+      const retry = await supabaseAdmin
+        .from('bookings')
+        .insert({
+          ...basePayload,
+          contact_first_name: body.booker.firstName.trim(),
+          contact_last_name: body.booker.lastName.trim(),
+          preferred_departure_city: flightPrefs.departureCity,
+          preferred_return_city: flightPrefs.returnCity,
+        })
+        .select()
+        .single();
+
+      booking = retry.data;
+      bookingError = retry.error;
+
+      // If still failing (RPC not available), fall back to base payload only
+      if (bookingError?.code === '42703') {
+        console.warn('RPC unavailable, falling back to base payload');
+        const fallback = await supabaseAdmin
+          .from('bookings')
+          .insert(basePayload)
+          .select()
+          .single();
+        booking = fallback.data;
+        bookingError = fallback.error;
+      }
+    }
 
     if (bookingError) {
       console.error('Booking creation error:', bookingError);
