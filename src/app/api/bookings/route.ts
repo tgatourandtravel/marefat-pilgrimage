@@ -49,21 +49,8 @@ interface CreateBookingRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    // #region agent log H-E
-    fetch('http://127.0.0.1:7308/ingest/75ffad5b-1248-480c-a1b9-38e4ca190d00',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'11dabf'},body:JSON.stringify({sessionId:'11dabf',location:'route.ts:51',message:'POST /api/bookings entered',data:{},timestamp:Date.now(),hypothesisId:'H-E'})}).catch(()=>{});
-    // #endregion
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
-    let rateLimitAllowed = false;
-    try {
-      const { allowed } = await checkRateLimit(`bookings:${ip}`);
-      rateLimitAllowed = allowed;
-    } catch (rlErr) {
-      // #region agent log H-E
-      fetch('http://127.0.0.1:7308/ingest/75ffad5b-1248-480c-a1b9-38e4ca190d00',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'11dabf'},body:JSON.stringify({sessionId:'11dabf',location:'route.ts:rate-limit',message:'checkRateLimit threw',data:{err: String(rlErr)},timestamp:Date.now(),hypothesisId:'H-E'})}).catch(()=>{});
-      // #endregion
-      rateLimitAllowed = true; // allow through if rate limiter is broken
-    }
-    const allowed = rateLimitAllowed;
+const { allowed } = await checkRateLimit(`bookings:${ip}`);
 if (!allowed) {
   return NextResponse.json(
     { error: 'Too many booking attempts. Please try again in one minute.' },
@@ -128,9 +115,6 @@ if (!allowed) {
       preferredDepartureCity: body.preferredDepartureCity,
       preferredReturnCity: body.preferredReturnCity,
     });
-    // #region agent log H-C
-    fetch('http://127.0.0.1:7308/ingest/75ffad5b-1248-480c-a1b9-38e4ca190d00',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'11dabf'},body:JSON.stringify({sessionId:'11dabf',location:'route.ts:flightPrefs',message:'flightPrefs result',data:{ok:flightPrefs.ok,message:(flightPrefs as {message?:string}).message,hasFlightBooking:body.hasFlightBooking,depCity:body.preferredDepartureCity,retCity:body.preferredReturnCity,tourFlightIncluded:(tour as {flightIncluded?:boolean}).flightIncluded},timestamp:Date.now(),hypothesisId:'H-C'})}).catch(()=>{});
-    // #endregion
     if (!flightPrefs.ok) {
       return NextResponse.json({ error: flightPrefs.message }, { status: 400 });
     }
@@ -147,9 +131,6 @@ if (!allowed) {
     const flightTotal = 0;
     const grandTotal = baseTotal + insuranceTotal + flightTotal;
     const depositAmount = Math.floor(grandTotal * 0.3);
-    // #region agent log H-D
-    fetch('http://127.0.0.1:7308/ingest/75ffad5b-1248-480c-a1b9-38e4ca190d00',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'11dabf'},body:JSON.stringify({sessionId:'11dabf',location:'route.ts:pricing',message:'pricing computed',data:{priceFrom:tour.priceFrom,numberOfTravelers,grandTotal,depositAmount,paymentMethod:body.paymentMethod},timestamp:Date.now(),hypothesisId:'H-D'})}).catch(()=>{});
-    // #endregion
     const selectedPaymentMethod =
       body.paymentMethod === 'card'
         ? 'card'
@@ -210,16 +191,10 @@ if (!allowed) {
       .select()
       .single();
 
-    // #region agent log H-A H-B
-    fetch('http://127.0.0.1:7308/ingest/75ffad5b-1248-480c-a1b9-38e4ca190d00',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'11dabf'},body:JSON.stringify({sessionId:'11dabf',location:'route.ts:booking-insert',message:'booking insert result',data:{hasError:!!bookingError,errorCode:(bookingError as {code?:string}|null)?.code,errorMsg:(bookingError as {message?:string}|null)?.message,bookingId:booking?.id},timestamp:Date.now(),hypothesisId:'H-A,H-B'})}).catch(()=>{});
-    // #endregion
     if (bookingError) {
       console.error('Booking creation error:', bookingError);
       return NextResponse.json(
-        {
-          error: 'Failed to create booking',
-          details: `[DBG] code=${bookingError.code} msg=${bookingError.message} hint=${(bookingError as {hint?:string}).hint ?? ''}`
-        },
+        { error: 'Failed to create booking' },
         { status: 500 }
       );
     }
@@ -301,10 +276,7 @@ if (!allowed) {
   } catch (error) {
     console.error('API error:', error);
     return NextResponse.json(
-      {
-        error: 'Internal server error',
-        details: `[DBG] ${error instanceof Error ? error.message : String(error)}`
-      },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
