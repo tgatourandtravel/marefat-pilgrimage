@@ -13,6 +13,8 @@ interface HotelDetails {
   roomType: string;
   meal: string;
   address?: string;
+  phone?: string;
+  email?: string;
 }
 
 interface ConfirmRequest {
@@ -95,7 +97,7 @@ export async function POST(
     // Generate PDF attachment
     let pdfBuffer: Buffer | undefined;
     try {
-      const pdfBytes = generateRegistrationConfirmationPDFBytes({
+      const pdfBytes = await generateRegistrationConfirmationPDFBytes({
         bookingRef: booking.booking_ref,
         tourTitle: booking.tour_title,
         firstName: booking.contact_first_name,

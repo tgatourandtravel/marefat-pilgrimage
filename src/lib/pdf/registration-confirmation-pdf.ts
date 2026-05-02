@@ -1,28 +1,30 @@
 /**
  * Registration Confirmation PDF
- * Sent to customer after admin confirms the booking.
- * Design matches the Marefat Registration Confirmation template.
+ * Layout matches the 4-page Marefat Registration Confirmation template:
+ *   Page 1 – Header / Booker Details / Travelers
+ *   Page 2 – Hotel (Medina + Mecca) / Transportation
+ *   Page 3 – Other Services / Payment Summary / Cancellation Policy
+ *   Page 4 – Sign-off
  */
 
 import jsPDF from 'jspdf';
+import { getLogoBase64 } from './logo-loader';
 
-const COLORS = {
-  ivory: '#f7f3eb',
-  charcoal: '#151515',
-  gold: '#c7a56a',
-  goldDark: '#a0844f',
-  gray: '#555555',
-  lightGray: '#888888',
-  border: [229, 220, 200] as [number, number, number],
-  goldRGB: [199, 165, 106] as [number, number, number],
-  charcoalRGB: [21, 21, 21] as [number, number, number],
-  ivoryRGB: [247, 243, 235] as [number, number, number],
-  grayRGB: [85, 85, 85] as [number, number, number],
-  lightGrayRGB: [136, 136, 136] as [number, number, number],
-  white: [255, 255, 255] as [number, number, number],
-  greenRGB: [22, 163, 74] as [number, number, number],
+// ─── Palette ────────────────────────────────────────────────────────────────
+const C = {
+  white:     [255, 255, 255] as [number, number, number],
+  ivory:     [247, 243, 235] as [number, number, number],
+  border:    [220, 210, 190] as [number, number, number],
+  gold:      [199, 165, 106] as [number, number, number],
+  goldDark:  [160, 132,  85] as [number, number, number],
+  charcoal:  [ 30,  30,  28] as [number, number, number],
+  gray:      [ 85,  85,  85] as [number, number, number],
+  lightGray: [140, 140, 140] as [number, number, number],
+  green:     [ 22, 163,  74] as [number, number, number],
+  footerBg:  [ 30,  30,  28] as [number, number, number],
 };
 
+// ─── Public types ────────────────────────────────────────────────────────────
 export interface HotelDetails {
   name: string;
   checkIn: string;
@@ -30,6 +32,8 @@ export interface HotelDetails {
   roomType: string;
   meal: string;
   address?: string;
+  phone?: string;
+  email?: string;
 }
 
 export interface RegistrationConfirmationData {
@@ -39,6 +43,7 @@ export interface RegistrationConfirmationData {
   lastName: string;
   phone: string;
   email: string;
+  address?: string;
   grandTotal: number;
   depositAmount: number;
   paymentMethod: string;
@@ -49,407 +54,420 @@ export interface RegistrationConfirmationData {
   notes?: string;
 }
 
-const formatDate = (d: string): string => {
+// ─── Utilities ───────────────────────────────────────────────────────────────
+const fmtDate = (d: string): string => {
   if (!d) return '—';
   try {
     return new Date(d).toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
+      month: 'long', day: 'numeric', year: 'numeric',
     });
-  } catch {
-    return d;
-  }
+  } catch { return d; }
 };
 
-const methodLabel = (m: string): string => {
-  if (m === 'zelle') return 'Zelle';
-  if (m === 'wire') return 'Bank Transfer';
-  return 'Credit Card';
-};
+const payLabel = (m: string): string =>
+  m === 'zelle' ? 'Zelle' : m === 'wire' ? 'Bank Transfer' : 'Credit Card';
 
-function buildRegistrationConfirmationPDF(data: RegistrationConfirmationData): jsPDF {
+const usd = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigits: 0 })}`;
+
+// ─── Main builder (async because logo loading is async) ──────────────────────
+async function buildPDF(data: RegistrationConfirmationData): Promise<jsPDF> {
+  const logoB64 = await getLogoBase64();
+
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const W = doc.internal.pageSize.getWidth();   // 210
+  const H = doc.internal.pageSize.getHeight();  // 297
+  const ML = 16;   // left margin
+  const MR = 16;   // right margin
+  const CW = W - ML - MR;  // content width ≈ 178
+  const FOOTER_H = 16;
+  const SAFE_BOTTOM = H - FOOTER_H - 6;
 
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  const margin = 18;
-  const contentWidth = pageWidth - margin * 2;
   let y = 0;
+  let pageNum = 1;
 
-  const footerHeight = 18;
-  const safeBottom = pageHeight - footerHeight - 8;
+  // ── Color helpers ──────────────────────────────────────────────────────────
+  const fill  = (c: [number,number,number]) => doc.setFillColor(c[0], c[1], c[2]);
+  const draw  = (c: [number,number,number]) => doc.setDrawColor(c[0], c[1], c[2]);
+  const color = (c: [number,number,number]) => doc.setTextColor(c[0], c[1], c[2]);
 
-  const needsPage = (space: number) => {
-    if (y + space > safeBottom) {
+  // ── Footer ─────────────────────────────────────────────────────────────────
+  const addFooter = () => {
+    const fy = H - FOOTER_H;
+    fill(C.footerBg);
+    doc.rect(0, fy, W, FOOTER_H, 'F');
+
+    // Left: contact info
+    doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+    color(C.lightGray);
+    doc.text('Ahmad Reshad Tajik  ·  +1 (954) 330-8904  ·  info@marefatpilgrimage.com',
+      ML, fy + 6.5);
+
+    // Right: website (gold)
+    doc.setFontSize(8); doc.setFont('helvetica', 'bold');
+    color(C.gold);
+    doc.text('www.marefatpilgrimage.com', W - MR, fy + 6.5, { align: 'right' });
+
+    // Bottom: generated date (centered)
+    doc.setFontSize(6.5); doc.setFont('helvetica', 'normal');
+    color([100, 100, 100]);
+    doc.text(
+      `Generated ${new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}`,
+      W / 2, fy + 12.5, { align: 'center' },
+    );
+  };
+
+  // ── Page guard ─────────────────────────────────────────────────────────────
+  const ensureSpace = (need: number) => {
+    if (y + need > SAFE_BOTTOM) {
       addFooter();
       doc.addPage();
-      y = margin;
-      return true;
+      pageNum++;
+      y = addPageHeader();
     }
-    return false;
   };
 
-  // ── Helpers ──────────────────────────────────────────────
+  // ── Page header (logo + gold rule) ─────────────────────────────────────────
+  // Returns the y position after the header
+  const addPageHeader = (rightSide = false): number => {
+    const logoW = 28;
+    const logoH = 28;
 
-  const setColor = (rgb: [number, number, number]) =>
-    doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+    if (logoB64) {
+      if (rightSide) {
+        // Pages 2, 3, 4 – logo small top-right
+        doc.addImage(logoB64, 'PNG', W - MR - logoW, 6, logoW, logoH);
+      } else {
+        // Page 1 – logo top-left
+        doc.addImage(logoB64, 'PNG', ML, 6, logoW, logoH);
+        // Brand text next to logo
+        doc.setFontSize(14); doc.setFont('helvetica', 'bold');
+        color(C.charcoal);
+        doc.text('MAREFAT', ML + logoW + 4, 16);
+        doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+        color(C.lightGray);
+        doc.text('Pilgrimage', ML + logoW + 4, 22);
+      }
+    } else {
+      // Fallback: text-only brand mark
+      fill(C.gold);
+      doc.circle(ML + 7, 18, 7, 'F');
+      doc.setFontSize(10); doc.setFont('helvetica', 'bold');
+      color(C.white);
+      doc.text('M', ML + 4.5, 20.5);
+      doc.setFontSize(14); doc.setFont('helvetica', 'bold');
+      color(C.charcoal);
+      doc.text('MAREFAT', ML + 17, 16);
+      doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+      color(C.lightGray);
+      doc.text('Pilgrimage', ML + 17, 22);
+    }
 
-  const setFill = (rgb: [number, number, number]) =>
-    doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+    // Gold horizontal rule
+    const ruleY = 36;
+    fill(C.gold);
+    doc.rect(0, ruleY, W, 1.2, 'F');
 
-  const setDraw = (rgb: [number, number, number]) =>
-    doc.setDrawColor(rgb[0], rgb[1], rgb[2]);
+    return ruleY + 6;
+  };
 
-  const sectionTitle = (label: string) => {
-    needsPage(14);
+  // ── Section heading ─────────────────────────────────────────────────────────
+  const sectionHeading = (label: string) => {
+    ensureSpace(12);
+    y += 4;
+    doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+    color(C.charcoal);
+    doc.text(label, ML, y);
+    y += 2;
+    draw(C.border); doc.setLineWidth(0.25);
+    doc.line(ML, y + 0.5, W - MR, y + 0.5);
     y += 5;
-    doc.setFontSize(7.5);
-    doc.setFont('helvetica', 'bold');
-    setColor(COLORS.lightGrayRGB);
-    doc.text(label.toUpperCase(), margin, y);
-    y += 1;
-    setDraw(COLORS.border);
-    doc.setLineWidth(0.3);
-    doc.line(margin, y + 1, pageWidth - margin, y + 1);
-    y += 6;
   };
 
-  const tableRow = (
-    labels: string[],
-    values: string[],
-    colWidths: number[],
-    isLast: boolean
-  ) => {
+  // ── Bordered table rows ─────────────────────────────────────────────────────
+  // cols: array of { label, value, width } where width is in mm
+  const tableRow = (cols: { label: string; value: string; width: number }[]) => {
     const rowH = 10;
-    const x0 = margin;
-    let x = x0;
+    let x = ML;
+    const labelW = 26;
 
-    // Row background for label cells
-    labels.forEach((label, i) => {
-      const lw = 30;
-      const vw = colWidths[i] - lw;
+    cols.forEach(({ label, value, width }) => {
+      if (width === 0) { x += 0; return; }
 
-      setFill(COLORS.ivoryRGB);
-      doc.rect(x, y, lw, rowH, 'F');
-      setFill(COLORS.white);
-      doc.rect(x + lw, y, vw, rowH, 'F');
+      // Label cell (ivory bg)
+      fill(C.ivory); draw(C.border); doc.setLineWidth(0.2);
+      doc.rect(x, y, labelW, rowH, 'FD');
+      doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+      color(C.lightGray);
+      doc.text(label, x + 2.5, y + 6.5);
 
-      // Border
-      setDraw(COLORS.border);
-      doc.setLineWidth(0.2);
-      doc.rect(x, y, colWidths[i], rowH, 'D');
+      // Value cell (white bg)
+      const vw = width - labelW;
+      fill(C.white);
+      doc.rect(x + labelW, y, vw, rowH, 'FD');
+      doc.setFontSize(8.5); doc.setFont('helvetica', 'normal');
+      color(C.charcoal);
+      const vLines = doc.splitTextToSize(value || '—', vw - 4);
+      doc.text(vLines[0], x + labelW + 3, y + 6.5);
 
-      // Label
-      doc.setFontSize(8.5);
-      doc.setFont('helvetica', 'normal');
-      setColor(COLORS.lightGrayRGB);
-      doc.text(label, x + 3, y + 6.5);
-
-      // Value
-      doc.setFont('helvetica', 'normal');
-      setColor(COLORS.charcoalRGB);
-      const vText = doc.splitTextToSize(values[i] || '—', vw - 4);
-      doc.text(vText[0], x + lw + 3, y + 6.5);
-
-      x += colWidths[i];
+      x += width;
     });
-
-    if (!isLast) {
-      // bottom line already drawn by rect
-    }
 
     y += rowH;
   };
 
-  // ── Footer (drawn on current page) ───────────────────────
-  const addFooter = () => {
-    const fy = pageHeight - footerHeight;
-    setFill(COLORS.charcoalRGB);
-    doc.rect(0, fy, pageWidth, footerHeight, 'F');
+  // ══════════════════════════════════════════════════════════════════════════════
+  // PAGE 1 – Header / Booking info / Booker / Travelers
+  // ══════════════════════════════════════════════════════════════════════════════
+  y = addPageHeader(false);
 
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    setColor(COLORS.goldRGB);
-    doc.text('www.marefatpilgrimage.com', margin, fy + 7);
+  // Title block (right of logo on page 1)
+  doc.setFontSize(20); doc.setFont('helvetica', 'bold');
+  color(C.gold);
+  doc.text('Registration Confirmation', W / 2, y + 4, { align: 'center' });
+  y += 10;
+  doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+  color(C.gray);
+  doc.text('Umrah Pilgrimage Package', W / 2, y, { align: 'center' });
+  y += 10;
 
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7.5);
-    setColor([160, 160, 160]);
-    doc.text(
-      'Ahmad Reshad Tajik  |  +1 (954) 330-8904  |  info@marefatpilgrimage.com',
-      pageWidth - margin,
-      fy + 7,
-      { align: 'right' }
-    );
+  // Booking ref line
+  doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+  color(C.charcoal);
+  doc.text(`Booking Confirmation: ${data.tourTitle} — Ref. ${data.bookingRef}`, ML, y);
+  y += 6;
 
-    doc.setFontSize(7);
-    setColor([120, 120, 120]);
-    doc.text(
-      `Generated on ${new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}`,
-      pageWidth / 2,
-      fy + 13,
-      { align: 'center' }
-    );
-  };
+  doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+  color(C.gray);
+  doc.text('Booking Pre-confirmation:', ML, y);
+  y += 8;
 
-  // ══════════════════════════════════════════════════════════
-  // HEADER
-  // ══════════════════════════════════════════════════════════
-  // White header area with gold bottom border
-  setFill(COLORS.white);
-  doc.rect(0, 0, pageWidth, 38, 'F');
+  // ── Booker Details ──────────────────────────────────────────────────────────
+  sectionHeading('Booker Details:');
 
-  // Gold accent line at bottom of header
-  setFill(COLORS.goldRGB);
-  doc.rect(0, 36, pageWidth, 2, 'F');
+  const third = CW / 3;
+  const half  = CW / 2;
 
-  // Logo mark (gold circle with ✦)
-  setFill(COLORS.goldRGB);
-  doc.circle(margin + 7, 15, 7, 'F');
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'bold');
-  setColor(COLORS.white);
-  doc.text('M', margin + 4.5, 17.5);
+  // Row 1: Full Name | Address | City/State/Zip
+  tableRow([
+    { label: 'Full Name',       value: `${data.firstName} ${data.lastName}`, width: third },
+    { label: 'Address',         value: data.address || '—',                   width: third },
+    { label: 'City / State / Zip', value: '—',                               width: CW - third * 2 },
+  ]);
+  // Row 2: Phone | E-mail
+  tableRow([
+    { label: 'Phone',  value: data.phone, width: half },
+    { label: 'E-mail', value: data.email, width: CW - half },
+  ]);
+  y += 4;
 
-  // Company name
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  setColor(COLORS.charcoalRGB);
-  doc.text('MAREFAT', margin + 17, 13);
-  doc.setFontSize(7);
-  doc.setFont('helvetica', 'normal');
-  setColor(COLORS.lightGrayRGB);
-  doc.text('Pilgrimage', margin + 17, 19);
+  // ── Thank you paragraph ──────────────────────────────────────────────────────
+  ensureSpace(18);
+  doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+  color(C.gray);
+  const thankYou = doc.splitTextToSize(
+    "Thank you for entrusting us to accompany you on this blessed journey. We're honored to guide you, and we pray to share in your spiritual rewards and blessings.",
+    CW,
+  );
+  doc.text(thankYou, ML, y);
+  y += thankYou.length * 5 + 6;
 
-  // Title
-  doc.setFontSize(18);
-  doc.setFont('helvetica', 'bold');
-  setColor(COLORS.goldRGB);
-  doc.text('Registration Confirmation', margin + 17, 30);
+  // ── Travelers ────────────────────────────────────────────────────────────────
+  sectionHeading('Travelers:');
 
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  setColor(COLORS.grayRGB);
-  doc.text(data.tourTitle, margin + 17, 35.5);
-
-  // Booking Ref (top-right)
-  doc.setFontSize(7);
-  setColor(COLORS.lightGrayRGB);
-  doc.text('BOOKING REFERENCE', pageWidth - margin, 13, { align: 'right' });
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  setColor(COLORS.charcoalRGB);
-  doc.text(data.bookingRef, pageWidth - margin, 23, { align: 'right' });
-
-  y = 46;
-
-  // ══════════════════════════════════════════════════════════
-  // BOOKER DETAILS
-  // ══════════════════════════════════════════════════════════
-  sectionTitle('Booker Details');
-
-  const half = contentWidth / 2;
-  tableRow(['Full Name', 'E-mail'], [`${data.firstName} ${data.lastName}`, data.email], [half, half], false);
-  tableRow(['Phone', ''], [data.phone, ''], [contentWidth, 0], true);
-  y += 2;
-
-  // ══════════════════════════════════════════════════════════
-  // THANK YOU
-  // ══════════════════════════════════════════════════════════
-  needsPage(16);
-  doc.setFontSize(9.5);
-  doc.setFont('helvetica', 'normal');
-  setColor(COLORS.grayRGB);
-  const thankYou =
-    'Thank you for entrusting us to accompany you on this blessed journey. We\'re honored to guide you, and we pray to share in your spiritual rewards and blessings.';
-  const wrapped = doc.splitTextToSize(thankYou, contentWidth);
-  doc.text(wrapped, margin, y);
-  y += wrapped.length * 5 + 4;
-
-  // ══════════════════════════════════════════════════════════
-  // TRAVELERS
-  // ══════════════════════════════════════════════════════════
-  sectionTitle('Travelers');
-
-  const colW = contentWidth / 2;
+  const colW = CW / 2;
   for (let i = 0; i < data.travelers.length; i += 2) {
-    needsPage(7);
-    doc.setFontSize(9.5);
-    doc.setFont('helvetica', 'normal');
-    setColor(COLORS.charcoalRGB);
-    doc.text(`${i + 1}. ${data.travelers[i]}`, margin, y);
+    ensureSpace(7);
+    doc.setFontSize(9.5); doc.setFont('helvetica', 'normal');
+    color(C.charcoal);
+    doc.text(`${i + 1}.  ${data.travelers[i]}`, ML, y);
     if (data.travelers[i + 1]) {
-      doc.text(`${i + 2}. ${data.travelers[i + 1]}`, margin + colW, y);
+      doc.text(`${i + 2}.  ${data.travelers[i + 1]}`, ML + colW, y);
     }
     y += 6;
   }
-  y += 2;
 
-  // ══════════════════════════════════════════════════════════
-  // HOTELS
-  // ══════════════════════════════════════════════════════════
-  sectionTitle('Hotel');
+  // ══════════════════════════════════════════════════════════════════════════════
+  // PAGE 2 – Hotels / Transportation
+  // ══════════════════════════════════════════════════════════════════════════════
+  addFooter();
+  doc.addPage(); pageNum++;
+  y = addPageHeader(true);
 
-  const drawHotel = (city: string, hotel: HotelDetails) => {
-    needsPage(40);
+  sectionHeading('Hotel:');
 
-    // City label
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    setColor(COLORS.goldRGB);
-    doc.text(city, margin, y);
+  const drawHotel = (city: string, h: HotelDetails) => {
+    ensureSpace(46);
+
+    // City label in gold
+    doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+    color(C.gold);
+    doc.text(city, ML, y);
     y += 5;
 
-    const h1 = contentWidth / 2;
-    tableRow(['Name of Hotel', 'Check-in'], [hotel.name, formatDate(hotel.checkIn)], [h1, h1], false);
-    tableRow(['Address', 'Check-out'], [hotel.address || '—', formatDate(hotel.checkOut)], [h1, h1], false);
-    tableRow(['Meal', 'Room Type'], [hotel.meal || '—', hotel.roomType || '—'], [h1, h1], true);
-    y += 4;
+    const col3 = CW / 3;
+
+    // Row 1: Name of Hotel | Checking Date/Time | Check out Date/Time
+    tableRow([
+      { label: 'Name of Hotel',       value: h.name,                   width: col3 },
+      { label: 'Check-in Date/Time',  value: fmtDate(h.checkIn),       width: col3 },
+      { label: 'Check-out Date/Time', value: fmtDate(h.checkOut),      width: CW - col3 * 2 },
+    ]);
+    // Row 2: Address | Phone | E-mail
+    tableRow([
+      { label: 'Address', value: h.address || '—', width: col3 },
+      { label: 'Phone',   value: h.phone   || '—', width: col3 },
+      { label: 'E-mail',  value: h.email   || '—', width: CW - col3 * 2 },
+    ]);
+    // Row 3: Meal | Type of Room
+    tableRow([
+      { label: 'Meal',        value: h.meal     || '—', width: half },
+      { label: 'Type of Room (Quad, Triple, Double, Single)', value: h.roomType || '—', width: CW - half },
+    ]);
+    y += 5;
   };
 
   drawHotel('Medina', data.hotelMedina);
-  drawHotel('Mecca', data.hotelMecca);
+  drawHotel('Mecca',  data.hotelMecca);
 
-  // ── Transportation info ───────────────────────────────────
-  needsPage(18);
-  setFill(COLORS.ivoryRGB);
-  setDraw(COLORS.border);
-  doc.setLineWidth(0.2);
-  const transText = 'Transportation: Package transportation is available within Saudi Arabia for airport pickup and drop-off. Mazonat (Holy Site) in Medina and Mecca.';
-  const transWrapped = doc.splitTextToSize(transText, contentWidth - 8);
-  const transH = transWrapped.length * 5 + 8;
-  doc.roundedRect(margin, y, contentWidth, transH, 2, 2, 'FD');
-  doc.setFontSize(8.5);
-  doc.setFont('helvetica', 'bold');
-  setColor(COLORS.charcoalRGB);
-  doc.text('Transportation:', margin + 4, y + 6);
-  doc.setFont('helvetica', 'normal');
-  setColor(COLORS.grayRGB);
-  const transBody = doc.splitTextToSize(
-    'Package transportation is available within Saudi Arabia for airport pickup and drop-off. Mazonat (Holy Site) in Medina and Mecca.',
-    contentWidth - 40
-  );
-  doc.text(transBody, margin + 33, y + 6);
-  y += transH + 4;
-
-  // ══════════════════════════════════════════════════════════
-  // OTHER SERVICES
-  // ══════════════════════════════════════════════════════════
-  sectionTitle('Other Services');
-
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  setColor(COLORS.charcoalRGB);
-  doc.text('Saudi Visa Application.', margin, y);
+  // ── Transportation ──────────────────────────────────────────────────────────
+  ensureSpace(18);
+  doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+  color(C.charcoal);
+  doc.text('Transportation:', ML, y);
   y += 5;
-  setColor(COLORS.grayRGB);
-  const visaText = doc.splitTextToSize(
-    'Please note that visa fee for the nationalities of the USA, Canada, and European Union is included in the package price. For other nationalities, extra visa fee may apply.',
-    contentWidth
+
+  doc.setFont('helvetica', 'normal');
+  color(C.gray);
+  const transLines = doc.splitTextToSize(
+    'Package Transportation is available within Saudi Arabia for Airport pickup and drop off. Mazonat (Holy Site) in Medina and Mecca.',
+    CW,
   );
-  doc.text(visaText, margin, y);
-  y += visaText.length * 5 + 2;
+  doc.text(transLines, ML, y);
+  y += transLines.length * 5 + 4;
 
-  // ══════════════════════════════════════════════════════════
-  // PAYMENT SUMMARY
-  // ══════════════════════════════════════════════════════════
-  sectionTitle('Payment Summary');
+  // ══════════════════════════════════════════════════════════════════════════════
+  // PAGE 3 – Other Services / Payment / Cancellation
+  // ══════════════════════════════════════════════════════════════════════════════
+  addFooter();
+  doc.addPage(); pageNum++;
+  y = addPageHeader(true);
 
-  const balanceDue = data.grandTotal - data.depositAmount;
-  const q = contentWidth / 4;
+  // ── Other Services ──────────────────────────────────────────────────────────
+  sectionHeading('Other Services:');
 
-  // Payment grid — 4 columns
-  needsPage(12);
-  const cells = [
-    { label: 'Total Price', value: `USD $${data.grandTotal.toLocaleString()}`, color: COLORS.charcoalRGB as [number,number,number] },
-    { label: 'Amount Paid', value: `USD $${data.depositAmount.toLocaleString()}`, color: COLORS.greenRGB as [number,number,number] },
-    { label: 'Balance Due', value: `USD $${balanceDue.toLocaleString()}`, color: COLORS.charcoalRGB as [number,number,number] },
-    { label: 'Balance Due Date', value: formatDate(data.balanceDueDate), color: COLORS.charcoalRGB as [number,number,number] },
+  doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+  color(C.charcoal);
+  doc.text('Saudi Visa Application.', ML, y);
+  y += 5;
+
+  color(C.gray);
+  const visaLines = doc.splitTextToSize(
+    'Please note that Visa fee for the nationalities of the USA, Canada and European Union is included in the package price. For other nationalities extra Visa fee may apply.',
+    CW,
+  );
+  doc.text(visaLines, ML, y);
+  y += visaLines.length * 5 + 6;
+
+  // ── Payment Summary ──────────────────────────────────────────────────────────
+  sectionHeading('Payment Summary:');
+
+  const balance = data.grandTotal - data.depositAmount;
+  const cellW   = CW / 4;
+  const cellH   = 18;
+
+  ensureSpace(cellH + 4);
+  const summaryBoxes = [
+    { label: 'Total Price',     value: usd(data.grandTotal),  color: C.charcoal },
+    { label: 'Amount Paid',     value: usd(data.depositAmount), color: C.green },
+    { label: 'Balance Due',     value: usd(balance),          color: C.charcoal },
+    { label: 'Balance Due Date', value: fmtDate(data.balanceDueDate), color: C.charcoal },
   ];
 
-  cells.forEach((cell, i) => {
-    const cx = margin + i * q;
-    setFill(i % 2 === 0 ? COLORS.ivoryRGB : COLORS.white);
-    setDraw(COLORS.border);
-    doc.setLineWidth(0.2);
-    doc.rect(cx, y, q, 14, 'FD');
-    doc.setFontSize(7.5);
-    doc.setFont('helvetica', 'normal');
-    setColor(COLORS.lightGrayRGB);
-    doc.text(cell.label, cx + 3, y + 5.5);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    setColor(cell.color);
-    doc.text(cell.value, cx + 3, y + 11);
+  summaryBoxes.forEach(({ label, value, color: vc }, i) => {
+    const cx = ML + i * cellW;
+    fill(i % 2 === 0 ? C.ivory : C.white);
+    draw(C.border); doc.setLineWidth(0.2);
+    doc.rect(cx, y, cellW, cellH, 'FD');
+
+    doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+    color(C.lightGray);
+    doc.text(label, cx + 3, y + 6);
+
+    doc.setFontSize(10); doc.setFont('helvetica', 'bold');
+    color(vc);
+    doc.text(value, cx + 3, y + 13);
   });
+  y += cellH + 5;
 
-  y += 17;
+  doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+  color(C.charcoal);
+  doc.text(`Payment Method: (${payLabel(data.paymentMethod)})`, ML, y);
+  y += 6;
 
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  setColor(COLORS.charcoalRGB);
-  doc.text(`Payment Method: ${methodLabel(data.paymentMethod)}`, margin, y);
-  y += 5;
-
-  doc.setFontSize(8);
-  setColor(COLORS.lightGrayRGB);
-  const cancelText = doc.splitTextToSize(
-    'Please note that failure of payment by the due date may result in cancellation with an applied cancellation fee according to our refund policy.',
-    contentWidth
+  doc.setFontSize(8.5); doc.setFont('helvetica', 'normal');
+  color(C.gray);
+  const cancelNote = doc.splitTextToSize(
+    'Please note failure of payment by Due Date may result the cancellation with applied cancellation fee according to our refund policy.',
+    CW,
   );
-  doc.text(cancelText, margin, y);
-  y += cancelText.length * 4.5 + 3;
+  doc.text(cancelNote, ML, y);
+  y += cancelNote.length * 5 + 6;
 
-  // ── Notes (optional) ─────────────────────────────────────
+  // ── Cancellation Policy ──────────────────────────────────────────────────────
+  sectionHeading('Cancellation Policy:');
+  // (empty in the template — admin fills this in manually after printing)
+
+  // ── Optional notes ───────────────────────────────────────────────────────────
   if (data.notes) {
-    needsPage(18);
-    setFill([255, 249, 238]);
-    setDraw(COLORS.border);
-    doc.setLineWidth(0.2);
-    const noteWrapped = doc.splitTextToSize(data.notes, contentWidth - 8);
-    const noteH = noteWrapped.length * 5 + 10;
-    doc.roundedRect(margin, y, contentWidth, noteH, 2, 2, 'FD');
-    doc.setFontSize(8.5);
-    doc.setFont('helvetica', 'bold');
-    setColor(COLORS.charcoalRGB);
-    doc.text('Notes: ', margin + 4, y + 7);
+    ensureSpace(20);
+    fill([255, 249, 238]); draw(C.border); doc.setLineWidth(0.2);
+    const noteLines = doc.splitTextToSize(data.notes, CW - 10);
+    const noteH = noteLines.length * 5 + 10;
+    doc.roundedRect(ML, y, CW, noteH, 2, 2, 'FD');
+    doc.setFontSize(8.5); doc.setFont('helvetica', 'bold');
+    color(C.charcoal);
+    doc.text('Notes:', ML + 4, y + 7);
     doc.setFont('helvetica', 'normal');
-    setColor(COLORS.grayRGB);
-    doc.text(noteWrapped, margin + 18, y + 7);
+    color(C.gray);
+    doc.text(noteLines, ML + 4, y + 13);
     y += noteH + 4;
   }
 
-  // ══════════════════════════════════════════════════════════
-  // SIGN-OFF
-  // ══════════════════════════════════════════════════════════
-  needsPage(28);
-  y += 4;
-  doc.setFontSize(9.5);
-  doc.setFont('helvetica', 'normal');
-  setColor(COLORS.grayRGB);
-  const signOffText = doc.splitTextToSize(
-    'If you have any inquiries or require assistance before your trip, please feel free to contact us. We\'re looking forward to providing you with an unforgettable experience.',
-    contentWidth
-  );
-  doc.text(signOffText, margin, y);
-  y += signOffText.length * 5 + 3;
-  doc.text('Respectfully,', margin, y);
-  y += 5;
-  doc.setFont('helvetica', 'bold');
-  setColor(COLORS.charcoalRGB);
-  doc.text('Marefat Pilgrimage Team', margin, y);
+  // ══════════════════════════════════════════════════════════════════════════════
+  // PAGE 4 – Sign-off
+  // ══════════════════════════════════════════════════════════════════════════════
+  addFooter();
+  doc.addPage(); pageNum++;
+  y = addPageHeader(true);
 
-  // ── Footer on last page ───────────────────────────────────
+  y += 10;
+  doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+  color(C.gray);
+  const signOff = doc.splitTextToSize(
+    "If you have any inquiries or require assistance before your trip, please feel free to contact us. We're looking forward to providing you with an unforgettable experience.",
+    CW,
+  );
+  doc.text(signOff, ML, y);
+  y += signOff.length * 5.5 + 4;
+
+  doc.setFontSize(10);
+  color(C.gray);
+  doc.text('Respectfully', ML, y);
+  y += 7;
+  doc.setFont('helvetica', 'bold');
+  color(C.charcoal);
+  doc.text('Marefat Pilgrimage Team', ML, y);
+
+  // Footer on last page
   addFooter();
 
   return doc;
 }
 
-export function generateRegistrationConfirmationPDFBytes(
-  data: RegistrationConfirmationData
-): Uint8Array {
-  const doc = buildRegistrationConfirmationPDF(data);
-  const arrayBuffer = doc.output('arraybuffer');
-  return new Uint8Array(arrayBuffer);
+// ─── Public exports ───────────────────────────────────────────────────────────
+export async function generateRegistrationConfirmationPDFBytes(
+  data: RegistrationConfirmationData,
+): Promise<Uint8Array> {
+  const doc = await buildPDF(data);
+  return new Uint8Array(doc.output('arraybuffer'));
 }
