@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
       expiresAt: booking.expires_at,
     };
 
-    const pdfBytes = generateBookingPDFBytes(pdfData);
+    const pdfBytes = await generateBookingPDFBytes(pdfData);
     const pdfArrayBuffer = pdfBytes.buffer.slice(
       pdfBytes.byteOffset,
       pdfBytes.byteOffset + pdfBytes.byteLength
