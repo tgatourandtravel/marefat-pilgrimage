@@ -209,17 +209,22 @@ export default function RootLayout({
               </div>
               {/* ── Trust Bar: Accreditations + Payments ── */}
               <div className="flex flex-col items-center gap-5 border-t border-charcoal/5 pt-5 lg:flex-row lg:items-center lg:justify-between">
-                {/* IATA accreditation */}
-                <div className="flex items-center gap-2.5">
+                {/* IATA accreditation (wording matches /about; sizes tuned for footer) */}
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                   <img
-                    src="/images/iata-ground-handling-partner.png"
-                    alt="IATA Ground Handling Partner"
-                    className="h-8 w-auto object-contain opacity-80"
-                    title="IATA Ground Handling Partner — International Air Transport Association"
+                    src="/images/iata-accredited.png"
+                    alt="IATA Accredited Travel Agent"
+                    className="h-8 w-auto shrink-0 object-contain opacity-85 sm:h-9"
+                    title="IATA Accredited Travel Agent — International Air Transport Association"
                   />
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/45">
-                    IATA Ground Handling Partner
-                  </span>
+                  <div className="flex min-w-0 flex-col gap-0.5">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-charcoal/60 sm:text-[11px]">
+                      IATA Accredited Travel Agent
+                    </p>
+                    <p className="text-xs font-medium text-charcoal sm:text-[13px]">
+                      International Air Transport Association
+                    </p>
+                  </div>
                 </div>
 
                 {/* Vertical divider — desktop only */}
