@@ -313,7 +313,7 @@ function buildBookingPDF(data: BookingData): jsPDF {
   // ============================================
   // PAYMENT INSTRUCTIONS SECTION
   // ============================================
-  checkPageBreak(55);
+  checkPageBreak(62);
 
   doc.setDrawColor(COLORS.gold);
   doc.line(margin, yPos, pageWidth - margin, yPos);
@@ -326,44 +326,60 @@ function buildBookingPDF(data: BookingData): jsPDF {
 
   yPos += 8;
 
-  // Bank details box
+  // Bank details box (must match booking confirmation email — JPMorgan Chase)
+  const bankBoxTop = yPos;
+  const bankBoxH = 51;
   doc.setFillColor(255, 250, 240);
   doc.setDrawColor(COLORS.gold);
   doc.setLineWidth(0.5);
-  doc.roundedRect(margin, yPos, contentWidth, 35, 3, 3, 'FD');
+  doc.roundedRect(margin, bankBoxTop, contentWidth, bankBoxH, 3, 3, 'FD');
 
   yPos += 7;
 
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(COLORS.charcoalLight);
-  doc.text('BANK DETAILS', margin + 3, yPos);
+  doc.text('WIRE TRANSFER — JPMORGAN CHASE', margin + 3, yPos);
 
   yPos += 6;
 
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(COLORS.charcoal);
 
-  const bankDetails = [
-    ['Bank:', 'Deutsche Bank'],
-    ['IBAN:', 'DE89 3704 0044 0532 0130 00'],
-    ['BIC:', 'COBADEFFXXX'],
-    ['Reference:', data.bookingRef],
+  const labelX = margin + 3;
+  const valueX = margin + 46;
+
+  const bankDetails: [string, string][] = [
+    ['Account name', 'TGA Tour and Travel LLC'],
+    ['Bank', 'JPMorgan Chase Bank, N.A.'],
+    ['Routing (wire)', '021000021'],
+    ['Account number', '2906503801'],
+    ['SWIFT / BIC', 'CHASUS33'],
+    ['Reference', data.bookingRef],
   ];
 
   bankDetails.forEach(([label, value]) => {
     doc.setTextColor(COLORS.charcoalLight);
-    doc.text(label, margin + 3, yPos);
+    doc.text(`${label}:`, labelX, yPos);
     doc.setTextColor(COLORS.charcoal);
     doc.setFont('helvetica', 'bold');
-    doc.text(value, margin + 25, yPos);
+    doc.text(value, valueX, yPos);
     doc.setFont('helvetica', 'normal');
     yPos += 5;
   });
 
-  yPos += 8;
+  doc.setFontSize(7.5);
+  doc.setTextColor(COLORS.charcoalLight);
+  doc.text(
+    'Wire transfer only (not ACH). Include your booking reference in the payment note.',
+    margin + 3,
+    yPos,
+  );
+
+  yPos = bankBoxTop + bankBoxH + 6;
 
   doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
   doc.setTextColor(COLORS.charcoalLight);
   doc.text(
     'Please use your booking reference when making the payment transfer.',
