@@ -86,7 +86,7 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
         )}
 
         {/* Content */}
-        <div className="px-5 pb-6 pt-3">{children}</div>
+        <div className="max-h-[70vh] overflow-y-auto px-5 pb-6 pt-3">{children}</div>
 
         {/* Safe area spacer for iOS home indicator */}
         <div className="h-safe-area-inset-bottom" style={{ height: "env(safe-area-inset-bottom, 0px)" }} />

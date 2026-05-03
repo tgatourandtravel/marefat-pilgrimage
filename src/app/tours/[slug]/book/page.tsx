@@ -95,7 +95,7 @@ function CopyButton({ text, label = "Copy" }: { text: string; label?: string }) 
     <button
       type="button"
       onClick={handleCopy}
-      className="flex items-center gap-1.5 rounded-lg bg-charcoal/5 px-3 py-1.5 text-xs font-medium text-charcoal transition hover:bg-charcoal/10"
+      className="flex min-h-[44px] items-center gap-1.5 rounded-lg bg-charcoal/5 px-3 py-1.5 text-xs font-medium text-charcoal transition hover:bg-charcoal/10"
     >
       {copied ? (
         <>
@@ -129,27 +129,27 @@ function WireTransferDetails({ copyText }: { copyText: string }) {
         <div className="space-y-2.5 text-sm text-charcoal">
           <div className="flex gap-2">
             <span className="w-36 shrink-0 font-medium text-charcoal/70">Account Name</span>
-            <span>TGA Tour and Travel LLC</span>
+            <span className="min-w-0 break-words">TGA Tour and Travel LLC</span>
           </div>
           <div className="flex gap-2">
             <span className="w-36 shrink-0 font-medium text-charcoal/70">Bank</span>
-            <span>JPMorgan Chase Bank, N.A.</span>
+            <span className="min-w-0 break-words">JPMorgan Chase Bank, N.A.</span>
           </div>
           <div className="flex gap-2">
             <span className="w-36 shrink-0 font-medium text-charcoal/70">Routing (Wire)</span>
-            <span className="font-mono">021000021</span>
+            <span className="min-w-0 break-all font-mono">021000021</span>
           </div>
           <div className="flex gap-2">
             <span className="w-36 shrink-0 font-medium text-charcoal/70">Account Number</span>
-            <span className="font-mono">2906503801</span>
+            <span className="min-w-0 break-all font-mono">2906503801</span>
           </div>
           <div className="flex gap-2">
             <span className="w-36 shrink-0 font-medium text-charcoal/70">SWIFT / BIC</span>
-            <span className="font-mono">CHASUS33</span>
+            <span className="min-w-0 break-all font-mono">CHASUS33</span>
           </div>
           <div className="flex gap-2">
             <span className="w-36 shrink-0 font-medium text-charcoal/70">Reference</span>
-            <span className="italic text-charcoal/60">Your Booking Reference</span>
+            <span className="min-w-0 break-words italic text-charcoal/60">Your Booking Reference</span>
           </div>
         </div>
       </div>
@@ -177,15 +177,15 @@ function ZelleDetails({ copyText }: { copyText: string }) {
         <div className="space-y-2.5 text-sm text-charcoal">
           <div className="flex gap-2">
             <span className="w-36 shrink-0 font-medium text-charcoal/70">Recipient Email</span>
-            <span className="font-mono">info@tgatourandtravel.com</span>
+            <span className="min-w-0 break-all font-mono">info@tgatourandtravel.com</span>
           </div>
           <div className="flex gap-2">
             <span className="w-36 shrink-0 font-medium text-charcoal/70">Recipient Name</span>
-            <span>TGA Tour and Travel LLC</span>
+            <span className="min-w-0 break-words">TGA Tour and Travel LLC</span>
           </div>
           <div className="flex gap-2">
             <span className="w-36 shrink-0 font-medium text-charcoal/70">Reference</span>
-            <span className="italic text-charcoal/60">Your Booking Reference</span>
+            <span className="min-w-0 break-words italic text-charcoal/60">Your Booking Reference</span>
           </div>
         </div>
       </div>
@@ -629,6 +629,7 @@ export default function TourBookingPage({ params }: Props) {
               ref={stepProgressRef}
               step={step}
               steps={["Traveler Info", "Add-ons", "Payment", "Review"]}
+              shortLabels={["Info", "Add-ons", "Pay", "Review"]}
             />
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -741,7 +742,7 @@ export default function TourBookingPage({ params }: Props) {
                               }
                             }}
                             disabled={numberOfTravelers <= 1}
-                            className="flex h-10 w-10 items-center justify-center rounded-full border border-charcoal/15 bg-ivory text-charcoal transition hover:bg-charcoal/5 disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="flex h-11 w-11 items-center justify-center rounded-full border border-charcoal/15 bg-ivory text-charcoal transition hover:bg-charcoal/5 disabled:opacity-30 disabled:cursor-not-allowed"
                           >
                             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
@@ -771,7 +772,7 @@ export default function TourBookingPage({ params }: Props) {
                               }
                             }}
                             disabled={numberOfTravelers >= 10}
-                            className="flex h-10 w-10 items-center justify-center rounded-full bg-gold text-charcoal transition hover:bg-gold-dark disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="flex h-11 w-11 items-center justify-center rounded-full bg-gold text-charcoal transition hover:bg-gold-dark disabled:opacity-30 disabled:cursor-not-allowed"
                           >
                             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -1061,7 +1062,7 @@ export default function TourBookingPage({ params }: Props) {
                       <button
                         type="button"
                         onClick={() => setStep(1)}
-                        className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-charcoal/70 transition hover:bg-charcoal/5"
+                        className="flex min-h-[44px] items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-charcoal/70 transition hover:bg-charcoal/5"
                       >
                         <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -1106,7 +1107,7 @@ export default function TourBookingPage({ params }: Props) {
                       <button
                         type="button"
                         onClick={() => setStep(1)}
-                        className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-charcoal/70 transition hover:bg-charcoal/5"
+                        className="flex min-h-[44px] items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-charcoal/70 transition hover:bg-charcoal/5"
                       >
                         <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -1181,7 +1182,7 @@ export default function TourBookingPage({ params }: Props) {
                       <button
                         type="button"
                         onClick={() => setStep(2)}
-                        className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-charcoal/70 transition hover:bg-charcoal/5"
+                        className="flex min-h-[44px] items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-charcoal/70 transition hover:bg-charcoal/5"
                       >
                         <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -1248,7 +1249,7 @@ export default function TourBookingPage({ params }: Props) {
                       <button
                         type="button"
                         onClick={() => setStep(3)}
-                        className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-charcoal/70 transition hover:bg-charcoal/5"
+                        className="flex min-h-[44px] items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-charcoal/70 transition hover:bg-charcoal/5"
                       >
                         <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -1550,7 +1551,7 @@ export default function TourBookingPage({ params }: Props) {
                   type="button"
                   onClick={handleBack}
                   disabled={step === 1 || (step === 4 && paymentMethod === "card" && !!cardClientSecret)}
-                  className="text-sm font-medium text-charcoal/70 transition hover:text-charcoal disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="inline-flex min-h-[44px] items-center text-sm font-medium text-charcoal/70 transition hover:text-charcoal disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   ← Back
                 </button>

@@ -20,7 +20,7 @@ function CopyDetailsButton({ text }: { text: string }) {
           setTimeout(() => setCopied(false), 2000);
         });
       }}
-      className="flex items-center gap-1.5 rounded-lg bg-charcoal/5 px-3 py-1.5 text-xs font-medium text-charcoal transition hover:bg-charcoal/10"
+      className="flex min-h-[44px] items-center gap-1.5 rounded-lg bg-charcoal/5 px-3 py-1.5 text-xs font-medium text-charcoal transition hover:bg-charcoal/10"
     >
       {copied ? (
         <>
@@ -245,27 +245,27 @@ function SuccessContent() {
                   <div className="space-y-2 text-sm text-charcoal">
                     <div className="flex gap-2">
                       <span className="w-36 shrink-0 font-medium text-charcoal/70">Account Name</span>
-                      <span>TGA Tour and Travel LLC</span>
+                      <span className="min-w-0 break-words">TGA Tour and Travel LLC</span>
                     </div>
                     <div className="flex gap-2">
                       <span className="w-36 shrink-0 font-medium text-charcoal/70">Bank</span>
-                      <span>JPMorgan Chase Bank, N.A.</span>
+                      <span className="min-w-0 break-words">JPMorgan Chase Bank, N.A.</span>
                     </div>
                     <div className="flex gap-2">
                       <span className="w-36 shrink-0 font-medium text-charcoal/70">Routing (Wire)</span>
-                      <span className="font-mono">021000021</span>
+                      <span className="min-w-0 break-all font-mono">021000021</span>
                     </div>
                     <div className="flex gap-2">
                       <span className="w-36 shrink-0 font-medium text-charcoal/70">Account Number</span>
-                      <span className="font-mono">2906503801</span>
+                      <span className="min-w-0 break-all font-mono">2906503801</span>
                     </div>
                     <div className="flex gap-2">
                       <span className="w-36 shrink-0 font-medium text-charcoal/70">SWIFT / BIC</span>
-                      <span className="font-mono">CHASUS33</span>
+                      <span className="min-w-0 break-all font-mono">CHASUS33</span>
                     </div>
                     <div className="flex gap-2">
                       <span className="w-36 shrink-0 font-medium text-charcoal/70">Reference</span>
-                      <span className="font-mono font-semibold text-charcoal">{bookingRef}</span>
+                      <span className="min-w-0 break-all font-mono font-semibold text-charcoal">{bookingRef}</span>
                     </div>
                   </div>
                   <div className="mt-4 rounded-lg bg-charcoal/5 p-3">
@@ -291,15 +291,15 @@ function SuccessContent() {
                   <div className="space-y-2 text-sm text-charcoal">
                     <div className="flex gap-2">
                       <span className="w-36 shrink-0 font-medium text-charcoal/70">Recipient Email</span>
-                      <span className="font-mono">info@tgatourandtravel.com</span>
+                      <span className="min-w-0 break-all font-mono">info@tgatourandtravel.com</span>
                     </div>
                     <div className="flex gap-2">
                       <span className="w-36 shrink-0 font-medium text-charcoal/70">Recipient Name</span>
-                      <span>TGA Tour and Travel LLC</span>
+                      <span className="min-w-0 break-words">TGA Tour and Travel LLC</span>
                     </div>
                     <div className="flex gap-2">
                       <span className="w-36 shrink-0 font-medium text-charcoal/70">Reference</span>
-                      <span className="font-mono font-semibold text-charcoal">{bookingRef}</span>
+                      <span className="min-w-0 break-all font-mono font-semibold text-charcoal">{bookingRef}</span>
                     </div>
                   </div>
                   <div className="mt-4 rounded-lg bg-charcoal/5 p-3">

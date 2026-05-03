@@ -768,12 +768,12 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
             {isOnRequest ? (
               <a
                 href="https://wa.me/19543308904"
-                className="rounded-full bg-charcoal px-5 py-2 text-sm font-medium text-ivory shadow-soft transition hover:bg-charcoal/90"
+                className="inline-flex min-h-[44px] items-center rounded-full bg-charcoal px-5 text-sm font-medium text-ivory shadow-soft transition hover:bg-charcoal/90"
               >
                 Request Quote
               </a>
             ) : (
-              <Button onClick={handleBookNow} size="sm">
+              <Button onClick={handleBookNow} size="md">
                 Book Now
               </Button>
             )}

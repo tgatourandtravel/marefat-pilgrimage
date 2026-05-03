@@ -211,7 +211,7 @@ export default function VerifyBookingPage({ params }: Props) {
             <button
               onClick={handleResend}
               disabled={isResending || resendCooldown > 0}
-              className="mt-2 text-sm font-medium text-charcoal transition hover:text-gold disabled:opacity-50"
+              className="mt-2 inline-flex min-h-[44px] items-center text-sm font-medium text-charcoal transition hover:text-gold disabled:opacity-50"
             >
               {resendCooldown > 0
                 ? `Resend in ${resendCooldown}s`
