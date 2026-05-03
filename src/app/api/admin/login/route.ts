@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { checkAdminLoginRateLimit } from '@/lib/utils/rate-limit';
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? '127.0.0.1';
+  const { allowed } = await checkAdminLoginRateLimit(ip);
+  if (!allowed) {
+    return NextResponse.json({ error: 'Too many attempts. Try again in 15 minutes.' }, { status: 429 });
+  }
+
   const { password } = await request.json();
 
   if (password !== process.env.ADMIN_PASSWORD) {
