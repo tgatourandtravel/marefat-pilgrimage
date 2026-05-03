@@ -7,8 +7,5 @@ if (dsn) {
     dsn,
     environment: process.env.NODE_ENV,
     tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
-
-    // Do not log Sentry noise to stdout
-    silent: true,
   });
 }
