@@ -97,7 +97,7 @@ export async function POST(
     // Generate PDF attachment
     let pdfBuffer: Buffer | undefined;
     try {
-      const pdfBytes = await generateRegistrationConfirmationPDFBytes({
+      const pdfBytes = generateRegistrationConfirmationPDFBytes({
         bookingRef: booking.booking_ref,
         tourTitle: booking.tour_title,
         firstName: booking.contact_first_name,
