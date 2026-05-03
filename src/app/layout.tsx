@@ -44,12 +44,25 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  manifest: "/site.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "Marefat Pilgrimage",
+    statusBarStyle: "default",
+  },
   icons: {
     icon: [
       { url: "/logo.svg", type: "image/svg+xml" },
+      { url: "/icons/app-mark.svg", type: "image/svg+xml" },
       { url: "/logo.png", type: "image/png" },
     ],
-    apple: "/logo.png",
+    apple: [
+      {
+        url: "/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
   },
 };
 
