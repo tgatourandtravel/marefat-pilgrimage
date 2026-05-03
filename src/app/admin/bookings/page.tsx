@@ -95,6 +95,18 @@ export default function AdminBookingsPage() {
     window.location.href = '/admin/login';
   }
 
+  async function handleExportCSV() {
+    const res = await fetch('/api/admin/bookings/export');
+    if (!res.ok) { alert('Export failed.'); return; }
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `marefat-bookings-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   const pendingCount = bookings.filter(b => b.payment_status === 'unpaid' && b.payment_method !== 'card').length;
   const paidCount    = bookings.filter(b => b.payment_status === 'paid').length;
 
@@ -129,9 +141,20 @@ export default function AdminBookingsPage() {
             <span className="text-charcoal/20">/</span>
             <p className="text-sm font-medium text-charcoal">Bookings</p>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleLogout}>
-            Sign Out
-          </Button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleExportCSV}
+              className="flex items-center gap-1.5 rounded-full border border-charcoal/15 px-3.5 py-1.5 text-xs font-medium text-charcoal/60 transition hover:border-charcoal/30 hover:text-charcoal"
+            >
+              <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.6">
+                <path d="M8 2v8M5 7l3 3 3-3M2 12h12" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Export CSV
+            </button>
+            <Button variant="ghost" size="sm" onClick={handleLogout}>
+              Sign Out
+            </Button>
+          </div>
         </div>
       </header>
 
