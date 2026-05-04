@@ -377,9 +377,9 @@ export default function AboutPage() {
                   International Air Transport Association
                 </p>
                 <p className="max-w-sm text-sm leading-relaxed text-charcoal/65">
-                  Marefat Pilgrimage is an IATA-accredited travel agency — a globally recognized
-                  certification that confirms our compliance with international aviation and
-                  travel industry standards.
+                  TGA Tour and Travel LLC is an IATA-accredited travel agency — a globally
+                  recognized certification that confirms our compliance with international
+                  aviation and travel industry standards.
                 </p>
               </div>
             </div>

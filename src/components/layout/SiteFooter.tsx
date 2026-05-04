@@ -65,12 +65,19 @@ export function SiteFooter() {
         </div>
 
         <div className="flex flex-col gap-4 border-t border-charcoal/5 pt-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
-          <p>© {year} Marefat Pilgrimage. All rights reserved.</p>
+          <div className="max-w-xl space-y-2 leading-relaxed">
+            <p>© {year} TGA Tour &amp; Travel. All rights reserved.</p>
+            <p>
+              This website is owned and operated by TGA Tour and Travel LLC.
+              &ldquo;Marefat Pilgrimage&rdquo; is a trademark and brand name
+              used under TGA Tour and Travel LLC.
+            </p>
+          </div>
           <nav
-            className="flex max-w-xl flex-col gap-2 text-charcoal/70 sm:items-end"
+            className="min-w-0 w-full text-charcoal/70 sm:w-auto"
             aria-label="Legal"
           >
-            <div className="flex flex-wrap gap-x-4 gap-y-2">
+            <div className="flex flex-wrap gap-x-4 gap-y-2 sm:justify-end">
               <Link href="/privacy" className="hover:text-charcoal hover:underline">
                 Privacy Policy
               </Link>
@@ -83,8 +90,6 @@ export function SiteFooter() {
               <Link href="/cookie-policy" className="hover:text-charcoal hover:underline">
                 Cookie Policy
               </Link>
-            </div>
-            <div className="flex flex-wrap gap-x-4 gap-y-2">
               <Link href="/legal-notice" className="hover:text-charcoal hover:underline">
                 Legal Notice
               </Link>
