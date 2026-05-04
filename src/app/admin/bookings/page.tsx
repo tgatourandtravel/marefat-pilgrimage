@@ -73,9 +73,13 @@ export default function AdminBookingsPage() {
   const [debugInfo, setDebugInfo] = useState<{
     returnedRows: number;
     bookingsCount: number;
+    explicitReturnedRows: number;
+    explicitBookingsCount: number;
     travelersCount: number;
     codesCount: number;
     firstRefs: string[];
+    explicitFirstRefs: string[];
+    explicitError: string | null;
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [markingPaid, setMarkingPaid] = useState<string | null>(null);
@@ -213,11 +217,15 @@ export default function AdminBookingsPage() {
           Source project: <span className="font-mono text-charcoal/70">{sourceProjectRef}</span>
           {lastFetchedAt ? ` • Last sync: ${new Date(lastFetchedAt).toLocaleString()}` : ''}
           {debugInfo
-            ? ` • API rows: ${debugInfo.returnedRows} • bookings: ${debugInfo.bookingsCount} • travelers: ${debugInfo.travelersCount} • codes: ${debugInfo.codesCount}`
+            ? ` • API rows: ${debugInfo.returnedRows} • bookings: ${debugInfo.bookingsCount} • explicitRows: ${debugInfo.explicitReturnedRows} • explicitBookings: ${debugInfo.explicitBookingsCount} • travelers: ${debugInfo.travelersCount} • codes: ${debugInfo.codesCount}`
             : ''}
           {debugInfo?.firstRefs?.length
             ? ` • refs: ${debugInfo.firstRefs.join(', ')}`
             : ''}
+          {debugInfo?.explicitFirstRefs?.length
+            ? ` • explicitRefs: ${debugInfo.explicitFirstRefs.join(', ')}`
+            : ''}
+          {debugInfo?.explicitError ? ` • explicitError: ${debugInfo.explicitError}` : ''}
         </div>
 
         {/* Table */}
