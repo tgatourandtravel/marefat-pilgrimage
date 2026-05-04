@@ -4,6 +4,9 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const sourceProjectRef = supabaseUrl.split('://')[1]?.split('.')[0] || 'unknown';
+
   const { data, error } = await supabaseAdmin
     .from('bookings')
     .select('*')
@@ -24,7 +27,11 @@ export async function GET() {
   }
 
   return NextResponse.json(
-    { bookings: data },
+    {
+      bookings: data,
+      sourceProjectRef,
+      fetchedAt: new Date().toISOString(),
+    },
     {
       headers: {
         'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',

@@ -68,6 +68,8 @@ function StatCard({ label, value, highlight }: {
 export default function AdminBookingsPage() {
   const router = useRouter();
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [sourceProjectRef, setSourceProjectRef] = useState<string>('unknown');
+  const [lastFetchedAt, setLastFetchedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [markingPaid, setMarkingPaid] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterType>('all');
@@ -82,6 +84,8 @@ export default function AdminBookingsPage() {
     });
     const data = await res.json();
     setBookings(data.bookings ?? []);
+    setSourceProjectRef(data.sourceProjectRef ?? 'unknown');
+    setLastFetchedAt(data.fetchedAt ?? null);
     setLoading(false);
   }, []);
 
@@ -188,6 +192,11 @@ export default function AdminBookingsPage() {
               {label}
             </button>
           ))}
+        </div>
+
+        <div className="rounded-lg border border-charcoal/10 bg-ivory/80 px-3 py-2 text-[11px] text-charcoal/55">
+          Source project: <span className="font-mono text-charcoal/70">{sourceProjectRef}</span>
+          {lastFetchedAt ? ` • Last sync: ${new Date(lastFetchedAt).toLocaleString()}` : ''}
         </div>
 
         {/* Table */}
