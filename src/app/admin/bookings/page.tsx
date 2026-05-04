@@ -68,33 +68,12 @@ function StatCard({ label, value, highlight }: {
 export default function AdminBookingsPage() {
   const router = useRouter();
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [sourceProjectRef, setSourceProjectRef] = useState<string>('unknown');
-  const [lastFetchedAt, setLastFetchedAt] = useState<string | null>(null);
-  const [debugInfo, setDebugInfo] = useState<{
-    returnedRows: number;
-    bookingsCount: number;
-    explicitReturnedRows: number;
-    explicitBookingsCount: number;
-    travelersCount: number;
-    codesCount: number;
-    firstRefs: string[];
-    explicitFirstRefs: string[];
-    explicitError: string | null;
-    requestPath?: string;
-  } | null>(null);
-  const [routeVersion, setRouteVersion] = useState<string>('unknown');
-  const [cacheBusterEcho, setCacheBusterEcho] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [markingPaid, setMarkingPaid] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterType>('all');
 
   const fetchBookings = useCallback(async () => {
-    const runId = `admin-page-${Date.now()}`;
-    const cacheBuster = String(Date.now());
-    // #region agent log
-    fetch('http://127.0.0.1:7308/ingest/75ffad5b-1248-480c-a1b9-38e4ca190d00',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'8724d0'},body:JSON.stringify({sessionId:'8724d0',runId,hypothesisId:'H4',location:'src/app/admin/bookings/page.tsx:fetchBookings:start',message:'Dashboard fetchBookings start',data:{path:'/api/admin/bookings'},timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
-    const res = await fetch(`/api/admin/bookings?cb=${cacheBuster}`, {
+    const res = await fetch('/api/admin/bookings', {
       cache: 'no-store',
       headers: {
         'cache-control': 'no-cache',
@@ -102,15 +81,7 @@ export default function AdminBookingsPage() {
       },
     });
     const data = await res.json();
-    // #region agent log
-    fetch('http://127.0.0.1:7308/ingest/75ffad5b-1248-480c-a1b9-38e4ca190d00',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'8724d0'},body:JSON.stringify({sessionId:'8724d0',runId,hypothesisId:'H5',location:'src/app/admin/bookings/page.tsx:fetchBookings:response',message:'Dashboard fetchBookings response',data:{status:res.status,ok:res.ok,receivedRows:Array.isArray(data?.bookings)?data.bookings.length:null,sourceProjectRef:data?.sourceProjectRef||null,fetchedAt:data?.fetchedAt||null,firstRefs:Array.isArray(data?.bookings)?data.bookings.slice(0,3).map((b: Booking)=>b.booking_ref):[]},timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
     setBookings(data.bookings ?? []);
-    setSourceProjectRef(data.sourceProjectRef ?? 'unknown');
-    setLastFetchedAt(data.fetchedAt ?? null);
-    setDebugInfo(data.debug ?? null);
-    setRouteVersion(data.routeVersion ?? 'unknown');
-    setCacheBusterEcho(data.cacheBusterEcho ?? null);
     setLoading(false);
   }, []);
 
@@ -217,24 +188,6 @@ export default function AdminBookingsPage() {
               {label}
             </button>
           ))}
-        </div>
-
-        <div className="rounded-lg border border-charcoal/10 bg-ivory/80 px-3 py-2 text-[11px] text-charcoal/55">
-          Source project: <span className="font-mono text-charcoal/70">{sourceProjectRef}</span>
-          {lastFetchedAt ? ` • Last sync: ${new Date(lastFetchedAt).toLocaleString()}` : ''}
-          {routeVersion ? ` • route: ${routeVersion}` : ''}
-          {cacheBusterEcho ? ` • cb: ${cacheBusterEcho}` : ''}
-          {debugInfo
-            ? ` • API rows: ${debugInfo.returnedRows} • bookings: ${debugInfo.bookingsCount} • explicitRows: ${debugInfo.explicitReturnedRows} • explicitBookings: ${debugInfo.explicitBookingsCount} • travelers: ${debugInfo.travelersCount} • codes: ${debugInfo.codesCount}`
-            : ''}
-          {debugInfo?.firstRefs?.length
-            ? ` • refs: ${debugInfo.firstRefs.join(', ')}`
-            : ''}
-          {debugInfo?.explicitFirstRefs?.length
-            ? ` • explicitRefs: ${debugInfo.explicitFirstRefs.join(', ')}`
-            : ''}
-          {debugInfo?.explicitError ? ` • explicitError: ${debugInfo.explicitError}` : ''}
-          {debugInfo?.requestPath ? ` • path: ${debugInfo.requestPath}` : ''}
         </div>
 
         {/* Table */}
