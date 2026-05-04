@@ -376,7 +376,7 @@ export default function AboutPage() {
                 <p className="text-sm font-medium text-charcoal">
                   International Air Transport Association
                 </p>
-                <p className="max-w-sm text-sm leading-relaxed text-charcoal/65">
+                <p className="text-sm leading-relaxed text-charcoal/65">
                   TGA Tour and Travel LLC is an IATA-accredited travel agency — a globally
                   recognized certification that confirms our compliance with international
                   aviation and travel industry standards.
