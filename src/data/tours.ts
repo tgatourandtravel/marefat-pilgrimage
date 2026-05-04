@@ -482,7 +482,7 @@ export const TOURS: Tour[] = [
   // TOUR 4: Thanksgiving Umrah 2026 (Premium)
   // ----------------------------------------
   {
-    slug: "spring-break-umrah-2026",
+    slug: "umrah-2026-thanksgiving",
     title: "Umrah 2026 - Thanksgiving",
     subtitle: "A Carefully Designed Spiritual Journey",
     destination: "Makkah & Madinah",

@@ -141,7 +141,7 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                   </p>
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     <Link
-                      href="/tours/spring-break-umrah-2026"
+                      href="/tours/umrah-2026-thanksgiving"
                       className="group flex items-center gap-3 rounded-xl border border-charcoal/10 bg-ivory p-4 transition hover:border-gold/40 hover:bg-gold/5"
                     >
                       <div className="flex-shrink-0 text-2xl">🕋</div>
