@@ -1,13 +1,15 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
   const sourceProjectRef = supabaseUrl.split('://')[1]?.split('.')[0] || 'unknown';
   const runId = `admin-bookings-${Date.now()}`;
   const publicSchema = supabaseAdmin.schema('public');
+  const cacheBuster = request.nextUrl.searchParams.get('cb');
+  const routeVersion = 'admin-bookings-route-v6';
 
   // #region agent log
   fetch('http://127.0.0.1:7308/ingest/75ffad5b-1248-480c-a1b9-38e4ca190d00',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'8724d0'},body:JSON.stringify({sessionId:'8724d0',runId,hypothesisId:'H1',location:'src/app/api/admin/bookings/route.ts:GET:start',message:'Admin bookings API called',data:{sourceProjectRef},timestamp:Date.now()})}).catch(()=>{});
@@ -62,6 +64,8 @@ export async function GET() {
       bookings: data,
       sourceProjectRef,
       fetchedAt: new Date().toISOString(),
+      routeVersion,
+      cacheBusterEcho: cacheBuster,
       debug: {
         returnedRows: Array.isArray(data) ? data.length : 0,
         bookingsCount: bookingsCount ?? 0,
@@ -72,6 +76,7 @@ export async function GET() {
         firstRefs: Array.isArray(data) ? data.slice(0, 5).map((b) => b.booking_ref) : [],
         explicitFirstRefs: Array.isArray(explicitData) ? explicitData.slice(0, 5).map((b) => b.booking_ref) : [],
         explicitError: explicitError?.message ?? null,
+        requestPath: request.nextUrl.pathname,
       },
     },
     {
