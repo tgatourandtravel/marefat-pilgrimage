@@ -53,6 +53,13 @@ export async function GET() {
       bookings: data,
       sourceProjectRef,
       fetchedAt: new Date().toISOString(),
+      debug: {
+        returnedRows: Array.isArray(data) ? data.length : 0,
+        bookingsCount: bookingsCount ?? 0,
+        travelersCount: travelersCount ?? 0,
+        codesCount: codesCount ?? 0,
+        firstRefs: Array.isArray(data) ? data.slice(0, 5).map((b) => b.booking_ref) : [],
+      },
     },
     {
       headers: {

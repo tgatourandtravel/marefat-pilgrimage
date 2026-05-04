@@ -70,6 +70,13 @@ export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [sourceProjectRef, setSourceProjectRef] = useState<string>('unknown');
   const [lastFetchedAt, setLastFetchedAt] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<{
+    returnedRows: number;
+    bookingsCount: number;
+    travelersCount: number;
+    codesCount: number;
+    firstRefs: string[];
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [markingPaid, setMarkingPaid] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterType>('all');
@@ -93,6 +100,7 @@ export default function AdminBookingsPage() {
     setBookings(data.bookings ?? []);
     setSourceProjectRef(data.sourceProjectRef ?? 'unknown');
     setLastFetchedAt(data.fetchedAt ?? null);
+    setDebugInfo(data.debug ?? null);
     setLoading(false);
   }, []);
 
@@ -204,6 +212,12 @@ export default function AdminBookingsPage() {
         <div className="rounded-lg border border-charcoal/10 bg-ivory/80 px-3 py-2 text-[11px] text-charcoal/55">
           Source project: <span className="font-mono text-charcoal/70">{sourceProjectRef}</span>
           {lastFetchedAt ? ` • Last sync: ${new Date(lastFetchedAt).toLocaleString()}` : ''}
+          {debugInfo
+            ? ` • API rows: ${debugInfo.returnedRows} • bookings: ${debugInfo.bookingsCount} • travelers: ${debugInfo.travelersCount} • codes: ${debugInfo.codesCount}`
+            : ''}
+          {debugInfo?.firstRefs?.length
+            ? ` • refs: ${debugInfo.firstRefs.join(', ')}`
+            : ''}
         </div>
 
         {/* Table */}
