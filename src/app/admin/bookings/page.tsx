@@ -73,7 +73,13 @@ export default function AdminBookingsPage() {
   const [filter, setFilter] = useState<FilterType>('all');
 
   const fetchBookings = useCallback(async () => {
-    const res = await fetch('/api/admin/bookings');
+    const res = await fetch('/api/admin/bookings', {
+      cache: 'no-store',
+      headers: {
+        'cache-control': 'no-cache',
+        pragma: 'no-cache',
+      },
+    });
     const data = await res.json();
     setBookings(data.bookings ?? []);
     setLoading(false);
