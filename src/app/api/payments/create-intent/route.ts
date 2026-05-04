@@ -103,11 +103,13 @@ export async function POST(request: NextRequest) {
       {
         amount: amountInCents,
         currency: "usd",
+        description: `${booking.tour_title} — ${booking.booking_ref}`,
         automatic_payment_methods: { enabled: true },
         receipt_email: booking.contact_email,
         metadata: {
           booking_ref: booking.booking_ref,
           tour_slug: booking.tour_slug,
+          tour_title: booking.tour_title,
           contact_email: booking.contact_email,
         },
       },

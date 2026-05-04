@@ -51,6 +51,7 @@ function SuccessContent() {
   const searchParams = useSearchParams();
   const bookingRef = searchParams.get("ref") || "MAR-XXXXX";
   const verified = searchParams.get("verified") === "true";
+  const paidFromReturnUrl = searchParams.get("paid") === "true";
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -371,6 +372,16 @@ function SuccessContent() {
               <p className="text-sm font-semibold text-charcoal">Online payment received</p>
               <p className="mt-1 text-xs text-charcoal/70">
                 Your deposit has been paid successfully. Our team will contact you with the next steps.
+              </p>
+            </div>
+          )}
+
+          {paidFromReturnUrl && paymentMethod === "card" && paymentStatus !== "paid" && (
+            <div className="mx-auto mt-6 max-w-md rounded-xl border border-charcoal/15 bg-ivory/90 p-4 text-left">
+              <p className="text-sm font-semibold text-charcoal">Payment submitted</p>
+              <p className="mt-1 text-xs leading-relaxed text-charcoal/70">
+                Your card payment was submitted successfully and is being finalized. This page will
+                update automatically once confirmation is received.
               </p>
             </div>
           )}

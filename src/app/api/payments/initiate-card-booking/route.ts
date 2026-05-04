@@ -195,11 +195,13 @@ if (!allowed) {
       {
         amount: amountInCents,
         currency: 'usd',
+        description: `${tour.title} — ${bookingRef}`,
         automatic_payment_methods: { enabled: true },
         receipt_email: body.booker.email.toLowerCase(),
         metadata: {
           booking_ref: bookingRef,
           tour_slug: tour.slug,
+          tour_title: tour.title,
           contact_email: body.booker.email.toLowerCase(),
           flow: 'payment_first',
           ...(flightPrefs.departureCity ? { flight_departure: flightPrefs.departureCity } : {}),

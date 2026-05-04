@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import {
   PaymentElement,
   useElements,
@@ -47,8 +47,7 @@ export default function PaymentForm({
     return `${window.location.origin}${window.location.pathname}?ref=${encodeURIComponent(bookingRef)}&verified=true&paid=true`;
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!stripe || !elements) return;
 
     setIsSubmitting(true);
@@ -72,16 +71,17 @@ export default function PaymentForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="space-y-4">
       <PaymentElement />
       {error && <p className="text-xs text-danger">{error}</p>}
       <button
-        type="submit"
+        type="button"
+        onClick={handleSubmit}
         disabled={!stripe || isSubmitting}
         className="w-full rounded-full bg-charcoal px-6 py-3 text-sm font-medium text-ivory transition hover:bg-charcoal/90 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isSubmitting ? "Processing..." : buttonLabel}
       </button>
-    </form>
+    </div>
   );
 }

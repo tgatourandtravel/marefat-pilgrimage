@@ -1533,7 +1533,7 @@ export default function TourBookingPage({ params }: Props) {
                       >
                         <PaymentForm
                           bookingRef={cardBookingRef!}
-                          successUrl={`${typeof window !== "undefined" ? window.location.origin : ""}/tours/${params.slug}/book/success?ref=${encodeURIComponent(cardBookingRef!)}&paid=true`}
+                          successUrl={`${typeof window !== "undefined" ? window.location.origin : ""}/tours/${params.slug}/book/success?ref=${encodeURIComponent(cardBookingRef!)}&verified=true&paid=true`}
                           buttonLabel={`Pay Deposit — $${depositAmount.toLocaleString()}`}
                         />
                       </Elements>
