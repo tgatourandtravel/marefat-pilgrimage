@@ -593,6 +593,84 @@ export const TOURS: Tour[] = [
       "/images/tours/spring-break-umrah-2026/umrah-thumbnail-3.jpg",
     ],
   },
+  // ----------------------------------------
+  // TOUR 5: Internal Payment Test (Hidden)
+  // ----------------------------------------
+  {
+    slug: "internal-payment-test-1usd",
+    title: "TEST - Internal Payment Verification",
+    subtitle: "Hidden low-value tour for real payment checks",
+    destination: "Internal QA Flow",
+    region: "Multi",
+    type: "Umrah",
+    packageLevel: "Economy",
+
+    startDate: "2026-11-25",
+    endDate: "2026-11-26",
+    durationDays: 2,
+
+    // Deposit is floor(priceFrom * 0.3) => floor(4 * 0.3) = 1 USD
+    priceFrom: 4,
+
+    roomPricing: {
+      quad: 4,
+    },
+
+    hotelStars: 3,
+    flightIncluded: false,
+    meals: "Breakfast only",
+    transfer: false,
+    spiritualGuide: false,
+
+    popularityScore: 1,
+    isFeatured: false,
+    // Hidden from public listings, available only via direct URL/slug for controlled tests.
+    isArchived: true,
+
+    description:
+      "Internal test-only tour for payment workflow validation. Do not use for public bookings.",
+
+    highlights: [
+      "Internal QA scenario for payment flow",
+      "Low-value real-charge verification",
+      "Credit/debit surcharge behavior validation",
+    ],
+
+    itinerary: [
+      "Step 1: Create booking in internal test flow",
+      "Step 2: Complete card payment and verify webhook updates",
+      "Step 3: Validate admin dashboard and PDF output",
+    ],
+
+    hotelInfo: "N/A (internal test package)",
+    flightsInfo: "No flights included",
+
+    included: [
+      "Internal payment workflow validation only",
+    ],
+
+    excluded: [
+      "All travel services",
+      "All accommodation services",
+      "All support services outside QA",
+    ],
+
+    documentsNeeded: [
+      "No travel documents required (internal QA only)",
+    ],
+
+    packages: [
+      {
+        name: "Internal QA",
+        price: "$4",
+        description: "Low-value package for payment pipeline testing only.",
+      },
+    ],
+
+    images: [
+      "/images/tours/spring-break-umrah-2026/umrah-thumbnail-1.png",
+    ],
+  },
 ];
 
 // ============================================

@@ -73,11 +73,33 @@ export async function POST(request: NextRequest) {
     const cardFeeCents = fundingType === "credit" ? Math.round(depositInCents * CARD_FEE_RATE) : 0;
     const amountInCents = depositInCents + cardFeeCents;
 
+    // Attach the payment method to a customer before reusing it in PaymentIntent.
+    // Stripe requires this for setup-confirmed payment methods.
+    const customer = await stripe.customers.create({
+      email: booking.contact_email,
+      name: `${booking.contact_first_name ?? ""} ${booking.contact_last_name ?? ""}`.trim() || undefined,
+      phone: booking.contact_phone || undefined,
+      metadata: {
+        booking_ref: booking.booking_ref,
+      },
+    });
+
+    try {
+      await stripe.paymentMethods.attach(body.paymentMethodId, { customer: customer.id });
+    } catch (attachError) {
+      const error = attachError as { code?: string; message?: string };
+      // Safe to continue when payment method is already attached.
+      if (error.code !== "resource_already_exists") {
+        throw attachError;
+      }
+    }
+
     const paymentIntent = await stripe.paymentIntents.create(
       {
         amount: amountInCents,
         currency: "usd",
         payment_method_types: ["card"],
+        customer: customer.id,
         payment_method: body.paymentMethodId,
         confirm: true,
         receipt_email: booking.contact_email,

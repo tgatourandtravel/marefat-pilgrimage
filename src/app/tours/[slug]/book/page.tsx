@@ -597,8 +597,12 @@ export default function TourBookingPage({ params }: Props) {
   const depositAmount = Math.floor(grandTotal * 0.3);
   // 3.6% credit card processing fee — applied only when Stripe funding type is credit
   const CARD_FEE_RATE = 0.036;
-  const cardFeeAmount = paymentMethod === 'card' ? Math.round(depositAmount * CARD_FEE_RATE) : 0;
-  const depositWithFee = depositAmount + cardFeeAmount;
+  const depositInCents = Math.round(depositAmount * 100);
+  const cardFeeAmountCents = paymentMethod === 'card' ? Math.round(depositInCents * CARD_FEE_RATE) : 0;
+  const cardFeeAmount = cardFeeAmountCents / 100;
+  const depositWithFee = (depositInCents + cardFeeAmountCents) / 100;
+  const formatUsd = (amount: number) =>
+    amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   return (
     <main className="min-h-screen bg-ivory">
@@ -1324,11 +1328,11 @@ export default function TourBookingPage({ params }: Props) {
                                 Credit card processing fee (3.6%)
                                 <span className="ml-1 text-[10px] text-charcoal/40">credit cards only</span>
                               </span>
-                              <span className="text-charcoal">+${cardFeeAmount.toLocaleString()}</span>
+                              <span className="text-charcoal">+${formatUsd(cardFeeAmount)}</span>
                             </div>
                             <div className="mt-1.5 flex justify-between border-t border-charcoal/10 pt-1.5 text-sm font-semibold">
                               <span className="text-charcoal">Total Charged Today</span>
-                              <span className="text-charcoal">${depositWithFee.toLocaleString()}</span>
+                              <span className="text-charcoal">${formatUsd(depositWithFee)}</span>
                             </div>
                           </>
                         )}
@@ -1488,11 +1492,11 @@ export default function TourBookingPage({ params }: Props) {
                             Credit card processing fee (3.6%)
                             <span className="ml-1 text-[10px] text-charcoal/50">credit cards only</span>
                           </span>
-                          <span className="text-charcoal">+${cardFeeAmount.toLocaleString()}</span>
+                          <span className="text-charcoal">+${formatUsd(cardFeeAmount)}</span>
                         </div>
                         <div className="flex justify-between border-t border-charcoal/10 pt-2 font-semibold">
                           <span className="text-charcoal">Total charged today</span>
-                          <span className="text-charcoal">${depositWithFee.toLocaleString()}</span>
+                          <span className="text-charcoal">${formatUsd(depositWithFee)}</span>
                         </div>
                         <p className="text-[10px] text-charcoal/50">
                           Debit, prepaid, and unknown funding types are not charged this fee in net.
@@ -1567,7 +1571,7 @@ export default function TourBookingPage({ params }: Props) {
                         disabled={isInitiatingPayment}
                         className="w-full rounded-full bg-gold px-6 py-3 text-sm font-semibold text-charcoal shadow-soft transition hover:bg-gold-dark disabled:cursor-wait disabled:opacity-70"
                       >
-                        {isInitiatingPayment ? "Preparing payment…" : "Continue to secure card check"}
+                        {isInitiatingPayment ? "Preparing payment…" : `Continue to secure card check — $${formatUsd(depositWithFee)}`}
                       </button>
                     </div>
                   ) : (
@@ -1582,7 +1586,7 @@ export default function TourBookingPage({ params }: Props) {
                         <FundingAwarePaymentForm
                           bookingRef={cardBookingRef!}
                           successUrl={`${typeof window !== "undefined" ? window.location.origin : ""}/tours/${params.slug}/book/success?ref=${encodeURIComponent(cardBookingRef!)}&verified=true&paid=true`}
-                          buttonLabel="Pay Deposit Securely"
+                          buttonLabel={`Pay Deposit Securely — $${formatUsd(depositWithFee)}`}
                         />
                       </Elements>
                     </div>
@@ -1725,11 +1729,11 @@ export default function TourBookingPage({ params }: Props) {
                     <>
                       <div className="mt-1.5 flex justify-between text-xs text-charcoal/70">
                         <span>Credit card fee (3.6%)</span>
-                        <span>+${cardFeeAmount.toLocaleString()}</span>
+                        <span>+${formatUsd(cardFeeAmount)}</span>
                       </div>
                       <div className="mt-1.5 flex justify-between border-t border-charcoal/15 pt-1.5 text-sm font-semibold text-charcoal">
                         <span>Total today</span>
-                        <span>${depositWithFee.toLocaleString()}</span>
+                        <span>${formatUsd(depositWithFee)}</span>
                       </div>
                     </>
                   )}
