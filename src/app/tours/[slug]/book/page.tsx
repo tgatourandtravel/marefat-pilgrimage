@@ -13,7 +13,7 @@ import { FormErrorBanner } from "@/components/ui/FormErrorBanner";
 import { StepProgress } from "@/components/booking/StepProgress";
 import { LegalConsent } from "@/components/booking/LegalConsent";
 import { ONLINE_PAYMENT_ENABLED } from "@/lib/config/features";
-import PaymentForm from "@/components/ui/PaymentForm";
+import FundingAwarePaymentForm from "@/components/ui/FundingAwarePaymentForm";
 
 // Booker: The person making the reservation and payment
 type BookerInfo = {
@@ -595,6 +595,10 @@ export default function TourBookingPage({ params }: Props) {
   // Flight assistance is quoted separately — never counted in totals here.
   const grandTotal = baseTotal;
   const depositAmount = Math.floor(grandTotal * 0.3);
+  // 3.6% credit card processing fee — applied only when Stripe funding type is credit
+  const CARD_FEE_RATE = 0.036;
+  const cardFeeAmount = paymentMethod === 'card' ? Math.round(depositAmount * CARD_FEE_RATE) : 0;
+  const depositWithFee = depositAmount + cardFeeAmount;
 
   return (
     <main className="min-h-screen bg-ivory">
@@ -1313,6 +1317,21 @@ export default function TourBookingPage({ params }: Props) {
                           <span className="text-charcoal/70">Deposit Due Now (30%)</span>
                           <span className="font-semibold text-gold-dark">${depositAmount.toLocaleString()}</span>
                         </div>
+                        {paymentMethod === 'card' && cardFeeAmount > 0 && (
+                          <>
+                            <div className="mt-1 flex justify-between text-xs">
+                              <span className="text-charcoal/70">
+                                Credit card processing fee (3.6%)
+                                <span className="ml-1 text-[10px] text-charcoal/40">credit cards only</span>
+                              </span>
+                              <span className="text-charcoal">+${cardFeeAmount.toLocaleString()}</span>
+                            </div>
+                            <div className="mt-1.5 flex justify-between border-t border-charcoal/10 pt-1.5 text-sm font-semibold">
+                              <span className="text-charcoal">Total Charged Today</span>
+                              <span className="text-charcoal">${depositWithFee.toLocaleString()}</span>
+                            </div>
+                          </>
+                        )}
                         <p className="mt-2 text-xs text-charcoal/60">
                           Remaining balance of ${(grandTotal - depositAmount).toLocaleString()} due 45 days before departure
                         </p>
@@ -1418,7 +1437,7 @@ export default function TourBookingPage({ params }: Props) {
                         <div className="flex-1 text-left">
                           <p className="text-sm font-medium text-charcoal">Online Card Payment</p>
                           <p className="text-xs text-charcoal/60">
-                            Credit or debit card via Stripe — pay securely in the next step
+                            Card via Stripe — 3.6% fee applies only when issuer classifies the card as credit
                           </p>
                         </div>
                       </button>
@@ -1437,18 +1456,47 @@ export default function TourBookingPage({ params }: Props) {
 
                   {/* Online Card Payment Info */}
                   {paymentMethod === "card" && (
-                    <div className="rounded-xl border border-charcoal/10 bg-ivory/80 p-5">
-                      <div className="flex items-start gap-3">
-                        <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-charcoal/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                        </svg>
-                        <div>
-                          <p className="text-sm font-medium text-charcoal">Secure Online Payment via Stripe</p>
-                          <p className="mt-1.5 text-xs leading-relaxed text-charcoal/70">
-                            Card payment is processed securely by Stripe. Your card details are never stored on our
-                            servers. You will complete your payment in the final review step — no verification email needed.
-                          </p>
+                    <div className="space-y-3">
+                      <div className="rounded-xl border border-charcoal/10 bg-ivory/80 p-5">
+                        <div className="flex items-start gap-3">
+                          <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-charcoal/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                          </svg>
+                          <div>
+                            <p className="text-sm font-medium text-charcoal">Secure Online Payment via Stripe</p>
+                            <p className="mt-1.5 text-xs leading-relaxed text-charcoal/70">
+                              Card payment is processed securely by Stripe. Your card details are never stored on our
+                              servers. You will complete your payment in the final review step — no verification email needed.
+                            </p>
+                          </div>
                         </div>
+                      </div>
+
+                      {/* Deposit breakdown for card */}
+                      <div className="rounded-xl border border-gold/20 bg-gold/5 p-4 space-y-2 text-sm">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-charcoal/60">Deposit Breakdown</p>
+                        <div className="flex justify-between">
+                          <span className="text-charcoal/70">Tour package × {numberOfTravelers}</span>
+                          <span className="text-charcoal">${baseTotal.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between border-t border-charcoal/10 pt-2">
+                          <span className="text-charcoal/70">Deposit due now (30%)</span>
+                          <span className="text-charcoal">${depositAmount.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-charcoal/70">
+                            Credit card processing fee (3.6%)
+                            <span className="ml-1 text-[10px] text-charcoal/50">credit cards only</span>
+                          </span>
+                          <span className="text-charcoal">+${cardFeeAmount.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between border-t border-charcoal/10 pt-2 font-semibold">
+                          <span className="text-charcoal">Total charged today</span>
+                          <span className="text-charcoal">${depositWithFee.toLocaleString()}</span>
+                        </div>
+                        <p className="text-[10px] text-charcoal/50">
+                          Debit, prepaid, and unknown funding types are not charged this fee in net.
+                        </p>
                       </div>
                     </div>
                   )}
@@ -1519,7 +1567,7 @@ export default function TourBookingPage({ params }: Props) {
                         disabled={isInitiatingPayment}
                         className="w-full rounded-full bg-gold px-6 py-3 text-sm font-semibold text-charcoal shadow-soft transition hover:bg-gold-dark disabled:cursor-wait disabled:opacity-70"
                       >
-                        {isInitiatingPayment ? "Preparing payment…" : `Pay Deposit — $${depositAmount.toLocaleString()}`}
+                        {isInitiatingPayment ? "Preparing payment…" : "Continue to secure card check"}
                       </button>
                     </div>
                   ) : (
@@ -1531,10 +1579,10 @@ export default function TourBookingPage({ params }: Props) {
                           appearance: { theme: "stripe" },
                         }}
                       >
-                        <PaymentForm
+                        <FundingAwarePaymentForm
                           bookingRef={cardBookingRef!}
                           successUrl={`${typeof window !== "undefined" ? window.location.origin : ""}/tours/${params.slug}/book/success?ref=${encodeURIComponent(cardBookingRef!)}&verified=true&paid=true`}
-                          buttonLabel={`Pay Deposit — $${depositAmount.toLocaleString()}`}
+                          buttonLabel="Pay Deposit Securely"
                         />
                       </Elements>
                     </div>
@@ -1673,6 +1721,18 @@ export default function TourBookingPage({ params }: Props) {
                     <span className="font-medium text-charcoal/80">Deposit Due Now (30%)</span>
                     <span className="font-semibold text-charcoal">${depositAmount.toLocaleString()}</span>
                   </div>
+                  {paymentMethod === 'card' && cardFeeAmount > 0 && (
+                    <>
+                      <div className="mt-1.5 flex justify-between text-xs text-charcoal/70">
+                        <span>Credit card fee (3.6%)</span>
+                        <span>+${cardFeeAmount.toLocaleString()}</span>
+                      </div>
+                      <div className="mt-1.5 flex justify-between border-t border-charcoal/15 pt-1.5 text-sm font-semibold text-charcoal">
+                        <span>Total today</span>
+                        <span>${depositWithFee.toLocaleString()}</span>
+                      </div>
+                    </>
+                  )}
                   <p className="mt-1.5 text-[10px] text-charcoal/60">
                     Remaining balance due 45 days before departure
                   </p>

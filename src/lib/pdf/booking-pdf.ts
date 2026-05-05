@@ -33,6 +33,11 @@ export interface BookingData {
   contactPhone: string;
   createdAt?: string;
   expiresAt?: string;
+  paymentMethod?: string | null;
+  paymentStatus?: string | null;
+  amountPaid?: number;
+  cardFeeAmount?: number;
+  cardFundingType?: string;
 }
 
 // Design system colors
@@ -73,6 +78,12 @@ function buildBookingPDF(data: BookingData): jsPDF {
 
   // Helper to format currency
   const formatCurrency = (amount: number) => `$${amount.toLocaleString()}`;
+  const formatPaymentMethod = (method?: string | null) => {
+    if (method === "card") return "Online Card Payment (Stripe)";
+    if (method === "zelle") return "Zelle Transfer";
+    if (method === "wire") return "Bank Wire Transfer";
+    return "Not specified";
+  };
 
   // Helper to format date
   const formatDate = (dateString?: string) => {
@@ -309,6 +320,49 @@ function buildBookingPDF(data: BookingData): jsPDF {
   );
 
   yPos += 10;
+
+  // Payment method and card-fee details (for clear customer disclosure).
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(COLORS.charcoalLight);
+  doc.text('Selected payment method:', margin, yPos);
+  doc.setTextColor(COLORS.charcoal);
+  doc.setFont('helvetica', 'bold');
+  doc.text(formatPaymentMethod(data.paymentMethod), margin + 40, yPos);
+  yPos += 6;
+
+  if (data.paymentMethod === "card") {
+    const fundingType = data.cardFundingType || "unknown";
+    const isCredit = fundingType === "credit";
+    const cardFeeAmount = data.cardFeeAmount || 0;
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(COLORS.charcoalLight);
+    doc.text('Card funding type:', margin, yPos);
+    doc.setTextColor(COLORS.charcoal);
+    doc.setFont('helvetica', 'bold');
+    doc.text(fundingType, margin + 40, yPos);
+    yPos += 6;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(COLORS.charcoalLight);
+    doc.text('Card processing fee (3.6%):', margin, yPos);
+    doc.setTextColor(COLORS.charcoal);
+    doc.setFont('helvetica', 'bold');
+    doc.text(isCredit ? formatCurrency(cardFeeAmount) : '$0', margin + 58, yPos);
+    yPos += 6;
+
+    if (typeof data.amountPaid === "number" && data.amountPaid > 0) {
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(COLORS.charcoalLight);
+      doc.text('Amount paid:', margin, yPos);
+      doc.setTextColor(COLORS.charcoal);
+      doc.setFont('helvetica', 'bold');
+      doc.text(formatCurrency(data.amountPaid), margin + 40, yPos);
+      yPos += 6;
+    }
+  }
+
+  yPos += 4;
 
   // ============================================
   // PAYMENT INSTRUCTIONS SECTION

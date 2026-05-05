@@ -187,17 +187,10 @@ if (!allowed) {
       return NextResponse.json({ error: 'Failed to save traveler information' }, { status: 500 });
     }
 
-    // ── Create Stripe PaymentIntent ─────────────────────────────────────────
-    const amountInCents = Math.max(1, Math.round(depositAmount * 100));
-    const idempotencyKey = `card-init-${bookingRef}-${amountInCents}`;
-
-    const paymentIntent = await stripe.paymentIntents.create(
+    // ── Create Stripe SetupIntent (card funding checked in finalize step) ──
+    const setupIntent = await stripe.setupIntents.create(
       {
-        amount: amountInCents,
-        currency: 'usd',
-        description: `${tour.title} — ${bookingRef}`,
-        automatic_payment_methods: { enabled: true },
-        receipt_email: body.booker.email.toLowerCase(),
+        payment_method_types: ['card'],
         metadata: {
           booking_ref: bookingRef,
           tour_slug: tour.slug,
@@ -208,20 +201,19 @@ if (!allowed) {
           ...(flightPrefs.returnCity ? { flight_return: flightPrefs.returnCity } : {}),
         },
       },
-      { idempotencyKey }
     );
 
-    // ── Attach PaymentIntent ID to booking ──────────────────────────────────
+    // ── Mark booking ready for card authorization ───────────────────────────
     await supabaseAdmin
       .from('bookings')
       .update({
-        stripe_payment_intent_id: paymentIntent.id,
+        stripe_payment_intent_id: null,
         payment_status: 'requires_action',
       })
       .eq('id', booking.id);
 
     return NextResponse.json({
-      clientSecret: paymentIntent.client_secret,
+      clientSecret: setupIntent.client_secret,
       bookingRef,
       depositAmount,
       grandTotal,
