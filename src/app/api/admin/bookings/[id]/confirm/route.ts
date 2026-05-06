@@ -15,6 +15,8 @@ interface HotelDetails {
   address?: string;
   phone?: string;
   email?: string;
+  checkInTime?: string;
+  checkOutTime?: string;
 }
 
 interface ConfirmRequest {
@@ -99,19 +101,52 @@ export async function POST(
     try {
       const pdfBytes = generateRegistrationConfirmationPDFBytes({
         bookingRef: booking.booking_ref,
-        tourTitle: booking.tour_title,
-        firstName: booking.contact_first_name,
-        lastName: booking.contact_last_name,
-        phone: booking.contact_phone,
-        email: booking.contact_email,
-        grandTotal: booking.grand_total,
-        depositAmount: booking.deposit_amount,
-        paymentMethod: booking.payment_method,
+        groupName: booking.tour_title,
+        preConfirmationNumber: `PC-${booking.booking_ref}`,
+        confirmationDate: new Date().toISOString(),
+        bookingStatus: 'Pre-Confirmed',
+        booker: {
+          fullName: `${booking.contact_first_name} ${booking.contact_last_name}`.trim(),
+          phone: booking.contact_phone,
+          email: booking.contact_email,
+        },
+        totalPrice: booking.grand_total,
+        amountPaid: booking.deposit_amount,
+        currency: 'USD',
         balanceDueDate: body.balanceDueDate,
-        travelers: travelers.map((t) => `${t.first_name} ${t.last_name}`),
-        hotelMedina: body.hotelMedina,
-        hotelMecca: body.hotelMecca,
-        notes: body.notes,
+        selectedPaymentMethod: booking.payment_method,
+        travelers: travelers.map((t) => ({
+          fullName: `${t.first_name} ${t.last_name}`.trim(),
+          nationality: t.nationality,
+          passportNumber: t.passport_number,
+          dateOfBirth: t.date_of_birth,
+          roomType: body.hotelMecca.roomType || body.hotelMedina.roomType || undefined,
+        })),
+        hotelMedina: {
+          name: body.hotelMedina.name,
+          checkInDate: body.hotelMedina.checkIn,
+          checkOutDate: body.hotelMedina.checkOut,
+          checkInTime: body.hotelMedina.checkInTime,
+          checkOutTime: body.hotelMedina.checkOutTime,
+          address: body.hotelMedina.address,
+          phone: body.hotelMedina.phone,
+          email: body.hotelMedina.email,
+          mealPlan: body.hotelMedina.meal,
+          roomType: body.hotelMedina.roomType,
+        },
+        hotelMecca: {
+          name: body.hotelMecca.name,
+          checkInDate: body.hotelMecca.checkIn,
+          checkOutDate: body.hotelMecca.checkOut,
+          checkInTime: body.hotelMecca.checkInTime,
+          checkOutTime: body.hotelMecca.checkOutTime,
+          address: body.hotelMecca.address,
+          phone: body.hotelMecca.phone,
+          email: body.hotelMecca.email,
+          mealPlan: body.hotelMecca.meal,
+          roomType: body.hotelMecca.roomType,
+        },
+        cancellationPolicy: body.notes,
       });
       pdfBuffer = Buffer.from(pdfBytes);
     } catch (pdfError) {
