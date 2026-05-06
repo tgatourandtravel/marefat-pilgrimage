@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -8,7 +8,9 @@ import type { Booking } from '@/lib/supabase/types';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type FilterType = 'all' | 'unpaid' | 'paid';
+type FilterType = 'all' | 'unpaid' | 'paid' | 'archived';
+type SortType = 'newest' | 'oldest' | 'amount_desc' | 'amount_asc';
+type DatePreset = 'all' | 'today' | '7d' | '30d' | 'custom';
 
 interface StatusConfig {
   label: string;
@@ -70,7 +72,13 @@ export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [markingPaid, setMarkingPaid] = useState<string | null>(null);
+  const [archivingId, setArchivingId] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterType>('all');
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState<SortType>('newest');
+  const [datePreset, setDatePreset] = useState<DatePreset>('all');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
 
   const fetchBookings = useCallback(async () => {
     const res = await fetch('/api/admin/bookings', {
@@ -96,6 +104,15 @@ export default function AdminBookingsPage() {
     setMarkingPaid(null);
   }
 
+  async function handleArchive(e: React.MouseEvent, id: string) {
+    e.stopPropagation();
+    if (!confirm('Archive this booking from active lists? You can still view it in Archived tab.')) return;
+    setArchivingId(id);
+    await fetch(`/api/admin/bookings/${id}/archive`, { method: 'POST' });
+    await fetchBookings();
+    setArchivingId(null);
+  }
+
   async function handleLogout() {
     await fetch('/api/admin/logout', { method: 'POST' });
     window.location.href = '/admin/login';
@@ -113,19 +130,68 @@ export default function AdminBookingsPage() {
     URL.revokeObjectURL(url);
   }
 
-  const pendingCount = bookings.filter(b => b.payment_status === 'unpaid' && b.payment_method !== 'card').length;
-  const paidCount    = bookings.filter(b => b.payment_status === 'paid').length;
+  const pendingCount = bookings.filter(b => b.payment_status === 'unpaid' && b.payment_method !== 'card' && b.status !== 'cancelled').length;
+  const paidCount    = bookings.filter(b => b.payment_status === 'paid' && b.status !== 'cancelled').length;
+  const archivedCount = bookings.filter(b => b.status === 'cancelled').length;
 
-  const filtered = bookings.filter(b => {
-    if (filter === 'unpaid') return b.payment_status === 'unpaid' && b.payment_method !== 'card';
-    if (filter === 'paid')   return b.payment_status === 'paid';
-    return true;
-  });
+  const filtered = useMemo(() => {
+    const now = new Date();
+    const query = search.trim().toLowerCase();
+
+    const byTab = bookings.filter(b => {
+      if (filter === 'unpaid') return b.payment_status === 'unpaid' && b.payment_method !== 'card' && b.status !== 'cancelled';
+      if (filter === 'paid') return b.payment_status === 'paid' && b.status !== 'cancelled';
+      if (filter === 'archived') return b.status === 'cancelled';
+      return b.status !== 'cancelled';
+    });
+
+    const bySearch = byTab.filter((b) => {
+      if (!query) return true;
+      const haystack = [
+        b.booking_ref,
+        b.contact_first_name,
+        b.contact_last_name,
+        b.contact_email,
+        b.tour_title,
+      ].join(' ').toLowerCase();
+      return haystack.includes(query);
+    });
+
+    const byDate = bySearch.filter((b) => {
+      const created = new Date(b.created_at);
+      if (datePreset === 'all') return true;
+      if (datePreset === 'today') {
+        return created.toDateString() === now.toDateString();
+      }
+      if (datePreset === '7d') {
+        return (now.getTime() - created.getTime()) <= 7 * 24 * 60 * 60 * 1000;
+      }
+      if (datePreset === '30d') {
+        return (now.getTime() - created.getTime()) <= 30 * 24 * 60 * 60 * 1000;
+      }
+      if (!fromDate && !toDate) return true;
+      const from = fromDate ? new Date(`${fromDate}T00:00:00`) : null;
+      const to = toDate ? new Date(`${toDate}T23:59:59`) : null;
+      if (from && created < from) return false;
+      if (to && created > to) return false;
+      return true;
+    });
+
+    const sorted = [...byDate];
+    sorted.sort((a, b) => {
+      if (sortBy === 'oldest') return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      if (sortBy === 'amount_desc') return b.deposit_amount - a.deposit_amount;
+      if (sortBy === 'amount_asc') return a.deposit_amount - b.deposit_amount;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+    return sorted;
+  }, [bookings, filter, search, sortBy, datePreset, fromDate, toDate]);
 
   const filterTabs: { key: FilterType; label: string }[] = [
     { key: 'all',    label: 'All Bookings' },
     { key: 'unpaid', label: `Awaiting Payment (${pendingCount})` },
     { key: 'paid',   label: 'Paid' },
+    { key: 'archived', label: `Archived (${archivedCount})` },
   ];
 
   if (loading) {
@@ -174,7 +240,7 @@ export default function AdminBookingsPage() {
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {filterTabs.map(({ key, label }) => (
             <button
               key={key}
@@ -189,6 +255,53 @@ export default function AdminBookingsPage() {
             </button>
           ))}
         </div>
+
+        {/* Controls */}
+        <Card variant="bordered" padding="md">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search ref, guest, email, tour..."
+              className="rounded-xl border border-charcoal/15 bg-ivory px-3 py-2 text-sm text-charcoal outline-none transition focus:border-charcoal/40"
+            />
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortType)}
+              className="rounded-xl border border-charcoal/15 bg-ivory px-3 py-2 text-sm text-charcoal outline-none transition focus:border-charcoal/40"
+            >
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="amount_desc">Deposit high to low</option>
+              <option value="amount_asc">Deposit low to high</option>
+            </select>
+            <select
+              value={datePreset}
+              onChange={(e) => setDatePreset(e.target.value as DatePreset)}
+              className="rounded-xl border border-charcoal/15 bg-ivory px-3 py-2 text-sm text-charcoal outline-none transition focus:border-charcoal/40"
+            >
+              <option value="all">All time</option>
+              <option value="today">Today</option>
+              <option value="7d">Last 7 days</option>
+              <option value="30d">Last 30 days</option>
+              <option value="custom">Custom range</option>
+            </select>
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              disabled={datePreset !== 'custom'}
+              className="rounded-xl border border-charcoal/15 bg-ivory px-3 py-2 text-sm text-charcoal outline-none transition focus:border-charcoal/40 disabled:opacity-50"
+            />
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              disabled={datePreset !== 'custom'}
+              className="rounded-xl border border-charcoal/15 bg-ivory px-3 py-2 text-sm text-charcoal outline-none transition focus:border-charcoal/40 disabled:opacity-50"
+            />
+          </div>
+        </Card>
 
         {/* Table */}
         <Card variant="elevated" padding="none">
@@ -208,6 +321,7 @@ export default function AdminBookingsPage() {
                   const paymentCfg = PAYMENT_STATUS_MAP[booking.payment_status] ?? { label: booking.payment_status, className: 'bg-charcoal/5 text-charcoal/40 border-charcoal/10' };
                   const bookingCfg = BOOKING_STATUS_MAP[booking.status]         ?? { label: booking.status,         className: 'bg-charcoal/5 text-charcoal/40 border-charcoal/10' };
                   const canMarkPaid = booking.payment_status === 'unpaid' && booking.payment_method !== 'card';
+                  const canArchive = booking.status !== 'cancelled';
 
                   return (
                     <tr
@@ -265,16 +379,28 @@ export default function AdminBookingsPage() {
                         })}
                       </td>
                       <td className="px-5 py-4">
-                        {canMarkPaid && (
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            isLoading={markingPaid === booking.id}
-                            onClick={(e) => handleMarkPaid(e, booking.id)}
-                          >
-                            Mark Paid
-                          </Button>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {canMarkPaid && (
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              isLoading={markingPaid === booking.id}
+                              onClick={(e) => handleMarkPaid(e, booking.id)}
+                            >
+                              Mark Paid
+                            </Button>
+                          )}
+                          {canArchive && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              isLoading={archivingId === booking.id}
+                              onClick={(e) => handleArchive(e, booking.id)}
+                            >
+                              Archive
+                            </Button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
