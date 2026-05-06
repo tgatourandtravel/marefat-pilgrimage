@@ -5,7 +5,7 @@ import path from 'node:path';
 const COLORS = {
   charcoal: [21, 21, 21] as [number, number, number],
   gold: [199, 165, 106] as [number, number, number],
-  softBg: [249, 247, 242] as [number, number, number],
+  softBg: [247, 243, 235] as [number, number, number],
   border: [229, 220, 200] as [number, number, number],
   gray: [85, 85, 85] as [number, number, number],
   lightGray: [130, 130, 130] as [number, number, number],
@@ -168,8 +168,20 @@ function buildRegistrationConfirmationPDF(data: RegistrationConfirmationData): j
 
   const drawKeyValueRows = (items: Array<[string, string]>, columns = 2) => {
     const colWidth = contentWidth / columns;
+    const labelToValueGap = 3.8;
+    const valueLineHeight = 3.9;
+    const rowBottomPadding = 2.2;
+
     for (let i = 0; i < items.length; i += columns) {
-      ensureSpace(8);
+      const rowItems = items.slice(i, i + columns);
+      const lineCounts = rowItems.map(([, value]) => {
+        const wrapped = doc.splitTextToSize(valueOrDash(value), colWidth - 3);
+        return Array.isArray(wrapped) ? wrapped.length : 1;
+      });
+      const maxLines = Math.max(...lineCounts, 1);
+      const rowHeight = labelToValueGap + maxLines * valueLineHeight + rowBottomPadding;
+      ensureSpace(rowHeight + 0.8);
+
       for (let c = 0; c < columns; c += 1) {
         const item = items[i + c];
         if (!item) continue;
@@ -183,25 +195,25 @@ function buildRegistrationConfirmationPDF(data: RegistrationConfirmationData): j
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(9);
         const valueLines = doc.splitTextToSize(valueOrDash(value), colWidth - 3);
-        doc.text(valueLines, x, y + 4);
+        doc.text(valueLines, x, y + labelToValueGap);
       }
-      y += 8;
+      y += rowHeight;
     }
   };
 
   const drawParagraph = (text: string) => {
     const lines = doc.splitTextToSize(text, contentWidth);
-    ensureSpace(lines.length * 4.5 + 2);
+    ensureSpace(lines.length * 4.3 + 2);
     setTextColor(doc, COLORS.gray);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8.8);
     doc.text(lines, margin, y);
-    y += lines.length * 4.5 + 2;
+    y += lines.length * 4.3 + 2;
   };
 
   const drawBoxParagraph = (heading: string, text: string) => {
     const bodyLines = doc.splitTextToSize(text, contentWidth - 8);
-    const boxHeight = bodyLines.length * 4.5 + 9;
+    const boxHeight = bodyLines.length * 4.2 + 9;
     ensureSpace(boxHeight + 2);
     setFillColor(doc, COLORS.softBg);
     setDrawColor(doc, COLORS.border);
@@ -214,7 +226,7 @@ function buildRegistrationConfirmationPDF(data: RegistrationConfirmationData): j
     setTextColor(doc, COLORS.gray);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8.3);
-    doc.text(bodyLines, margin + 4, y + 10);
+    doc.text(bodyLines, margin + 4, y + 9.5);
     y += boxHeight + 2;
   };
 
@@ -234,13 +246,14 @@ function buildRegistrationConfirmationPDF(data: RegistrationConfirmationData): j
   };
 
   // 1) Header / Branding
-  ensureSpace(30);
+  ensureSpace(28);
   setFillColor(doc, COLORS.softBg);
   setDrawColor(doc, COLORS.border);
-  doc.roundedRect(margin, y, contentWidth, 25, 2, 2, 'FD');
+  doc.roundedRect(margin, y, contentWidth, 23, 2, 2, 'FD');
   const headerLogoDataUrl = getHeaderLogoDataUrl();
   if (headerLogoDataUrl) {
-    doc.addImage(headerLogoDataUrl, 'PNG', margin + 4, y + 5, 66, 16);
+    // Keep brand mark proportional (400x140 ratio) and slightly smaller.
+    doc.addImage(headerLogoDataUrl, 'PNG', margin + 4, y + 5.3, 34.2, 12);
   } else {
     setTextColor(doc, COLORS.charcoal);
     doc.setFont('helvetica', 'bold');
@@ -251,10 +264,8 @@ function buildRegistrationConfirmationPDF(data: RegistrationConfirmationData): j
   setTextColor(doc, COLORS.gray);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.text('www.marefatpilgrimage.com', margin + 72, y + 8.2);
-  doc.text('Ahmad Reshad Tajik', margin + 72, y + 12.8);
-  doc.text('+1 (954) 330-8904  |  info@marefatpilgrimage.com', margin + 72, y + 17.4);
-  y += 31;
+  doc.text('www.marefatpilgrimage.com', margin + 42.5, y + 10.8);
+  y += 28.5;
 
   // 2) Document Title
   setTextColor(doc, COLORS.gold);
@@ -309,7 +320,7 @@ function buildRegistrationConfirmationPDF(data: RegistrationConfirmationData): j
         ['Date of Birth', valueOrDash(traveler.dateOfBirth)],
         ['Room Type', valueOrDash(traveler.roomType)],
       ]);
-      const requiredHeight = 6 + lines.length * 4.2 + 4;
+      const requiredHeight = 6 + lines.length * 4 + 4;
       ensureSpace(requiredHeight);
       setFillColor(doc, COLORS.white);
       setDrawColor(doc, COLORS.border);
@@ -321,7 +332,7 @@ function buildRegistrationConfirmationPDF(data: RegistrationConfirmationData): j
       setTextColor(doc, COLORS.gray);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8.3);
-      doc.text(lines, margin + 4, y + 9.8);
+      doc.text(lines, margin + 4, y + 9.2);
       y += requiredHeight + 2;
     });
   }
