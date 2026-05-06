@@ -1,9 +1,9 @@
 /**
  * PDF Generation Utility for Booking Confirmations
- * Uses jsPDF to generate professional booking confirmation PDFs
  */
-
 import jsPDF from 'jspdf';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 
 export interface BookingData {
   bookingRef: string;
@@ -40,473 +40,300 @@ export interface BookingData {
   cardFundingType?: string;
 }
 
-// Design system colors
 const COLORS = {
-  ivory: '#f7f3eb',
-  charcoal: '#151515',
-  gold: '#c7a56a',
-  goldDark: '#a0844f',
-  charcoalLight: '#555555',
+  ivory: [247, 243, 235] as [number, number, number],
+  charcoal: [21, 21, 21] as [number, number, number],
+  gold: [199, 165, 106] as [number, number, number],
+  charcoalLight: [85, 85, 85] as [number, number, number],
+  lightGray: [130, 130, 130] as [number, number, number],
+  border: [229, 220, 200] as [number, number, number],
+  white: [255, 255, 255] as [number, number, number],
 };
 
-/**
- * Generate booking confirmation PDF
- */
-function buildBookingPDF(data: BookingData): jsPDF {
-  // Create new PDF document (A4 size)
-  const doc = new jsPDF({
-    orientation: 'portrait',
-    unit: 'mm',
-    format: 'a4',
-  });
+let cachedHeaderLogoDataUrl: string | null | undefined;
 
+const getHeaderLogoDataUrl = (): string | undefined => {
+  if (cachedHeaderLogoDataUrl !== undefined) return cachedHeaderLogoDataUrl || undefined;
+  try {
+    const logoPath = path.join(process.cwd(), 'public', 'branding', 'marefat-logo-full.png');
+    const pngBuffer = readFileSync(logoPath);
+    cachedHeaderLogoDataUrl = `data:image/png;base64,${pngBuffer.toString('base64')}`;
+    return cachedHeaderLogoDataUrl;
+  } catch {
+    cachedHeaderLogoDataUrl = null;
+    return undefined;
+  }
+};
+
+function buildBookingPDF(data: BookingData): jsPDF {
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  const margin = 20;
-  const contentWidth = pageWidth - (margin * 2);
+  const margin = 16;
+  const contentWidth = pageWidth - margin * 2;
+  const footerHeight = 16;
+  const safeBottom = pageHeight - footerHeight - 10;
   let yPos = margin;
 
-  // Helper function to add a new page if needed
-  const checkPageBreak = (requiredSpace: number) => {
-    if (yPos + requiredSpace > pageHeight - margin) {
-      doc.addPage();
-      yPos = margin;
-      return true;
-    }
-    return false;
+  const setTextColor = (rgb: [number, number, number]) => doc.setTextColor(...rgb);
+  const setFillColor = (rgb: [number, number, number]) => doc.setFillColor(...rgb);
+  const setDrawColor = (rgb: [number, number, number]) => doc.setDrawColor(...rgb);
+
+  const ensureSpace = (requiredSpace: number) => {
+    if (yPos + requiredSpace <= safeBottom) return;
+    drawFooter();
+    doc.addPage();
+    yPos = margin;
   };
 
-  // Helper to format currency
-  const formatCurrency = (amount: number) => `$${amount.toLocaleString()}`;
-  const formatPaymentMethod = (method?: string | null) => {
-    if (method === "card") return "Online Card Payment (Stripe)";
-    if (method === "zelle") return "Zelle Transfer";
-    if (method === "wire") return "Bank Wire Transfer";
-    return "Not specified";
+  const valueOrDash = (value?: string | number | null): string => {
+    if (value === null || value === undefined) return '—';
+    const text = String(value).trim();
+    return text.length ? text : '—';
   };
 
-  // Helper to format date
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'N/A';
+  const formatCurrency = (amount: number): string =>
+    new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+
+  const formatPaymentMethod = (method?: string | null): string => {
+    if (method === 'card') return 'Card';
+    if (method === 'zelle') return 'Zelle';
+    if (method === 'wire') return 'Bank Transfer';
+    if (method === 'crypto') return 'Crypto';
+    return 'Not specified';
+  };
+
+  const formatDate = (dateString?: string): string => {
+    if (!dateString) return '—';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
+    if (Number.isNaN(date.getTime())) return valueOrDash(dateString);
+    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   };
 
-  // ============================================
-  // HEADER - Company Branding
-  // ============================================
-  doc.setFillColor(COLORS.charcoal);
-  doc.rect(0, 0, pageWidth, 35, 'F');
-
-  doc.setTextColor(COLORS.ivory);
-  doc.setFontSize(24);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Marefat Pilgrimage', margin, 15);
-
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Sacred Journeys with Purpose', margin, 23);
-
-  yPos = 45;
-
-  // ============================================
-  // BOOKING REFERENCE - Prominent
-  // ============================================
-  doc.setFillColor(COLORS.gold);
-  doc.roundedRect(margin, yPos, contentWidth, 25, 3, 3, 'F');
-
-  doc.setTextColor(COLORS.charcoal);
-  doc.setFontSize(11);
-  doc.setFont('helvetica', 'normal');
-  doc.text('BOOKING REFERENCE', margin + 5, yPos + 8);
-
-  doc.setFontSize(20);
-  doc.setFont('helvetica', 'bold');
-  doc.text(data.bookingRef, margin + 5, yPos + 18);
-
-  yPos += 35;
-
-  // ============================================
-  // CONFIRMATION MESSAGE
-  // ============================================
-  doc.setTextColor(COLORS.charcoal);
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Booking Confirmation', margin, yPos);
-
-  yPos += 8;
-
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(COLORS.charcoalLight);
-  doc.text('Thank you for choosing Marefat Pilgrimage. Your sacred journey awaits.', margin, yPos);
-
-  yPos += 12;
-
-  // ============================================
-  // TOUR DETAILS SECTION
-  // ============================================
-  doc.setDrawColor(COLORS.gold);
-  doc.setLineWidth(0.5);
-  doc.line(margin, yPos, pageWidth - margin, yPos);
-  yPos += 8;
-
-  doc.setTextColor(COLORS.charcoal);
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Tour Details', margin, yPos);
-
-  yPos += 8;
-
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-
-  const tourDetails = [
-    ['Tour Package:', data.tourTitle],
-    ['Destination:', data.tourDestination],
-    ['Duration:', data.tourDurationDays ? `${data.tourDurationDays} days` : 'To be confirmed'],
-    ['Start Date:', formatDate(data.tourStartDate)],
-    ['Number of Travelers:', `${data.numberOfTravelers} ${data.numberOfTravelers === 1 ? 'person' : 'people'}`],
-  ];
-
-  tourDetails.forEach(([label, value]) => {
-    doc.setTextColor(COLORS.charcoalLight);
-    doc.text(label, margin, yPos);
-    doc.setTextColor(COLORS.charcoal);
-    doc.setFont('helvetica', 'bold');
-    doc.text(value, margin + 50, yPos);
+  const drawFooter = () => {
+    const fy = pageHeight - footerHeight;
+    setDrawColor(COLORS.border);
+    doc.setLineWidth(0.25);
+    doc.line(margin, fy - 2, pageWidth - margin, fy - 2);
+    setTextColor(COLORS.charcoalLight);
     doc.setFont('helvetica', 'normal');
-    yPos += 6;
-  });
+    doc.setFontSize(7.4);
+    doc.text('www.marefatpilgrimage.com', margin, fy + 3);
+    doc.text('Phone/WhatsApp: +1 (954) 330-8904', margin + 66, fy + 3);
+    doc.text('Email: info@marefatpilgrimage.com', margin, fy + 7);
+  };
 
-  yPos += 6;
-
-  // ============================================
-  // TRAVELER INFORMATION SECTION
-  // ============================================
-  checkPageBreak(40);
-
-  doc.setDrawColor(COLORS.gold);
-  doc.line(margin, yPos, pageWidth - margin, yPos);
-  yPos += 8;
-
-  doc.setTextColor(COLORS.charcoal);
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Traveler Information', margin, yPos);
-
-  yPos += 8;
-
-  data.travelers.forEach((traveler, index) => {
-    checkPageBreak(35);
-
-    // Traveler header
-    doc.setFillColor(240, 240, 240);
-    doc.roundedRect(margin, yPos, contentWidth, 7, 2, 2, 'F');
-    
-    doc.setTextColor(COLORS.charcoal);
-    doc.setFontSize(10);
+  const section = (title: string) => {
+    ensureSpace(14);
+    setTextColor(COLORS.lightGray);
     doc.setFont('helvetica', 'bold');
-    doc.text(`Traveler ${index + 1}`, margin + 3, yPos + 5);
-
-    yPos += 10;
-
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-
-    const travelerDetails = [
-      ['Name:', `${traveler.firstName} ${traveler.lastName}`],
-      ['Date of Birth:', formatDate(traveler.dateOfBirth)],
-      ['Nationality:', traveler.nationality],
-      ['Passport Number:', traveler.passportNumber],
-      ['Passport Expiry:', formatDate(traveler.passportExpiry)],
-      ['Email:', traveler.email],
-      ['Phone:', traveler.phone],
-    ];
-
-    travelerDetails.forEach(([label, value]) => {
-      doc.setTextColor(COLORS.charcoalLight);
-      doc.text(label, margin + 3, yPos);
-      doc.setTextColor(COLORS.charcoal);
-      doc.text(value, margin + 40, yPos);
-      yPos += 5;
-    });
-
-    yPos += 3;
-  });
-
-  yPos += 3;
-
-  // ============================================
-  // PRICING BREAKDOWN SECTION
-  // ============================================
-  checkPageBreak(45);
-
-  doc.setDrawColor(COLORS.gold);
-  doc.line(margin, yPos, pageWidth - margin, yPos);
-  yPos += 8;
-
-  doc.setTextColor(COLORS.charcoal);
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Price Summary', margin, yPos);
-
-  yPos += 8;
-
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-
-  const baseTotal = data.basePricePerPerson * data.numberOfTravelers;
-
-  const pricingDetails = [
-    [`Tour Package × ${data.numberOfTravelers}`, formatCurrency(baseTotal)],
-  ];
-
-  if (data.hasInsurance && data.insuranceTotal > 0) {
-    pricingDetails.push(['Travel Insurance', formatCurrency(data.insuranceTotal)]);
-  }
-
-  if (data.hasFlightBooking && data.flightTotal > 0) {
-    pricingDetails.push(['Flight Booking', formatCurrency(data.flightTotal)]);
-  }
-
-  pricingDetails.forEach(([label, value]) => {
-    doc.setTextColor(COLORS.charcoalLight);
-    doc.text(label, margin, yPos);
-    doc.setTextColor(COLORS.charcoal);
-    doc.text(value, pageWidth - margin, yPos, { align: 'right' });
-    yPos += 6;
-  });
-
-  yPos += 2;
-  doc.setDrawColor(COLORS.charcoalLight);
-  doc.setLineWidth(0.3);
-  doc.line(margin, yPos, pageWidth - margin, yPos);
-  yPos += 7;
-
-  // Total Amount
-  doc.setFontSize(11);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(COLORS.charcoal);
-  doc.text('Total Amount', margin, yPos);
-  doc.text(formatCurrency(data.grandTotal), pageWidth - margin, yPos, { align: 'right' });
-
-  yPos += 8;
-
-  // Deposit Amount (highlighted)
-  doc.setFillColor(COLORS.gold);
-  doc.roundedRect(margin, yPos - 5, contentWidth, 10, 2, 2, 'F');
-
-  doc.setTextColor(COLORS.charcoal);
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Deposit Due Now (30%)', margin + 3, yPos + 2);
-  doc.text(formatCurrency(data.depositAmount), pageWidth - margin - 3, yPos + 2, { align: 'right' });
-
-  yPos += 12;
-
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(COLORS.charcoalLight);
-  const remainingBalance = data.grandTotal - data.depositAmount;
-  doc.text(
-    `Remaining balance of ${formatCurrency(remainingBalance)} due 30 days before departure`,
-    margin,
-    yPos
-  );
-
-  yPos += 10;
-
-  // Payment method and card-fee details (for clear customer disclosure).
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(COLORS.charcoalLight);
-  doc.text('Selected payment method:', margin, yPos);
-  doc.setTextColor(COLORS.charcoal);
-  doc.setFont('helvetica', 'bold');
-  doc.text(formatPaymentMethod(data.paymentMethod), margin + 40, yPos);
-  yPos += 6;
-
-  if (data.paymentMethod === "card") {
-    const fundingType = data.cardFundingType || "unknown";
-    const isCredit = fundingType === "credit";
-    const cardFeeAmount = data.cardFeeAmount || 0;
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(COLORS.charcoalLight);
-    doc.text('Card funding type:', margin, yPos);
-    doc.setTextColor(COLORS.charcoal);
-    doc.setFont('helvetica', 'bold');
-    doc.text(fundingType, margin + 40, yPos);
-    yPos += 6;
-
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(COLORS.charcoalLight);
-    doc.text('Card processing fee (3.6%):', margin, yPos);
-    doc.setTextColor(COLORS.charcoal);
-    doc.setFont('helvetica', 'bold');
-    doc.text(isCredit ? formatCurrency(cardFeeAmount) : '$0', margin + 58, yPos);
-    yPos += 6;
-
-    if (typeof data.amountPaid === "number" && data.amountPaid > 0) {
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(COLORS.charcoalLight);
-      doc.text('Amount paid:', margin, yPos);
-      doc.setTextColor(COLORS.charcoal);
-      doc.setFont('helvetica', 'bold');
-      doc.text(formatCurrency(data.amountPaid), margin + 40, yPos);
-      yPos += 6;
-    }
-  }
-
-  yPos += 4;
-
-  // ============================================
-  // PAYMENT INSTRUCTIONS SECTION
-  // ============================================
-  checkPageBreak(62);
-
-  doc.setDrawColor(COLORS.gold);
-  doc.line(margin, yPos, pageWidth - margin, yPos);
-  yPos += 8;
-
-  doc.setTextColor(COLORS.charcoal);
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Payment Instructions', margin, yPos);
-
-  yPos += 8;
-
-  // Bank details box (must match booking confirmation email — JPMorgan Chase)
-  const bankBoxTop = yPos;
-  const bankBoxH = 51;
-  doc.setFillColor(255, 250, 240);
-  doc.setDrawColor(COLORS.gold);
-  doc.setLineWidth(0.5);
-  doc.roundedRect(margin, bankBoxTop, contentWidth, bankBoxH, 3, 3, 'FD');
-
-  yPos += 7;
-
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(COLORS.charcoalLight);
-  doc.text('WIRE TRANSFER — JPMORGAN CHASE', margin + 3, yPos);
-
-  yPos += 6;
-
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(COLORS.charcoal);
-
-  const labelX = margin + 3;
-  const valueX = margin + 46;
-
-  const bankDetails: [string, string][] = [
-    ['Account name', 'TGA Tour and Travel LLC'],
-    ['Bank', 'JPMorgan Chase Bank, N.A.'],
-    ['Routing (wire)', '021000021'],
-    ['Account number', '2906503801'],
-    ['SWIFT / BIC', 'CHASUS33'],
-    ['Reference', data.bookingRef],
-  ];
-
-  bankDetails.forEach(([label, value]) => {
-    doc.setTextColor(COLORS.charcoalLight);
-    doc.text(`${label}:`, labelX, yPos);
-    doc.setTextColor(COLORS.charcoal);
-    doc.setFont('helvetica', 'bold');
-    doc.text(value, valueX, yPos);
-    doc.setFont('helvetica', 'normal');
-    yPos += 5;
-  });
-
-  doc.setFontSize(7.5);
-  doc.setTextColor(COLORS.charcoalLight);
-  doc.text(
-    'Wire transfer only (not ACH). Include your booking reference in the payment note.',
-    margin + 3,
-    yPos,
-  );
-
-  yPos = bankBoxTop + bankBoxH + 6;
-
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(COLORS.charcoalLight);
-  doc.text(
-    'Please use your booking reference when making the payment transfer.',
-    margin,
-    yPos
-  );
-
-  yPos += 10;
-
-  if (data.expiresAt) {
-    doc.setFillColor(255, 240, 240);
-    doc.roundedRect(margin, yPos, contentWidth, 12, 2, 2, 'F');
-
-    yPos += 5;
-
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(COLORS.charcoal);
-    doc.text(`Reservation expires: ${formatDate(data.expiresAt)}`, margin + 3, yPos);
-
-    yPos += 3;
-
-    doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
-    doc.setTextColor(COLORS.charcoalLight);
-    doc.text(
-      'Please complete the deposit payment by this date to secure your booking.',
-      margin + 3,
-      yPos
-    );
+    doc.text(title.toUpperCase(), margin, yPos);
+    yPos += 2;
+    setDrawColor(COLORS.border);
+    doc.setLineWidth(0.25);
+    doc.line(margin, yPos, pageWidth - margin, yPos);
+    yPos += 6;
+  };
 
-    yPos += 10;
+  const drawParagraph = (text: string) => {
+    const lines = doc.splitTextToSize(text, contentWidth);
+    ensureSpace(lines.length * 4.3 + 2);
+    setTextColor(COLORS.charcoalLight);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.8);
+    doc.text(lines, margin, yPos);
+    yPos += lines.length * 4.3 + 2;
+  };
+
+  const drawKeyValueRows = (items: Array<[string, string]>, columns = 2) => {
+    const colWidth = contentWidth / columns;
+    const labelToValueGap = 3.8;
+    const valueLineHeight = 3.9;
+    const rowBottomPadding = 2.2;
+
+    for (let i = 0; i < items.length; i += columns) {
+      const rowItems = items.slice(i, i + columns);
+      const lineCounts = rowItems.map(([, value]) => {
+        const wrapped = doc.splitTextToSize(valueOrDash(value), colWidth - 3);
+        return Array.isArray(wrapped) ? wrapped.length : 1;
+      });
+      const maxLines = Math.max(...lineCounts, 1);
+      const rowHeight = labelToValueGap + maxLines * valueLineHeight + rowBottomPadding;
+      ensureSpace(rowHeight + 0.8);
+
+      for (let c = 0; c < columns; c += 1) {
+        const item = rowItems[c];
+        if (!item) continue;
+        const x = margin + c * colWidth;
+        const [label, value] = item;
+        setTextColor(COLORS.lightGray);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.text(label, x, yPos);
+        setTextColor(COLORS.charcoal);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        const valueLines = doc.splitTextToSize(valueOrDash(value), colWidth - 3);
+        doc.text(valueLines, x, yPos + labelToValueGap);
+      }
+      yPos += rowHeight;
+    }
+  };
+
+  ensureSpace(28);
+  setFillColor(COLORS.ivory);
+  setDrawColor(COLORS.border);
+  doc.roundedRect(margin, yPos, contentWidth, 23, 2, 2, 'FD');
+  const headerLogoDataUrl = getHeaderLogoDataUrl();
+  if (headerLogoDataUrl) {
+    doc.addImage(headerLogoDataUrl, 'PNG', margin + 4, yPos + 5.3, 34.2, 12);
+  } else {
+    setTextColor(COLORS.charcoal);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('MAREFAT PILGRIMAGE', margin + 4, yPos + 11);
   }
-
-  // ============================================
-  // FOOTER - Contact Information
-  // ============================================
-  const footerY = pageHeight - 25;
-  
-  doc.setDrawColor(COLORS.gold);
-  doc.setLineWidth(0.5);
-  doc.line(margin, footerY, pageWidth - margin, footerY);
-
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(COLORS.charcoal);
-  doc.text('Questions? We\'re here to help.', margin, footerY + 6);
-
+  setTextColor(COLORS.charcoalLight);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.setTextColor(COLORS.charcoalLight);
-  doc.text('Email: info@marefat-pilgrimage.com', margin, footerY + 11);
-  doc.text('WhatsApp: +1 (954) 330-8904', margin, footerY + 15);
+  doc.text('www.marefatpilgrimage.com', margin + 42.5, yPos + 10.8);
+  yPos += 28.5;
 
-  doc.setTextColor(COLORS.charcoalLight);
-  doc.setFontSize(7);
-  doc.text(
-    `Generated on ${new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}`,
-    pageWidth - margin,
-    footerY + 15,
-    { align: 'right' }
+  setTextColor(COLORS.gold);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(17);
+  doc.text('Booking Confirmation', margin, yPos);
+  yPos += 5.8;
+  setTextColor(COLORS.charcoalLight);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.text('Thank you for choosing Marefat Pilgrimage. Your sacred journey awaits.', margin, yPos);
+  yPos += 6;
+
+  section('Booking Summary');
+  drawKeyValueRows(
+    [
+      ['Booking Reference', data.bookingRef],
+      ['Confirmation Date', formatDate(data.createdAt)],
+      ['Tour Package', valueOrDash(data.tourTitle)],
+      ['Destination', valueOrDash(data.tourDestination)],
+      ['Start Date', formatDate(data.tourStartDate)],
+      ['Duration', data.tourDurationDays ? `${data.tourDurationDays} days` : 'To be confirmed'],
+      ['Travelers', `${data.numberOfTravelers} ${data.numberOfTravelers === 1 ? 'person' : 'people'}`],
+      ['Payment Status', valueOrDash(data.paymentStatus)],
+    ],
+    2
   );
 
-  // ============================================
-  // SAVE PDF
-  // ============================================
+  section('Contact');
+  drawKeyValueRows(
+    [
+      ['Email', valueOrDash(data.contactEmail)],
+      ['Phone', valueOrDash(data.contactPhone)],
+    ],
+    2
+  );
+
+  section('Travelers');
+  if (!data.travelers.length) {
+    drawParagraph('No traveler records are attached to this booking yet.');
+  } else {
+    data.travelers.forEach((traveler, index) => {
+      const lines = [
+        `Full Name: ${valueOrDash(`${traveler.firstName} ${traveler.lastName}`.trim())}`,
+        `Date of Birth: ${formatDate(traveler.dateOfBirth)}`,
+        `Nationality: ${valueOrDash(traveler.nationality)}`,
+        `Passport Number: ${valueOrDash(traveler.passportNumber)}`,
+        `Passport Expiry: ${formatDate(traveler.passportExpiry)}`,
+        `Email: ${valueOrDash(traveler.email)}`,
+        `Phone: ${valueOrDash(traveler.phone)}`,
+      ];
+      const requiredHeight = 6 + lines.length * 4 + 4;
+      ensureSpace(requiredHeight + 2);
+      setFillColor(COLORS.white);
+      setDrawColor(COLORS.border);
+      doc.roundedRect(margin, yPos, contentWidth, requiredHeight, 2, 2, 'D');
+      setTextColor(COLORS.charcoal);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.text(`Traveler ${index + 1}`, margin + 4, yPos + 5.2);
+      setTextColor(COLORS.charcoalLight);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.3);
+      doc.text(lines, margin + 4, yPos + 9.2);
+      yPos += requiredHeight + 2;
+    });
+  }
+
+  section('Payment Summary');
+  const baseTotal = data.basePricePerPerson * data.numberOfTravelers;
+  const pricingRows: Array<[string, string]> = [[`Tour Package x ${data.numberOfTravelers}`, formatCurrency(baseTotal)]];
+  if (data.hasInsurance && data.insuranceTotal > 0) pricingRows.push(['Travel Insurance', formatCurrency(data.insuranceTotal)]);
+  if (data.hasFlightBooking && data.flightTotal > 0) pricingRows.push(['Flight Booking', formatCurrency(data.flightTotal)]);
+  pricingRows.push(['Total Amount', formatCurrency(data.grandTotal)]);
+  pricingRows.push(['Deposit Due Now (30%)', formatCurrency(data.depositAmount)]);
+  drawKeyValueRows(pricingRows, 2);
+  drawParagraph(`Remaining balance of ${formatCurrency(data.grandTotal - data.depositAmount)} is due 30 days before departure.`);
+  drawKeyValueRows([['Selected Payment Method', formatPaymentMethod(data.paymentMethod)]], 1);
+
+  if (data.paymentMethod === 'card') {
+    const fundingType = data.cardFundingType || 'unknown';
+    const isCredit = fundingType === 'credit';
+    const cardFeeAmount = data.cardFeeAmount || 0;
+    const cardRows: Array<[string, string]> = [
+      ['Card Funding Type', fundingType],
+      ['Card Processing Fee (3.6%)', isCredit ? formatCurrency(cardFeeAmount) : formatCurrency(0)],
+    ];
+    if (typeof data.amountPaid === 'number' && data.amountPaid > 0) {
+      cardRows.push(['Amount Paid', formatCurrency(data.amountPaid)]);
+    }
+    drawKeyValueRows(cardRows, 2);
+  }
+
+  section('Payment Instructions');
+  drawParagraph('Please use your booking reference when making the payment transfer.');
+  drawKeyValueRows(
+    [
+      ['Account Name', 'TGA Tour and Travel LLC'],
+      ['Bank', 'JPMorgan Chase Bank, N.A.'],
+      ['Routing (Wire)', '021000021'],
+      ['Account Number', '2906503801'],
+      ['SWIFT / BIC', 'CHASUS33'],
+      ['Reference', data.bookingRef],
+    ],
+    2
+  );
+  drawParagraph('Wire transfer only (not ACH). Include your booking reference in the payment note.');
+
+  if (data.expiresAt) {
+    ensureSpace(14);
+    setFillColor(COLORS.ivory);
+    setDrawColor(COLORS.border);
+    doc.roundedRect(margin, yPos, contentWidth, 12, 2, 2, 'FD');
+    setTextColor(COLORS.charcoal);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.8);
+    doc.text(`Reservation expires: ${formatDate(data.expiresAt)}`, margin + 3, yPos + 4.8);
+    setTextColor(COLORS.charcoalLight);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.text('Please complete the deposit payment by this date to secure your booking.', margin + 3, yPos + 9);
+    yPos += 14;
+  }
+
+  drawFooter();
   return doc;
 }
 
 export function generateBookingPDF(data: BookingData): void {
   const doc = buildBookingPDF(data);
-  const filename = `Marefat-Booking-${data.bookingRef}.pdf`;
-  doc.save(filename);
+  doc.save(`Marefat-Booking-${data.bookingRef}.pdf`);
 }
 
 export function generateBookingPDFBytes(data: BookingData): Uint8Array {
