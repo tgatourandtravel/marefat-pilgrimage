@@ -1555,6 +1555,10 @@ export default function TourBookingPage({ params }: Props) {
                   <h3 className="border-b border-charcoal/5 pb-3 text-sm font-semibold text-charcoal">
                     Secure Card Payment
                   </h3>
+                  <div className="mt-3 rounded-lg border border-gold/30 bg-gold/10 px-3 py-2 text-xs text-charcoal/80">
+                    Online payment surcharge: <span className="font-semibold text-charcoal">3.6%</span> on
+                    <span className="font-semibold text-charcoal"> credit cards only</span>.
+                  </div>
 
                   {!cardClientSecret ? (
                     <div className="mt-4 space-y-4">
