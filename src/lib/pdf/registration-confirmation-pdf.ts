@@ -1,4 +1,6 @@
 import jsPDF from 'jspdf';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 
 const COLORS = {
   charcoal: [21, 21, 21] as [number, number, number],
@@ -75,6 +77,23 @@ const CLOSING_TEXT =
 const setTextColor = (doc: jsPDF, rgb: [number, number, number]) => doc.setTextColor(...rgb);
 const setFillColor = (doc: jsPDF, rgb: [number, number, number]) => doc.setFillColor(...rgb);
 const setDrawColor = (doc: jsPDF, rgb: [number, number, number]) => doc.setDrawColor(...rgb);
+let cachedHeaderLogoDataUrl: string | null | undefined;
+
+const getHeaderLogoDataUrl = (): string | undefined => {
+  if (cachedHeaderLogoDataUrl !== undefined) {
+    return cachedHeaderLogoDataUrl || undefined;
+  }
+
+  try {
+    const logoPath = path.join(process.cwd(), 'public', 'branding', 'marefat-logo-full.png');
+    const pngBuffer = readFileSync(logoPath);
+    cachedHeaderLogoDataUrl = `data:image/png;base64,${pngBuffer.toString('base64')}`;
+    return cachedHeaderLogoDataUrl;
+  } catch {
+    cachedHeaderLogoDataUrl = null;
+    return undefined;
+  }
+};
 
 const valueOrDash = (value?: string | number | null): string => {
   if (value === null || value === undefined) return '—';
@@ -219,24 +238,22 @@ function buildRegistrationConfirmationPDF(data: RegistrationConfirmationData): j
   setFillColor(doc, COLORS.softBg);
   setDrawColor(doc, COLORS.border);
   doc.roundedRect(margin, y, contentWidth, 25, 2, 2, 'FD');
+  const headerLogoDataUrl = getHeaderLogoDataUrl();
+  if (headerLogoDataUrl) {
+    doc.addImage(headerLogoDataUrl, 'PNG', margin + 4, y + 5, 66, 16);
+  } else {
+    setTextColor(doc, COLORS.charcoal);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('MAREFAT PILGRIMAGE', margin + 4, y + 11);
+  }
 
-  setFillColor(doc, COLORS.gold);
-  doc.circle(margin + 7, y + 8.5, 5, 'F');
-  setTextColor(doc, COLORS.white);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
-  doc.text('M', margin + 5.5, y + 10.2);
-
-  setTextColor(doc, COLORS.charcoal);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(12);
-  doc.text('MAREFAT PILGRIMAGE', margin + 16, y + 7.5);
   setTextColor(doc, COLORS.gray);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.text('www.marefatpilgrimage.com', margin + 16, y + 12);
-  doc.text('Ahmad Reshad Tajik', margin + 16, y + 16.2);
-  doc.text('+1 (954) 330-8904  |  info@marefatpilgrimage.com', margin + 16, y + 20.4);
+  doc.text('www.marefatpilgrimage.com', margin + 72, y + 8.2);
+  doc.text('Ahmad Reshad Tajik', margin + 72, y + 12.8);
+  doc.text('+1 (954) 330-8904  |  info@marefatpilgrimage.com', margin + 72, y + 17.4);
   y += 31;
 
   // 2) Document Title
