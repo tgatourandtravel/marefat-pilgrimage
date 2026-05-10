@@ -39,7 +39,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     };
 
     const baseStyles =
-      "w-full resize-none rounded-xl border text-charcoal placeholder:text-charcoal/40 transition focus:outline-none focus:ring-2";
+      "w-full resize-none rounded-xl border text-charcoal placeholder:text-charcoal/40 transition focus:outline-none focus:ring-2 box-border";
 
     const borderColor = error
       ? "border-danger bg-danger-light/10 focus:border-danger focus:ring-danger/20"

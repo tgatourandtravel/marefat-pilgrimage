@@ -1,9 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { TourCard } from "@/components/ui";
+import { Input, Select, TourCard } from "@/components/ui";
 
 type Sorting = "price-asc" | "date-soonest" | "duration";
+
+const SORT_OPTIONS: { value: Sorting; label: string }[] = [
+  { value: "date-soonest", label: "Soonest departure" },
+  { value: "price-asc", label: "Price (low to high)" },
+  { value: "duration", label: "Duration" },
+];
 
 // Type for both Sanity and static tours
 type Tour = {
@@ -132,37 +138,33 @@ export default function ToursClient({ tours }: ToursClientProps) {
     <div className="space-y-6">
       {/* Tour Type & Destination */}
       <div className="space-y-4">
-        <div>
-          <label className="mb-2 block text-xs font-medium text-charcoal/75">
-            Tour Type
-          </label>
-          <select
-            value={tourType}
-            onChange={(e) => setTourType(e.target.value)}
-            className="w-full rounded-xl border border-charcoal/10 bg-ivory px-3 py-2.5 text-xs text-charcoal transition focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory"
-          >
-            <option value="all">All Types</option>
-            <option value="Hajj">Hajj</option>
-            <option value="Umrah">Umrah</option>
-            <option value="Ziyarat">Ziyarat</option>
-            <option value="Combo">Combination</option>
-          </select>
-        </div>
-        <div>
-          <label className="mb-2 block text-xs font-medium text-charcoal/75">
-            Destination
-          </label>
-          <select
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-            className="w-full rounded-xl border border-charcoal/10 bg-ivory px-3 py-2.5 text-xs text-charcoal transition focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory"
-          >
-            <option value="all">All</option>
-            <option value="Makkah/Madinah">Saudi Arabia</option>
-            <option value="Iraq">Iraq</option>
-            <option value="Multi">Combination</option>
-          </select>
-        </div>
+        <Select
+          label="Tour Type"
+          size="sm"
+          value={tourType}
+          onChange={(e) => setTourType(e.target.value)}
+          options={[
+            { value: "all", label: "All Types" },
+            { value: "Hajj", label: "Hajj" },
+            { value: "Umrah", label: "Umrah" },
+            { value: "Ziyarat", label: "Ziyarat" },
+            { value: "Combo", label: "Combination" },
+          ]}
+          className="text-xs"
+        />
+        <Select
+          label="Destination"
+          size="sm"
+          value={destination}
+          onChange={(e) => setDestination(e.target.value)}
+          options={[
+            { value: "all", label: "All" },
+            { value: "Makkah/Madinah", label: "Saudi Arabia" },
+            { value: "Iraq", label: "Iraq" },
+            { value: "Multi", label: "Combination" },
+          ]}
+          className="text-xs"
+        />
       </div>
 
       {/* Price Range */}
@@ -171,26 +173,32 @@ export default function ToursClient({ tours }: ToursClientProps) {
           Price Range: ${priceMin || 0} - ${priceMax || "20,000"}
         </label>
         <div className="flex gap-2">
-          <input
-            type="number"
-            min={0}
-            max={20000}
-            step={100}
-            value={priceMin}
-            onChange={(e) => setPriceMin(e.target.value)}
-            placeholder="Min"
-            className="flex-1 rounded-xl border border-charcoal/10 bg-ivory px-3 py-2 text-xs text-charcoal placeholder:text-charcoal/40 transition focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory"
-          />
-          <input
-            type="number"
-            min={0}
-            max={20000}
-            step={100}
-            value={priceMax}
-            onChange={(e) => setPriceMax(e.target.value)}
-            placeholder="Max"
-            className="flex-1 rounded-xl border border-charcoal/10 bg-ivory px-3 py-2 text-xs text-charcoal placeholder:text-charcoal/40 transition focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory"
-          />
+          <div className="min-w-0 flex-1">
+            <Input
+              type="number"
+              min={0}
+              max={20000}
+              step={100}
+              value={priceMin}
+              onChange={(e) => setPriceMin(e.target.value)}
+              placeholder="Min"
+              size="sm"
+              className="text-xs"
+            />
+          </div>
+          <div className="min-w-0 flex-1">
+            <Input
+              type="number"
+              min={0}
+              max={20000}
+              step={100}
+              value={priceMax}
+              onChange={(e) => setPriceMax(e.target.value)}
+              placeholder="Max"
+              size="sm"
+              className="text-xs"
+            />
+          </div>
         </div>
       </div>
 
@@ -200,24 +208,30 @@ export default function ToursClient({ tours }: ToursClientProps) {
           Duration: {durationMin || 1} - {durationMax || 30} days
         </label>
         <div className="flex gap-2">
-          <input
-            type="number"
-            min={1}
-            max={30}
-            value={durationMin}
-            onChange={(e) => setDurationMin(e.target.value)}
-            placeholder="Min"
-            className="flex-1 rounded-xl border border-charcoal/10 bg-ivory px-3 py-2 text-xs text-charcoal placeholder:text-charcoal/40 transition focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory"
-          />
-          <input
-            type="number"
-            min={1}
-            max={30}
-            value={durationMax}
-            onChange={(e) => setDurationMax(e.target.value)}
-            placeholder="Max"
-            className="flex-1 rounded-xl border border-charcoal/10 bg-ivory px-3 py-2 text-xs text-charcoal placeholder:text-charcoal/40 transition focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory"
-          />
+          <div className="min-w-0 flex-1">
+            <Input
+              type="number"
+              min={1}
+              max={30}
+              value={durationMin}
+              onChange={(e) => setDurationMin(e.target.value)}
+              placeholder="Min"
+              size="sm"
+              className="text-xs"
+            />
+          </div>
+          <div className="min-w-0 flex-1">
+            <Input
+              type="number"
+              min={1}
+              max={30}
+              value={durationMax}
+              onChange={(e) => setDurationMax(e.target.value)}
+              placeholder="Max"
+              size="sm"
+              className="text-xs"
+            />
+          </div>
         </div>
       </div>
 
@@ -366,15 +380,16 @@ export default function ToursClient({ tours }: ToursClientProps) {
           >
             {mobileFiltersOpen ? "Hide filters" : "Show filters & sorting"}
           </button>
-          <select
-            value={sorting}
-            onChange={(e) => setSorting(e.target.value as Sorting)}
-            className="h-9 rounded-full border border-charcoal/10 bg-ivory px-3 text-[11px] text-charcoal focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory"
-          >
-            <option value="date-soonest">Soonest departure</option>
-            <option value="price-asc">Price (low to high)</option>
-            <option value="duration">Duration</option>
-          </select>
+          <div className="w-[min(11.5rem,46vw)] shrink-0">
+            <Select
+              aria-label="Sort tours"
+              value={sorting}
+              onChange={(e) => setSorting(e.target.value as Sorting)}
+              options={SORT_OPTIONS}
+              size="sm"
+              className="rounded-full py-2 text-[11px] leading-tight"
+            />
+          </div>
         </div>
 
         <div className="grid gap-8 md:grid-cols-[320px_minmax(0,1fr)]">
@@ -411,18 +426,14 @@ export default function ToursClient({ tours }: ToursClientProps) {
                     </button>
                   </div>
                   <div className="mb-4">
-                    <label className="text-xs font-medium text-charcoal/70">
-                      Sort by
-                    </label>
-                    <select
+                    <Select
+                      label="Sort by"
                       value={sorting}
                       onChange={(e) => setSorting(e.target.value as Sorting)}
-                      className="mt-1 w-full rounded-full border border-charcoal/10 bg-ivory px-3 py-2 text-xs text-charcoal focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory"
-                    >
-                      <option value="date-soonest">Soonest departure</option>
-                      <option value="price-asc">Price (low to high)</option>
-                      <option value="duration">Duration</option>
-                    </select>
+                      options={SORT_OPTIONS}
+                      size="sm"
+                      className="rounded-full text-xs"
+                    />
                   </div>
                   <div className="max-h-[55vh] space-y-4 overflow-y-auto pb-3">
                     {filtersPanel}
@@ -440,16 +451,17 @@ export default function ToursClient({ tours }: ToursClientProps) {
                 curated departures
               </p>
               <div className="flex items-center gap-2 text-xs">
-                <span className="text-charcoal/60">Sort by</span>
-                <select
-                  value={sorting}
-                  onChange={(e) => setSorting(e.target.value as Sorting)}
-                  className="h-8 rounded-full border border-charcoal/10 bg-ivory px-3 text-[11px] text-charcoal focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory"
-                >
-                  <option value="date-soonest">Soonest departure</option>
-                  <option value="price-asc">Price (low to high)</option>
-                  <option value="duration">Duration</option>
-                </select>
+                <span className="shrink-0 text-charcoal/60">Sort by</span>
+                <div className="min-w-0 max-w-[220px]">
+                  <Select
+                    value={sorting}
+                    onChange={(e) => setSorting(e.target.value as Sorting)}
+                    options={SORT_OPTIONS}
+                    size="sm"
+                    className="rounded-full text-[11px]"
+                    aria-label="Sort tours"
+                  />
+                </div>
               </div>
             </div>
 

@@ -49,6 +49,7 @@ export const LegalConsent = forwardRef<HTMLDivElement, LegalConsentProps>(
               onChange={(e) => onChange(e.target.checked)}
               className="h-4 w-4 rounded border-charcoal/30 text-charcoal accent-charcoal transition focus:ring-2 focus:ring-gold/50"
               aria-describedby="legal-consent-text"
+              aria-invalid={error ? "true" : "false"}
             />
           </div>
           <div id="legal-consent-text" className="space-y-2.5">

@@ -1,7 +1,9 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { FormEvent, useState, Suspense } from "react";
+import { FormEvent, useRef, useState, Suspense } from "react";
+import { Input } from "@/components/ui/Input";
+import { focusFirstInvalidField } from "@/lib/focusFirstInvalidField";
 
 type Step = 1 | 2 | 3 | 4 | 5;
 
@@ -32,33 +34,52 @@ function BookingContent() {
   const [paymentMethod, setPaymentMethod] = useState<"card" | "bank">("card");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const formRef = useRef<HTMLFormElement>(null);
 
   const validateStep = (currentStep: Step) => {
+    const nextErrors: Record<string, string> = {};
     if (currentStep === 1) {
-      return !!selectedDate;
+      if (!selectedDate) {
+        nextErrors.selectedDate = "Please choose a preferred start date.";
+      }
+      setFieldErrors(nextErrors);
+      return Object.keys(nextErrors).length === 0;
     }
     if (currentStep === 2) {
-      return (
-        traveler.firstName &&
-        traveler.lastName &&
-        traveler.email &&
-        traveler.phone &&
-        traveler.passportNumber &&
-        traveler.nationality &&
-        traveler.passportExpiry
-      );
+      if (!traveler.firstName.trim()) nextErrors.firstName = "First name is required.";
+      if (!traveler.lastName.trim()) nextErrors.lastName = "Last name is required.";
+      if (!traveler.email.trim()) nextErrors.email = "Email is required.";
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(traveler.email.trim())) {
+        nextErrors.email = "Please enter a valid email address.";
+      }
+      if (!traveler.phone.trim()) nextErrors.phone = "Phone number is required.";
+      if (!traveler.passportNumber.trim())
+        nextErrors.passportNumber = "Passport number is required.";
+      if (!traveler.nationality.trim()) nextErrors.nationality = "Nationality is required.";
+      if (!traveler.passportExpiry) nextErrors.passportExpiry = "Passport expiry is required.";
+      setFieldErrors(nextErrors);
+      return Object.keys(nextErrors).length === 0;
     }
+    setFieldErrors({});
     return true;
   };
 
+  const validateStepOrFocus = () => {
+    const ok = validateStep(step);
+    if (!ok) focusFirstInvalidField(formRef.current);
+    return ok;
+  };
+
   const handleNext = () => {
-    if (!validateStep(step)) return;
+    if (!validateStepOrFocus()) return;
+    setFieldErrors({});
     setStep((s) => (Math.min(5, s + 1) as Step));
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!validateStep(step)) return;
+    if (!validateStepOrFocus()) return;
     setIsSubmitting(true);
 
     // Placeholder: here you would call an API route / server action
@@ -128,8 +149,10 @@ function BookingContent() {
         </ol>
 
         <form
+          ref={formRef}
           onSubmit={handleSubmit}
           className="space-y-6 rounded-2xl border border-charcoal/5 bg-ivory p-5 shadow-sm shadow-charcoal/5"
+          noValidate
         >
           {step === 1 && (
             <div className="space-y-4">
@@ -166,30 +189,38 @@ function BookingContent() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="text-xs font-medium text-charcoal/75">
-                    Preferred start date
-                  </label>
-                  <input
+                  <Input
+                    label="Preferred start date"
+                    id="booking-selected-date"
                     type="date"
                     value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedDate(e.target.value);
+                      if (fieldErrors.selectedDate) {
+                        setFieldErrors((prev) => {
+                          const { selectedDate: _, ...rest } = prev;
+                          return rest;
+                        });
+                      }
+                    }}
+                    error={fieldErrors.selectedDate}
+                    size="sm"
+                    className="text-xs"
                     required
-                    className="mt-1 w-full rounded-xl border border-charcoal/10 bg-ivory px-3 py-2 text-xs text-charcoal focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory"
                   />
                   <p className="mt-1 text-[11px] text-charcoal/60">
                     Your advisor will confirm exact flight and hotel dates.
                   </p>
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-charcoal/75">
-                    Selected tour (optional)
-                  </label>
-                  <input
+                  <Input
+                    label="Selected tour (optional)"
                     type="text"
                     defaultValue={preselectedTour}
                     readOnly={!!preselectedTour}
                     placeholder="If you know the exact tour name, add it here"
-                    className="mt-1 w-full rounded-xl border border-charcoal/10 bg-ivory px-3 py-2 text-xs text-charcoal placeholder:text-charcoal/40 focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory"
+                    size="sm"
+                    className="text-xs"
                   />
                 </div>
               </div>
@@ -202,117 +233,113 @@ function BookingContent() {
                 2. Traveler information
               </h2>
               <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="text-xs font-medium text-charcoal/75">
-                    First name
-                  </label>
-                  <input
-                    type="text"
-                    value={traveler.firstName}
-                    onChange={(e) =>
-                      setTraveler({ ...traveler, firstName: e.target.value })
-                    }
-                    required
-                    className="mt-1 w-full rounded-xl border border-charcoal/10 bg-ivory px-3 py-2 text-xs text-charcoal focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-charcoal/75">
-                    Last name
-                  </label>
-                  <input
-                    type="text"
-                    value={traveler.lastName}
-                    onChange={(e) =>
-                      setTraveler({ ...traveler, lastName: e.target.value })
-                    }
-                    required
-                    className="mt-1 w-full rounded-xl border border-charcoal/10 bg-ivory px-3 py-2 text-xs text-charcoal focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory"
-                  />
-                </div>
+                <Input
+                  label="First name"
+                  id="booking-first-name"
+                  type="text"
+                  value={traveler.firstName}
+                  onChange={(e) => {
+                    setTraveler({ ...traveler, firstName: e.target.value });
+                    if (fieldErrors.firstName)
+                      setFieldErrors(({ firstName: _, ...r }) => r);
+                  }}
+                  error={fieldErrors.firstName}
+                  size="sm"
+                  className="text-xs"
+                  required
+                />
+                <Input
+                  label="Last name"
+                  id="booking-last-name"
+                  type="text"
+                  value={traveler.lastName}
+                  onChange={(e) => {
+                    setTraveler({ ...traveler, lastName: e.target.value });
+                    if (fieldErrors.lastName)
+                      setFieldErrors(({ lastName: _, ...r }) => r);
+                  }}
+                  error={fieldErrors.lastName}
+                  size="sm"
+                  className="text-xs"
+                  required
+                />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="text-xs font-medium text-charcoal/75">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value={traveler.email}
-                    onChange={(e) =>
-                      setTraveler({ ...traveler, email: e.target.value })
-                    }
-                    required
-                    className="mt-1 w-full rounded-xl border border-charcoal/10 bg-ivory px-3 py-2 text-xs text-charcoal focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-charcoal/75">
-                    Phone (with country code)
-                  </label>
-                  <input
-                    type="tel"
-                    value={traveler.phone}
-                    onChange={(e) =>
-                      setTraveler({ ...traveler, phone: e.target.value })
-                    }
-                    required
-                    className="mt-1 w-full rounded-xl border border-charcoal/10 bg-ivory px-3 py-2 text-xs text-charcoal focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory"
-                  />
-                </div>
+                <Input
+                  label="Email"
+                  id="booking-email"
+                  type="email"
+                  value={traveler.email}
+                  onChange={(e) => {
+                    setTraveler({ ...traveler, email: e.target.value });
+                    if (fieldErrors.email) setFieldErrors(({ email: _, ...r }) => r);
+                  }}
+                  error={fieldErrors.email}
+                  size="sm"
+                  className="text-xs"
+                  required
+                />
+                <Input
+                  label="Phone (with country code)"
+                  id="booking-phone"
+                  type="tel"
+                  value={traveler.phone}
+                  onChange={(e) => {
+                    setTraveler({ ...traveler, phone: e.target.value });
+                    if (fieldErrors.phone) setFieldErrors(({ phone: _, ...r }) => r);
+                  }}
+                  error={fieldErrors.phone}
+                  size="sm"
+                  className="text-xs"
+                  required
+                />
               </div>
               <div className="grid gap-4 sm:grid-cols-3">
-                <div>
-                  <label className="text-xs font-medium text-charcoal/75">
-                    Passport number
-                  </label>
-                  <input
-                    type="text"
-                    value={traveler.passportNumber}
-                    onChange={(e) =>
-                      setTraveler({
-                        ...traveler,
-                        passportNumber: e.target.value,
-                      })
-                    }
-                    required
-                    className="mt-1 w-full rounded-xl border border-charcoal/10 bg-ivory px-3 py-2 text-xs text-charcoal focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-charcoal/75">
-                    Nationality
-                  </label>
-                  <input
-                    type="text"
-                    value={traveler.nationality}
-                    onChange={(e) =>
-                      setTraveler({
-                        ...traveler,
-                        nationality: e.target.value,
-                      })
-                    }
-                    required
-                    className="mt-1 w-full rounded-xl border border-charcoal/10 bg-ivory px-3 py-2 text-xs text-charcoal focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-charcoal/75">
-                    Passport expiry
-                  </label>
-                  <input
-                    type="date"
-                    value={traveler.passportExpiry}
-                    onChange={(e) =>
-                      setTraveler({
-                        ...traveler,
-                        passportExpiry: e.target.value,
-                      })
-                    }
-                    required
-                    className="mt-1 w-full rounded-xl border border-charcoal/10 bg-ivory px-3 py-2 text-xs text-charcoal focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory"
-                  />
-                </div>
+                <Input
+                  label="Passport number"
+                  id="booking-passport"
+                  type="text"
+                  value={traveler.passportNumber}
+                  onChange={(e) => {
+                    setTraveler({ ...traveler, passportNumber: e.target.value });
+                    if (fieldErrors.passportNumber)
+                      setFieldErrors(({ passportNumber: _, ...r }) => r);
+                  }}
+                  error={fieldErrors.passportNumber}
+                  size="sm"
+                  className="text-xs"
+                  required
+                />
+                <Input
+                  label="Nationality"
+                  id="booking-nationality"
+                  type="text"
+                  value={traveler.nationality}
+                  onChange={(e) => {
+                    setTraveler({ ...traveler, nationality: e.target.value });
+                    if (fieldErrors.nationality)
+                      setFieldErrors(({ nationality: _, ...r }) => r);
+                  }}
+                  error={fieldErrors.nationality}
+                  size="sm"
+                  className="text-xs"
+                  required
+                />
+                <Input
+                  label="Passport expiry"
+                  id="booking-passport-expiry"
+                  type="date"
+                  value={traveler.passportExpiry}
+                  onChange={(e) => {
+                    setTraveler({ ...traveler, passportExpiry: e.target.value });
+                    if (fieldErrors.passportExpiry)
+                      setFieldErrors(({ passportExpiry: _, ...r }) => r);
+                  }}
+                  error={fieldErrors.passportExpiry}
+                  size="sm"
+                  className="text-xs"
+                  required
+                />
               </div>
             </div>
           )}

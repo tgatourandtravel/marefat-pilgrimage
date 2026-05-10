@@ -43,11 +43,11 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
 
     // Size styles matching Input component
     const sizeStyles: Record<SizeVariant, string> = {
-      xs: "px-2.5 py-1.5 text-xs min-h-[32px]",
-      sm: "px-3 py-2 text-xs min-h-[36px]",
-      md: "px-3 py-2.5 text-sm min-h-[42px]",
+      xs: "px-2.5 py-2 text-xs min-h-[36px]",
+      sm: "px-3 py-2 text-xs min-h-[40px]",
+      md: "px-3 py-2.5 text-sm min-h-[44px]",
       lg: "px-4 py-3 text-base min-h-[48px]",
-      xl: "px-5 py-4 text-lg min-h-[56px]",
+      xl: "px-5 py-3.5 text-lg min-h-[56px]",
     };
 
     // استایل‌های سفارشی بر اساس design system ما
@@ -61,6 +61,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
       w-full
       rounded-xl
       border
+      box-border
       ${sizeStyles[size]}
       text-charcoal
       transition

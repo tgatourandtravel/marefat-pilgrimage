@@ -1,5 +1,6 @@
 import { getFeaturedTours } from "@/data/tours";
 import { TourCard } from "@/components/ui";
+import { NewsletterQuietForm } from "@/components/home/NewsletterQuietForm";
 
 // Get featured tours from central data file
 const featuredTours = getFeaturedTours();
@@ -271,19 +272,7 @@ export default function HomePage() {
                 limited Ziyarat departures. No frequent marketing.
               </p>
             </div>
-            <form className="flex w-full flex-col gap-3 sm:max-w-md sm:flex-row">
-              <input
-                type="email"
-                placeholder="Your email address"
-                className="h-10 flex-1 rounded-full border border-charcoal/15 bg-ivory px-4 text-sm text-charcoal placeholder:text-charcoal/40 focus:outline-none focus:ring-2 focus:ring-gold/70 focus:ring-offset-2 focus:ring-offset-ivory"
-              />
-              <button
-                type="submit"
-                className="h-10 rounded-full bg-charcoal px-6 text-sm font-medium text-ivory shadow-soft transition hover:bg-charcoal/90"
-              >
-                Join quietly
-              </button>
-            </form>
+            <NewsletterQuietForm />
           </div>
         </div>
       </section>

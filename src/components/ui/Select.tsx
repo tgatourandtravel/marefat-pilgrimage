@@ -30,17 +30,17 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ) => {
     const inputId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
 
-    // Minimum height standards for user-friendly selects (matching Input component)
+    // Extra end padding reserves space so the native dropdown arrow isn’t flush to the edge
     const sizeStyles: Record<SizeVariant, string> = {
-      xs: "px-2.5 py-1.5 text-xs min-h-[32px]",
-      sm: "px-3 py-2 text-xs min-h-[36px]",
-      md: "px-3 py-2.5 text-sm min-h-[42px]",
-      lg: "px-4 py-3 text-base min-h-[48px]",
-      xl: "px-5 py-4 text-lg min-h-[56px]",
+      xs: "pl-2.5 pr-8 py-2 text-xs min-h-[36px]",
+      sm: "pl-3 pr-9 py-2 text-xs min-h-[40px]",
+      md: "pl-3 pr-10 py-2.5 text-sm min-h-[44px]",
+      lg: "pl-4 pr-11 py-3 text-base min-h-[48px]",
+      xl: "pl-5 pr-12 py-3.5 text-lg min-h-[56px]",
     };
 
     const baseStyles =
-      "w-full rounded-xl border text-charcoal transition focus:outline-none focus:ring-2 cursor-pointer";
+      "w-full rounded-xl border text-charcoal transition focus:outline-none focus:ring-2 cursor-pointer box-border";
 
     const borderColor = error
       ? "border-danger bg-danger-light/10 focus:border-danger focus:ring-danger/20"

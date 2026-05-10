@@ -28,17 +28,17 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ) => {
     const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
 
-    // Minimum height standards for user-friendly inputs
+    // Touch-friendly minimum heights (aligns with Button md min-h ~44px)
     const sizeStyles: Record<SizeVariant, string> = {
-      xs: "px-2.5 py-1.5 text-xs min-h-[32px]",
-      sm: "px-3 py-2 text-xs min-h-[36px]",
-      md: "px-3 py-2.5 text-sm min-h-[42px]",
+      xs: "px-2.5 py-2 text-xs min-h-[36px]",
+      sm: "px-3 py-2 text-xs min-h-[40px]",
+      md: "px-3 py-2.5 text-sm min-h-[44px]",
       lg: "px-4 py-3 text-base min-h-[48px]",
-      xl: "px-5 py-4 text-lg min-h-[56px]",
+      xl: "px-5 py-3.5 text-lg min-h-[56px]",
     };
 
     const baseStyles =
-      "w-full rounded-xl border text-charcoal placeholder:text-charcoal/40 transition focus:outline-none focus:ring-2";
+      "w-full rounded-xl border text-charcoal placeholder:text-charcoal/40 transition focus:outline-none focus:ring-2 box-border";
 
     const borderColor = error
       ? "border-danger bg-danger-light/10 focus:border-danger focus:ring-danger/20"

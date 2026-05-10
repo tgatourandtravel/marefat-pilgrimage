@@ -7,6 +7,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { getTourBySlug } from "@/data/tours";
 import { validateTravelerFields, validateBookerFields } from "@/lib/utils/validation";
+import { focusFirstInvalidField } from "@/lib/focusFirstInvalidField";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { FormErrorBanner } from "@/components/ui/FormErrorBanner";
@@ -413,12 +414,7 @@ export default function TourBookingPage({ params }: Props) {
           });
           return updated;
         });
-        
-        // Scroll to top so user sees errors from the beginning
-        setTimeout(() => {
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }, 100);
-        
+
         return false;
       }
 
@@ -451,8 +447,14 @@ export default function TourBookingPage({ params }: Props) {
     return true;
   };
 
+  const validateStepOrFocus = (): boolean => {
+    const ok = validateStep(step);
+    if (!ok) focusFirstInvalidField(formRef.current ?? undefined);
+    return ok;
+  };
+
   const handleNext = () => {
-    if (!validateStep(step)) return;
+    if (!validateStepOrFocus()) return;
     setStep((s) => Math.min(4, s + 1) as Step);
   };
 
@@ -464,7 +466,7 @@ export default function TourBookingPage({ params }: Props) {
 
   // Initiates the payment-first card flow: creates booking + PaymentIntent in one call.
   const initiateCardBooking = async () => {
-    if (!validateStep(step)) return;
+    if (!validateStepOrFocus()) return;
     if (!termsAccepted) { setTermsError(true); return; }
 
     setIsInitiatingPayment(true);
@@ -514,7 +516,7 @@ export default function TourBookingPage({ params }: Props) {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!validateStep(step)) return;
+    if (!validateStepOrFocus()) return;
 
     if (!termsAccepted) {
       setTermsError(true);
