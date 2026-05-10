@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Input, Select, TourCard } from "@/components/ui";
 
 type Sorting = "price-asc" | "date-soonest" | "duration";
@@ -48,6 +48,20 @@ export default function ToursClient({ tours }: ToursClientProps) {
   const [packageLevel, setPackageLevel] = useState<string>("all");
   const [sorting, setSorting] = useState<Sorting>("date-soonest");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
+  useEffect(() => {
+    if (!mobileFiltersOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileFiltersOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [mobileFiltersOpen]);
 
   // Normalize tours data (handle both Sanity and static format)
   const normalizedTours = useMemo(() => {
@@ -410,11 +424,23 @@ export default function ToursClient({ tours }: ToursClientProps) {
             {/* Animated drawer for mobile */}
             {mobileFiltersOpen && (
               <div className="md:hidden">
-                <div className="fixed inset-0 z-30 bg-charcoal/20 backdrop-blur-sm" />
-                <div className="fixed inset-x-0 bottom-0 z-40 max-h-[80vh] rounded-t-3xl border-t border-charcoal/10 bg-ivory p-5 shadow-soft transition-transform">
+                <div
+                  className="fixed inset-0 z-30 bg-charcoal/20 backdrop-blur-sm"
+                  aria-hidden="true"
+                  onClick={() => setMobileFiltersOpen(false)}
+                />
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="filters-sheet-title"
+                  className="fixed inset-x-0 bottom-0 z-40 max-h-[80vh] rounded-t-3xl border-t border-charcoal/10 bg-ivory p-5 shadow-soft transition-transform"
+                >
                   <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-charcoal/15" />
                   <div className="mb-4 flex items-center justify-between">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-charcoal/70">
+                    <p
+                      id="filters-sheet-title"
+                      className="text-xs font-semibold uppercase tracking-[0.16em] text-charcoal/70"
+                    >
                       Filters &amp; sorting
                     </p>
                     <button
