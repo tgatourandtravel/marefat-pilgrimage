@@ -15,3 +15,6 @@ export const COMPANY_ADDRESS_LINES = [
 export const COMPANY_ADDRESS_USA = `${COMPANY_ADDRESS_STREET}, ${COMPANY_ADDRESS_CITY_LINE}, USA`;
 
 export const COMPANY_ADDRESS_US_LEGAL = `${COMPANY_ADDRESS_STREET}, ${COMPANY_ADDRESS_CITY_LINE}, United States of America`;
+
+/** For HTML email templates (insert inside a block that already allows HTML). */
+export const COMPANY_ADDRESS_HTML = COMPANY_ADDRESS_LINES.join("<br />");

@@ -4,6 +4,7 @@
 import jsPDF from 'jspdf';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { COMPANY_ADDRESS_LINES } from '@/lib/company-address';
 
 export interface BookingData {
   bookingRef: string;
@@ -71,7 +72,7 @@ function buildBookingPDF(data: BookingData): jsPDF {
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 16;
   const contentWidth = pageWidth - margin * 2;
-  const footerHeight = 16;
+  const footerHeight = 28;
   const safeBottom = pageHeight - footerHeight - 10;
   let yPos = margin;
 
@@ -122,10 +123,20 @@ function buildBookingPDF(data: BookingData): jsPDF {
     doc.line(margin, fy - 2, pageWidth - margin, fy - 2);
     setTextColor(COLORS.charcoalLight);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7.4);
-    doc.text('www.marefatpilgrimage.com', margin, fy + 3);
-    doc.text('Phone/WhatsApp: +1 (954) 330-8904', margin + 66, fy + 3);
-    doc.text('Email: info@marefatpilgrimage.com', margin, fy + 7);
+    doc.setFontSize(7.2);
+    let ty = fy + 3;
+    doc.text('www.marefatpilgrimage.com', margin, ty);
+    ty += 4;
+    doc.text('Phone/WhatsApp: +1 (954) 330-8904', margin, ty);
+    ty += 4;
+    doc.text('Email: info@marefatpilgrimage.com', margin, ty);
+    ty += 4;
+    doc.setFontSize(7);
+    for (const line of COMPANY_ADDRESS_LINES) {
+      const wrapped = doc.splitTextToSize(line, contentWidth);
+      doc.text(wrapped, margin, ty);
+      ty += wrapped.length * 3.6;
+    }
   };
 
   const section = (title: string) => {
