@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { SiteChrome } from "@/components/layout/SiteChrome";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import {
+  COMPANY_POSTAL_ADDRESS_JSONLD,
+} from "@/lib/company-address";
 import { getSiteUrl } from "@/lib/site";
 
 const siteUrl = getSiteUrl();
@@ -72,6 +75,17 @@ export const viewport: Viewport = {
   themeColor: "#f7f4ed",
 };
 
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "TravelAgency",
+  name: "Marefat Pilgrimage",
+  legalName: "TGA Tour and Travel LLC",
+  url: siteUrl,
+  telephone: "+19543308904",
+  email: "info@marefatpilgrimage.com",
+  address: COMPANY_POSTAL_ADDRESS_JSONLD,
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -80,6 +94,12 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className="bg-ivory text-charcoal antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema),
+          }}
+        />
         <div className="flex min-h-screen flex-col">
           <SiteChrome>{children}</SiteChrome>
           <SiteFooter />

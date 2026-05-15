@@ -4,7 +4,10 @@
 import jsPDF from 'jspdf';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { COMPANY_ADDRESS_LINES } from '@/lib/company-address';
+import {
+  COMPANY_ADDRESS_LINES,
+  COMPANY_ADDRESS_USA,
+} from '@/lib/company-address';
 
 export interface BookingData {
   bookingRef: string;
@@ -311,6 +314,7 @@ function buildBookingPDF(data: BookingData): jsPDF {
   drawParagraph('Please use your booking reference when making the payment transfer.');
   drawKeyValueRows(
     [
+      ['Registered Address', COMPANY_ADDRESS_USA],
       ['Account Name', 'TGA Tour and Travel LLC'],
       ['Bank', 'JPMorgan Chase Bank, N.A.'],
       ['Routing (Wire)', '021000021'],

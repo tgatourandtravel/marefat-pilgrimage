@@ -8,6 +8,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { getTourBySlug } from "@/data/tours";
 import { validateTravelerFields, validateBookerFields } from "@/lib/utils/validation";
 import { focusFirstInvalidField } from "@/lib/focusFirstInvalidField";
+import { COMPANY_ADDRESS_USA } from "@/lib/company-address";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { FormErrorBanner } from "@/components/ui/FormErrorBanner";
@@ -1452,12 +1453,12 @@ export default function TourBookingPage({ params }: Props) {
 
                   {/* Wire Transfer Details */}
                   {paymentMethod === "wire" && (
-                    <WireTransferDetails copyText={`Account Name: TGA Tour and Travel LLC\nBank: JPMorgan Chase Bank, N.A.\nRouting Number (Wire): 021000021\nAccount Number: 2906503801\nSWIFT/BIC: CHASUS33\nReference: Your Booking Reference`} />
+                    <WireTransferDetails copyText={`Account Name: TGA Tour and Travel LLC\nRegistered address: ${COMPANY_ADDRESS_USA}\nBank: JPMorgan Chase Bank, N.A.\nRouting Number (Wire): 021000021\nAccount Number: 2906503801\nSWIFT/BIC: CHASUS33\nReference: Your Booking Reference`} />
                   )}
 
                   {/* Zelle Details */}
                   {paymentMethod === "zelle" && (
-                    <ZelleDetails copyText={`Zelle Recipient: info@tgatourandtravel.com\nRecipient Name: TGA Tour and Travel LLC\nReference: Your Booking Reference`} />
+                    <ZelleDetails copyText={`Zelle Recipient: info@tgatourandtravel.com\nRecipient Name: TGA Tour and Travel LLC\nRegistered address: ${COMPANY_ADDRESS_USA}\nReference: Your Booking Reference`} />
                   )}
 
                   {/* Online Card Payment Info */}

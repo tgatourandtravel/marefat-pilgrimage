@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPageShell } from "@/components/legal";
+import { COMPANY_ADDRESS_USA } from "@/lib/company-address";
 
 export const metadata: Metadata = {
   title: "Cookie Policy | Marefat Pilgrimage",
@@ -148,6 +149,8 @@ export default function CookiePolicyPage() {
       <p>If you have any questions regarding this Cookie Policy, you may contact:</p>
       <p>
         <strong className="text-charcoal">TGA Tour and Travel LLC</strong>
+        <br />
+        Address: {COMPANY_ADDRESS_USA}
         <br />
         Email:{" "}
         <a

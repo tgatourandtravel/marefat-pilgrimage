@@ -18,3 +18,13 @@ export const COMPANY_ADDRESS_US_LEGAL = `${COMPANY_ADDRESS_STREET}, ${COMPANY_AD
 
 /** For HTML email templates (insert inside a block that already allows HTML). */
 export const COMPANY_ADDRESS_HTML = COMPANY_ADDRESS_LINES.join("<br />");
+
+/** Schema.org PostalAddress — keep in sync with street/city constants above */
+export const COMPANY_POSTAL_ADDRESS_JSONLD = {
+  "@type": "PostalAddress" as const,
+  streetAddress: COMPANY_ADDRESS_STREET,
+  addressLocality: "Fort Lauderdale",
+  addressRegion: "FL",
+  postalCode: "33301",
+  addressCountry: "US",
+};

@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase/client";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import PaymentForm from "@/components/ui/PaymentForm";
+import { COMPANY_ADDRESS_USA } from "@/lib/company-address";
 import { ONLINE_PAYMENT_ENABLED } from "@/lib/config/features";
 import type { PaymentMethod, PaymentStatus } from "@/lib/supabase/types";
 
@@ -240,7 +241,7 @@ function SuccessContent() {
                       Wire Transfer Details
                     </p>
                     <CopyDetailsButton
-                      text={`Account Name: TGA Tour and Travel LLC\nBank: JPMorgan Chase Bank, N.A.\nRouting Number (Wire): 021000021\nAccount Number: 2906503801\nSWIFT/BIC: CHASUS33\nReference: ${bookingRef}`}
+                      text={`Account Name: TGA Tour and Travel LLC\nRegistered address: ${COMPANY_ADDRESS_USA}\nBank: JPMorgan Chase Bank, N.A.\nRouting Number (Wire): 021000021\nAccount Number: 2906503801\nSWIFT/BIC: CHASUS33\nReference: ${bookingRef}`}
                     />
                   </div>
                   <div className="space-y-2 text-sm text-charcoal">
@@ -286,7 +287,7 @@ function SuccessContent() {
                       Zelle Transfer Details
                     </p>
                     <CopyDetailsButton
-                      text={`Zelle Recipient: info@tgatourandtravel.com\nRecipient Name: TGA Tour and Travel LLC\nReference: ${bookingRef}`}
+                      text={`Zelle Recipient: info@tgatourandtravel.com\nRecipient Name: TGA Tour and Travel LLC\nRegistered address: ${COMPANY_ADDRESS_USA}\nReference: ${bookingRef}`}
                     />
                   </div>
                   <div className="space-y-2 text-sm text-charcoal">
