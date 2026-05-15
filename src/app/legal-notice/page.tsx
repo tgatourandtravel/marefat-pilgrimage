@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPageShell } from "@/components/legal";
+import { COMPANY_ADDRESS_US_LEGAL } from "@/lib/company-address";
 
 export const metadata: Metadata = {
   title: "Legal Notice | Marefat Pilgrimage",
@@ -34,7 +35,7 @@ export default function LegalNoticePage() {
         <br />
         Doing Business As: Marefat Pilgrimage
         <br />
-        Address: 404 NW 68th Ave, Plantation, FL 33317, United States of America
+        Address: {COMPANY_ADDRESS_US_LEGAL}
         <br />
         Phone:{" "}
         <a href="tel:+19543308904" className="text-charcoal underline underline-offset-2">
@@ -299,7 +300,7 @@ export default function LegalNoticePage() {
         <br />
         Customer Service Department
         <br />
-        Address: 404 NW 68th Ave, Plantation, FL 33317, United States of America
+        Address: {COMPANY_ADDRESS_US_LEGAL}
         <br />
         Email:{" "}
         <a

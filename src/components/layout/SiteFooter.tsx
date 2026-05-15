@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PaymentBadges } from "@/components/layout/PaymentBadges";
+import { COMPANY_ADDRESS_LINES } from "@/lib/company-address";
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
@@ -15,6 +16,14 @@ export function SiteFooter() {
             <p className="mt-1 max-w-md">
               Licensed religious travel agency specialized in premium
               Umrah, Hajj, and Ziyarat experiences.
+            </p>
+            <p className="mt-3 max-w-md text-charcoal/70">
+              {COMPANY_ADDRESS_LINES.map((line, i) => (
+                <span key={line}>
+                  {i > 0 && <br />}
+                  {line}
+                </span>
+              ))}
             </p>
           </div>
           <div className="flex flex-col items-start gap-2 text-xs sm:items-end">

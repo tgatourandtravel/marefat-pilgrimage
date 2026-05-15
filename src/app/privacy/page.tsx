@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPageShell } from "@/components/legal";
+import { COMPANY_ADDRESS_USA } from "@/lib/company-address";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | Marefat Pilgrimage",
@@ -367,7 +368,7 @@ export default function PrivacyPage() {
         <br />
         Customer Service Department
         <br />
-        Address: 404 NW 68th Ave, Plantation, FL 33317, USA
+        Address: {COMPANY_ADDRESS_USA}
         <br />
         Email:{" "}
         <a

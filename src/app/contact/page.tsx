@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Container, Section, PageHeader } from "@/components/layout";
 import { Card, Button, Input, Select, Textarea } from "@/components/ui";
+import { COMPANY_ADDRESS_LINES } from "@/lib/company-address";
 
 export default function ContactPage() {
   // State for form fields (for PhoneInput controlled component)
@@ -131,11 +132,12 @@ export default function ContactPage() {
                   Office
                 </h2>
                 <p className="mt-3 text-sm">
-                404 NW 68th Ave #511
-                  <br />
-                  Plantation, FL 33317
-                  <br />
-                  United States
+                  {COMPANY_ADDRESS_LINES.map((line, i) => (
+                    <span key={line}>
+                      {i > 0 && <br />}
+                      {line}
+                    </span>
+                  ))}
                 </p>
                 <p className="mt-2 text-xs text-charcoal/60">
                   Meetings are available by appointment only. Video consultation is
