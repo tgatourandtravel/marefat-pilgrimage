@@ -27,3 +27,4 @@ export { TourCard } from "./TourCard";
 export { FormErrorBanner } from "./FormErrorBanner";
 export { RoomSelector, RoomSelectorTrigger, buildRoomOptions, type RoomOption } from "./RoomSelector";
 export { BottomSheet } from "./BottomSheet";
+export { WhatsAppLink } from "./WhatsAppLink";

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { AnalyticsProviders } from "@/components/analytics/AnalyticsProviders";
 import { SiteChrome } from "@/components/layout/SiteChrome";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import {
@@ -100,10 +101,12 @@ export default function RootLayout({
             __html: JSON.stringify(organizationSchema),
           }}
         />
-        <div className="flex min-h-screen flex-col">
-          <SiteChrome>{children}</SiteChrome>
-          <SiteFooter />
-        </div>
+        <AnalyticsProviders>
+          <div className="flex min-h-screen flex-col">
+            <SiteChrome>{children}</SiteChrome>
+            <SiteFooter />
+          </div>
+        </AnalyticsProviders>
       </body>
     </html>
   );

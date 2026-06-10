@@ -1,6 +1,7 @@
 import { getFeaturedTours } from "@/data/tours";
 import { TourCard } from "@/components/ui";
 import { NewsletterQuietForm } from "@/components/home/NewsletterQuietForm";
+import { WhatsAppLink } from "@/components/ui/WhatsAppLink";
 
 // Get featured tours from central data file
 const featuredTours = getFeaturedTours();
@@ -248,12 +249,12 @@ export default function HomePage() {
               >
                 Start online booking
               </a>
-              <a
-                href="https://wa.me/19543308904"
+              <WhatsAppLink
+                trackingCategory="homepage"
                 className="inline-flex w-full items-center justify-center rounded-full border border-charcoal/15 bg-ivory/80 px-6 py-3 text-sm font-medium text-charcoal shadow-sm shadow-charcoal/5 transition hover:border-gold"
               >
                 Message on WhatsApp
-              </a>
+              </WhatsAppLink>
             </div>
           </div>
         </div>

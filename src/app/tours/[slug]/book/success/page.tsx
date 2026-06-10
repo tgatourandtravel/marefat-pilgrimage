@@ -8,6 +8,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import PaymentForm from "@/components/ui/PaymentForm";
 import { COMPANY_ADDRESS_USA } from "@/lib/company-address";
+import { WhatsAppLink } from "@/components/ui/WhatsAppLink";
 import { ONLINE_PAYMENT_ENABLED } from "@/lib/config/features";
 import type { PaymentMethod, PaymentStatus } from "@/lib/supabase/types";
 
@@ -464,12 +465,12 @@ function SuccessContent() {
                 info@marefatpilgrimage.com
               </a>
               {" "}or WhatsApp{" "}
-              <a
-                href="https://wa.me/19543308904"
+              <WhatsAppLink
+                trackingCategory="booking_success"
                 className="font-medium text-gold-dark transition hover:underline"
               >
                 +1 (954) 330-8904
-              </a>
+              </WhatsAppLink>
             </p>
           </div>
 

@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { useStickyBarOffset, useFloatingHidden } from "@/contexts/StickyBarContext";
+import { WHATSAPP_URL, trackMetaContact } from "@/lib/meta-pixel";
 
 // Tailwind's `lg` breakpoint in px
 const LG_BREAKPOINT = 1024;
@@ -12,7 +14,7 @@ export function FloatingWhatsApp() {
   const [isMobile, setIsMobile] = useState(false);
   const stickyOffset = useStickyBarOffset();
   const floatingHidden = useFloatingHidden();
-  const phoneNumber = "19543308904"; // +1 (954) 330-8904
+  const pathname = usePathname();
 
   // Track mobile breakpoint
   useEffect(() => {
@@ -71,9 +73,15 @@ export function FloatingWhatsApp() {
 
       {/* Main button */}
       <a
-        href={`https://wa.me/${phoneNumber}`}
+        href={WHATSAPP_URL}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => {
+          trackMetaContact({
+            content_name: "floating_button",
+            content_category: pathname || "unknown",
+          });
+        }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className="relative flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-[#25D366]/30 transition-all duration-300 hover:scale-110 hover:bg-[#20bd5a] hover:shadow-xl hover:shadow-[#25D366]/40 focus:outline-none focus:ring-2 focus:ring-[#25D366] focus:ring-offset-2"

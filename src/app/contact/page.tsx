@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Container, Section, PageHeader } from "@/components/layout";
 import { Card, Button, Input, Select, Textarea } from "@/components/ui";
+import { WhatsAppLink } from "@/components/ui/WhatsAppLink";
 import { COMPANY_ADDRESS_LINES } from "@/lib/company-address";
 
 export default function ContactPage() {
@@ -113,10 +113,7 @@ export default function ContactPage() {
                     info@marefatpilgrimage.com
                   </span>
                 </p>
-                <Link
-                  href="https://wa.me/19543308904"
-                  className="mt-4 block"
-                >
+                <WhatsAppLink trackingCategory="contact" className="mt-4 block">
                   <Button
                     variant="outline"
                     size="sm"
@@ -124,7 +121,7 @@ export default function ContactPage() {
                   >
                     Open WhatsApp chat
                   </Button>
-                </Link>
+                </WhatsAppLink>
               </Card>
 
               <Card variant="default" padding="md">

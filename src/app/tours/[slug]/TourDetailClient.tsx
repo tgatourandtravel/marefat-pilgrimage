@@ -5,6 +5,7 @@ import { useSetStickyBarOffset } from "@/contexts/StickyBarContext";
 import Link from "next/link";
 import { Tour } from "@/data/tours";
 import { Button, InfoCard, Tabs, TabsList, TabsTrigger, TabsContent, Card, ImageGallery, RoomSelector, RoomSelectorTrigger, buildRoomOptions, type RoomOption } from "@/components/ui";
+import { WhatsAppLink } from "@/components/ui/WhatsAppLink";
 
 // Icons
 const CalendarIcon = () => (
@@ -682,12 +683,12 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                 {/* CTA Buttons */}
                 <div className="space-y-2 border-t border-charcoal/5 pt-4">
                   {isOnRequest ? (
-                    <a
-                      href="https://wa.me/19543308904"
+                    <WhatsAppLink
+                      trackingCategory="tour_detail_sidebar"
                       className="flex w-full items-center justify-center rounded-full bg-charcoal px-6 py-3 text-sm font-medium text-ivory shadow-soft transition hover:bg-charcoal/90"
                     >
                       Request Quote
-                    </a>
+                    </WhatsAppLink>
                   ) : (
                     <Button
                       onClick={handleBookNow}
@@ -697,12 +698,12 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                       Book Now
                     </Button>
                   )}
-                  <a
-                    href="https://wa.me/19543308904"
+                  <WhatsAppLink
+                    trackingCategory="tour_detail_sidebar"
                     className="flex items-center justify-center rounded-full border border-charcoal/15 bg-ivory/80 px-6 py-2.5 text-sm font-medium text-charcoal shadow-sm shadow-charcoal/5 transition hover:border-gold"
                   >
                     WhatsApp our team
-                  </a>
+                  </WhatsAppLink>
                   {!isOnRequest && (
                     <p className="pt-1 text-center text-[11px] text-charcoal/55">
                       Secure your spot with a 30% deposit
@@ -766,12 +767,12 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
 
           <div className="ml-auto shrink-0">
             {isOnRequest ? (
-              <a
-                href="https://wa.me/19543308904"
+              <WhatsAppLink
+                trackingCategory="tour_detail_mobile_cta"
                 className="inline-flex min-h-[44px] items-center rounded-full bg-charcoal px-5 text-sm font-medium text-ivory shadow-soft transition hover:bg-charcoal/90"
               >
                 Request Quote
-              </a>
+              </WhatsAppLink>
             ) : (
               <Button onClick={handleBookNow} size="md">
                 Book Now
