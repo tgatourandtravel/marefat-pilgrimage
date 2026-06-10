@@ -4,15 +4,20 @@ import Script from "next/script";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useCookieConsent } from "@/contexts/CookieConsentContext";
-import { META_PIXEL_ID, trackMetaPageView } from "@/lib/meta-pixel";
+import {
+  META_PIXEL_ID,
+  isMetaPixelExcludedPath,
+  trackMetaPageView,
+} from "@/lib/meta-pixel";
 
 export function MetaPixel() {
   const { marketingAllowed } = useCookieConsent();
   const pathname = usePathname();
   const skipNextPageView = useRef(true);
+  const isExcluded = isMetaPixelExcludedPath(pathname);
 
   useEffect(() => {
-    if (!marketingAllowed) {
+    if (!marketingAllowed || isExcluded) {
       skipNextPageView.current = true;
       return;
     }
@@ -21,9 +26,9 @@ export function MetaPixel() {
       return;
     }
     trackMetaPageView();
-  }, [pathname, marketingAllowed]);
+  }, [pathname, marketingAllowed, isExcluded]);
 
-  if (!marketingAllowed) return null;
+  if (!marketingAllowed || isExcluded) return null;
 
   return (
     <>

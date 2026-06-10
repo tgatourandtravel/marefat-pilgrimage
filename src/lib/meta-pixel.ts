@@ -9,6 +9,14 @@ export const META_PIXEL_ID =
 
 export const WHATSAPP_URL = "https://wa.me/19543308904";
 
+/** Admin routes are excluded from Meta Pixel (no init, no PageView). */
+export function isMetaPixelExcludedPath(
+  pathname: string | null | undefined
+): boolean {
+  if (!pathname) return false;
+  return pathname.startsWith("/admin");
+}
+
 function canTrack(): boolean {
   return typeof window !== "undefined" && typeof window.fbq === "function";
 }
