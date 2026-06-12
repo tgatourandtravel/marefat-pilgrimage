@@ -40,3 +40,30 @@ export function trackMetaContact(source: WhatsAppContactTracking): void {
   if (!canTrack()) return;
   window.fbq!("track", "Contact", source);
 }
+
+/**
+ * Fire Contact on the current page, then run navigation (e.g. open WhatsApp).
+ * Prevents the pixel beacon from being lost when a new tab opens immediately.
+ */
+export function trackMetaContactThenNavigate(
+  source: WhatsAppContactTracking,
+  navigate: () => void
+): void {
+  if (!canTrack()) {
+    navigate();
+    return;
+  }
+
+  let finished = false;
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    navigate();
+  };
+
+  window.fbq!("track", "Contact", source, {
+    eventCallback: finish,
+    eventTimeout: 2000,
+  });
+  window.setTimeout(finish, 2000);
+}

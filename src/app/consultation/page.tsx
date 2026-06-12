@@ -1,36 +1,31 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import Script from "next/script";
 import Link from "next/link";
 import { WhatsAppLink } from "@/components/ui/WhatsAppLink";
 import { trackMetaLead } from "@/lib/meta-pixel";
 
+const CALENDLY_URL =
+  "https://calendly.com/marefatpilgrimage-info/30min?hide_event_type_details=1&hide_gdpr_banner=1&primary_color=1a1a1a";
+
 export default function ConsultationPage() {
+  const leadFiredRef = useRef(false);
+
   useEffect(() => {
-    const onCalendlyMessage = (event: MessageEvent) => {
-      if (event.origin !== "https://calendly.com") return;
-      const data = event.data as { event?: string };
-      if (data?.event === "calendly.event_scheduled") {
+    const onMessage = (e: MessageEvent) => {
+      if (
+        typeof e.data === "object" &&
+        e.data !== null &&
+        (e.data as { event?: string }).event === "calendly.event_scheduled"
+      ) {
+        if (leadFiredRef.current) return;
+        leadFiredRef.current = true;
         trackMetaLead({ content_name: "consultation_booking" });
       }
     };
-    window.addEventListener("message", onCalendlyMessage);
-
-    // Load Calendly widget script
-    const script = document.createElement("script");
-    script.src = "https://assets.calendly.com/assets/external/widget.js";
-    script.async = true;
-    document.body.appendChild(script);
-
-    return () => {
-      window.removeEventListener("message", onCalendlyMessage);
-      const existingScript = document.querySelector(
-        'script[src="https://assets.calendly.com/assets/external/widget.js"]'
-      );
-      if (existingScript) {
-        existingScript.remove();
-      }
-    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
   }, []);
 
   return (
@@ -96,8 +91,12 @@ export default function ConsultationPage() {
         <div className="rounded-2xl border border-charcoal/5 bg-white p-4 shadow-sm">
           <div
             className="calendly-inline-widget"
-            data-url="https://calendly.com/marefatpilgrimage-info/30min?hide_event_type_details=1&hide_gdpr_banner=1&primary_color=1a1a1a"
+            data-url={CALENDLY_URL}
             style={{ minWidth: "320px", height: "700px" }}
+          />
+          <Script
+            src="https://assets.calendly.com/assets/external/widget.js"
+            strategy="afterInteractive"
           />
         </div>
       </section>

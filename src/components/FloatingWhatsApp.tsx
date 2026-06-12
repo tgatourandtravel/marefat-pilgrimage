@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useStickyBarOffset, useFloatingHidden } from "@/contexts/StickyBarContext";
-import { WHATSAPP_URL, trackMetaContact } from "@/lib/meta-pixel";
+import { WHATSAPP_URL, trackMetaContactThenNavigate } from "@/lib/meta-pixel";
 
 // Tailwind's `lg` breakpoint in px
 const LG_BREAKPOINT = 1024;
@@ -76,11 +76,15 @@ export function FloatingWhatsApp() {
         href={WHATSAPP_URL}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={() => {
-          trackMetaContact({
-            content_name: "floating_button",
-            content_category: pathname || "unknown",
-          });
+        onClick={(e) => {
+          e.preventDefault();
+          trackMetaContactThenNavigate(
+            {
+              content_name: "floating_button",
+              content_category: pathname || "unknown",
+            },
+            () => window.open(WHATSAPP_URL, "_blank", "noopener,noreferrer")
+          );
         }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}

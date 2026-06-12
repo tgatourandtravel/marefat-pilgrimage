@@ -3,7 +3,7 @@
 import type { ComponentProps } from "react";
 import {
   WHATSAPP_URL,
-  trackMetaContact,
+  trackMetaContactThenNavigate,
   type WhatsAppContactTracking,
 } from "@/lib/meta-pixel";
 
@@ -29,10 +29,21 @@ export function WhatsAppLink({
       target={target}
       rel={rel}
       onClick={(e) => {
-        trackMetaContact({
-          content_name: trackingVariant,
-          content_category: trackingCategory,
-        });
+        e.preventDefault();
+        const openLink = () => {
+          if (target === "_blank") {
+            window.open(href, "_blank", "noopener,noreferrer");
+          } else {
+            window.location.assign(href);
+          }
+        };
+        trackMetaContactThenNavigate(
+          {
+            content_name: trackingVariant,
+            content_category: trackingCategory,
+          },
+          openLink
+        );
         onClick?.(e);
       }}
       {...props}
