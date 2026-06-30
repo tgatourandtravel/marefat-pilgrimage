@@ -44,13 +44,13 @@ export async function POST(request: NextRequest) {
   try {
     // Rate limiting
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
-const { allowed } = await checkRateLimit(`card-booking:${ip}`);
-if (!allowed) {
-  return NextResponse.json(
-    { error: 'Too many payment attempts. Please try again in one minute.' },
-    { status: 429 }
-  );
-}
+    const { allowed } = await checkRateLimit(`card-booking:${ip}`);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: 'Too many payment attempts. Please try again in one minute.' },
+        { status: 429 }
+      );
+    }
 
     if (!isStripeConfigured || !stripe) {
       return NextResponse.json({ error: 'Online payment is not configured.' }, { status: 503 });

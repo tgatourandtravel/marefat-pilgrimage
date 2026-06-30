@@ -503,13 +503,27 @@ export default function TourBookingPage({ params }: Props) {
         }),
       });
 
-      const data = await response.json();
+      let data: { error?: string; clientSecret?: string; bookingRef?: string } = {};
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error(
+          response.ok
+            ? "Invalid payment response. Please try again."
+            : `Payment service unavailable (${response.status}). Please try again.`
+        );
+      }
       if (!response.ok) throw new Error(data.error || "Failed to initiate payment.");
 
-      setCardClientSecret(data.clientSecret);
-      setCardBookingRef(data.bookingRef);
+      setCardClientSecret(data.clientSecret ?? null);
+      setCardBookingRef(data.bookingRef ?? null);
     } catch (err) {
-      setCardInitError(err instanceof Error ? err.message : "Failed to initiate payment. Please try again.");
+      const message = err instanceof Error ? err.message : "Failed to initiate payment. Please try again.";
+      setCardInitError(
+        message === "Load failed" || message === "Failed to fetch"
+          ? "Network error while starting payment. Please check your connection and try again."
+          : message
+      );
     } finally {
       setIsInitiatingPayment(false);
     }

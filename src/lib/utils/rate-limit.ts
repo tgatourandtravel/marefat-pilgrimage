@@ -26,12 +26,27 @@ const adminLoginRatelimit = redis
 
 export async function checkRateLimit(ip: string): Promise<{ allowed: boolean }> {
   if (!ratelimit) return { allowed: true };
-  const { success } = await ratelimit.limit(ip);
-  return { allowed: success };
+  try {
+    const { success } = await Promise.race([
+      ratelimit.limit(ip),
+      new Promise<{ success: boolean }>((_, reject) => {
+        setTimeout(() => reject(new Error("rate_limit_timeout")), 2500);
+      }),
+    ]);
+    return { allowed: success };
+  } catch (error) {
+    console.error("Rate limit check failed; allowing request:", error);
+    return { allowed: true };
+  }
 }
 
 export async function checkAdminLoginRateLimit(ip: string): Promise<{ allowed: boolean }> {
   if (!adminLoginRatelimit) return { allowed: true };
-  const { success } = await adminLoginRatelimit.limit(`admin_login:${ip}`);
-  return { allowed: success };
+  try {
+    const { success } = await adminLoginRatelimit.limit(`admin_login:${ip}`);
+    return { allowed: success };
+  } catch (error) {
+    console.error("Admin login rate limit check failed; allowing request:", error);
+    return { allowed: true };
+  }
 }
