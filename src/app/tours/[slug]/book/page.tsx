@@ -598,7 +598,7 @@ export default function TourBookingPage({ params }: Props) {
   // Flight assistance is quoted separately — never counted in totals here.
   const grandTotal = baseTotal;
   const depositAmount = Math.floor(grandTotal * 0.3);
-  // 3.6% credit card processing fee — applied only when Stripe funding type is credit
+  // 3.6% card processing fee — applied to all card payments
   const CARD_FEE_RATE = 0.036;
   const depositInCents = Math.round(depositAmount * 100);
   const cardFeeAmountCents = paymentMethod === 'card' ? Math.round(depositInCents * CARD_FEE_RATE) : 0;
@@ -1328,8 +1328,7 @@ export default function TourBookingPage({ params }: Props) {
                           <>
                             <div className="mt-1 flex justify-between text-xs">
                               <span className="text-charcoal/70">
-                                Credit card processing fee (3.6%)
-                                <span className="ml-1 text-[10px] text-charcoal/40">credit cards only</span>
+                                Card processing fee (3.6%)
                               </span>
                               <span className="text-charcoal">+${formatUsd(cardFeeAmount)}</span>
                             </div>
@@ -1444,7 +1443,7 @@ export default function TourBookingPage({ params }: Props) {
                         <div className="flex-1 text-left">
                           <p className="text-sm font-medium text-charcoal">Online Card Payment</p>
                           <p className="text-xs text-charcoal/60">
-                            Card via Stripe — 3.6% fee applies only when issuer classifies the card as credit
+                            Card via Stripe — 3.6% processing fee applies to card payments
                           </p>
                         </div>
                       </button>
@@ -1492,8 +1491,7 @@ export default function TourBookingPage({ params }: Props) {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-charcoal/70">
-                            Credit card processing fee (3.6%)
-                            <span className="ml-1 text-[10px] text-charcoal/50">credit cards only</span>
+                            Card processing fee (3.6%)
                           </span>
                           <span className="text-charcoal">+${formatUsd(cardFeeAmount)}</span>
                         </div>
@@ -1501,9 +1499,6 @@ export default function TourBookingPage({ params }: Props) {
                           <span className="text-charcoal">Total charged today</span>
                           <span className="text-charcoal">${formatUsd(depositWithFee)}</span>
                         </div>
-                        <p className="text-[10px] text-charcoal/50">
-                          Debit, prepaid, and unknown funding types are not charged this fee in net.
-                        </p>
                       </div>
                     </div>
                   )}
@@ -1521,10 +1516,7 @@ export default function TourBookingPage({ params }: Props) {
                       <>
                         <ul className="space-y-1 text-xs leading-relaxed text-charcoal/75">
                           <li>
-                            A <strong className="text-charcoal">3.6% processing fee</strong> applies to credit card payments only.
-                          </li>
-                          <li>
-                            Debit and prepaid card payments do not incur any processing fee.
+                            A <strong className="text-charcoal">3.6% processing fee</strong> applies to card payments.
                           </li>
                           <li>
                             Your final total will be shown clearly before payment confirmation.
@@ -1560,7 +1552,7 @@ export default function TourBookingPage({ params }: Props) {
                   </h3>
                   <div className="mt-3 rounded-lg border border-gold/30 bg-gold/10 px-3 py-2 text-xs text-charcoal/80">
                     Online payment surcharge: <span className="font-semibold text-charcoal">3.6%</span> on
-                    <span className="font-semibold text-charcoal"> credit cards only</span>.
+                    <span className="font-semibold text-charcoal"> card payments</span>.
                   </div>
 
                   {!cardClientSecret ? (
@@ -1735,7 +1727,7 @@ export default function TourBookingPage({ params }: Props) {
                   {paymentMethod === 'card' && cardFeeAmount > 0 && (
                     <>
                       <div className="mt-1.5 flex justify-between text-xs text-charcoal/70">
-                        <span>Credit card fee (3.6%)</span>
+                        <span>Card fee (3.6%)</span>
                         <span>+${formatUsd(cardFeeAmount)}</span>
                       </div>
                       <div className="mt-1.5 flex justify-between border-t border-charcoal/15 pt-1.5 text-sm font-semibold text-charcoal">

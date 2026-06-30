@@ -1,7 +1,6 @@
 import type Stripe from "stripe";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { sendPaymentSuccessAdminEmail, sendBookingConfirmationEmail } from "@/lib/email/resend";
-import { stripe } from "@/lib/stripe/client";
 
 export async function handleStripeWebhookEvent(event: Stripe.Event) {
   if (event.type === "payment_intent.succeeded") {
@@ -39,41 +38,6 @@ export async function handleStripeWebhookEvent(event: Stripe.Event) {
 
     if (error || !booking) {
       throw new Error("Failed to update booking payment state");
-    }
-
-    // Auto-refund processing fee for any non-credit funding type.
-    // This keeps net fee application strictly limited to true credit cards.
-    const feeAmountCents = Number(paymentIntent.metadata?.credit_card_fee_cents ?? 0);
-    if (feeAmountCents > 0 && stripe) {
-      try {
-        const chargeId = typeof paymentIntent.latest_charge === 'string'
-          ? paymentIntent.latest_charge
-          : (paymentIntent.latest_charge as Stripe.Charge | null)?.id;
-
-        if (chargeId) {
-          const charge = await stripe.charges.retrieve(chargeId);
-          const funding = charge.payment_method_details?.card?.funding;
-          const capturedAmount = charge.amount_captured || charge.amount || 0;
-          const refundAmount = Math.min(feeAmountCents, capturedAmount);
-
-          if (funding !== 'credit' && refundAmount > 0) {
-            await stripe.refunds.create({
-              charge: chargeId,
-              amount: refundAmount,
-              reason: 'requested_by_customer',
-              metadata: {
-                booking_ref: bookingRef,
-                reason: `Processing fee refunded — ${funding ?? 'unknown'} funding`,
-              },
-            }, {
-              // Idempotent guard against duplicate webhook delivery or retries.
-              idempotencyKey: `fee-refund-${paymentIntent.id}`,
-            });
-          }
-        }
-      } catch (refundError) {
-        console.error('Surcharge refund error:', refundError);
-      }
     }
 
     // Send admin notification

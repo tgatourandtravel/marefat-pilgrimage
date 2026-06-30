@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     const fundingType = paymentMethod.card?.funding ?? "unknown";
     const depositInCents = Math.max(1, Math.round(booking.deposit_amount * 100));
-    const cardFeeCents = fundingType === "credit" ? Math.round(depositInCents * CARD_FEE_RATE) : 0;
+    const cardFeeCents = Math.round(depositInCents * CARD_FEE_RATE);
     const amountInCents = depositInCents + cardFeeCents;
 
     // Attach the payment method to a customer before reusing it in PaymentIntent.

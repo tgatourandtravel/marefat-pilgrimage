@@ -298,11 +298,10 @@ function buildBookingPDF(data: BookingData): jsPDF {
 
   if (data.paymentMethod === 'card') {
     const fundingType = data.cardFundingType || 'unknown';
-    const isCredit = fundingType === 'credit';
     const cardFeeAmount = data.cardFeeAmount || 0;
     const cardRows: Array<[string, string]> = [
       ['Card Funding Type', fundingType],
-      ['Card Processing Fee (3.6%)', isCredit ? formatCurrency(cardFeeAmount) : formatCurrency(0)],
+      ['Card Processing Fee (3.6%)', formatCurrency(cardFeeAmount)],
     ];
     if (typeof data.amountPaid === 'number' && data.amountPaid > 0) {
       cardRows.push(['Amount Paid', formatCurrency(data.amountPaid)]);

@@ -83,10 +83,9 @@ export async function GET(request: NextRequest) {
         const latestCharge = paymentIntent.latest_charge as { payment_method_details?: { card?: { funding?: string } } } | null;
         const fundingType = latestCharge?.payment_method_details?.card?.funding ?? "unknown";
         const configuredFeeCents = Number(paymentIntent.metadata?.credit_card_fee_cents ?? 0);
-        const appliedFeeCents = fundingType === "credit" ? configuredFeeCents : 0;
 
         pdfData.cardFundingType = fundingType;
-        pdfData.cardFeeAmount = appliedFeeCents / 100;
+        pdfData.cardFeeAmount = configuredFeeCents / 100;
         pdfData.amountPaid = (paymentIntent.amount_received || 0) / 100;
       } catch (stripeError) {
         console.error("Booking PDF Stripe enrichment error:", stripeError);

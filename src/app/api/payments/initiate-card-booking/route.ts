@@ -187,7 +187,7 @@ if (!allowed) {
       return NextResponse.json({ error: 'Failed to save traveler information' }, { status: 500 });
     }
 
-    // ── Create Stripe SetupIntent (card funding checked in finalize step) ──
+    // ── Create Stripe SetupIntent (charge finalized in next step) ──
     const setupIntent = await stripe.setupIntents.create(
       {
         payment_method_types: ['card'],

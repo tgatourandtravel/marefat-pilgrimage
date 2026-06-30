@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import { stripe, isStripeConfigured } from "@/lib/stripe/client";
 
 export const dynamic = "force-dynamic";
+const CARD_FEE_RATE = 0.036;
 const rateLimitWindowMs = 60_000;
 const maxRequestsPerWindow = 10;
 const requestLog = new Map<string, number[]>();
@@ -76,7 +77,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const amountInCents = Math.max(1, Math.round(booking.deposit_amount * 100));
+    const depositInCents = Math.max(1, Math.round(booking.deposit_amount * 100));
+    const cardFeeCents = Math.round(depositInCents * CARD_FEE_RATE);
+    const amountInCents = depositInCents + cardFeeCents;
 
     // Reuse an existing PaymentIntent if one is still actionable — avoids
     // orphaned intents and keeps the Stripe dashboard clean.
@@ -85,10 +88,14 @@ export async function POST(request: NextRequest) {
         const existing = await stripe.paymentIntents.retrieve(booking.stripe_payment_intent_id);
         const reusableStatuses = ["requires_payment_method", "requires_confirmation", "requires_action"];
         if (reusableStatuses.includes(existing.status)) {
+          const existingAmount = (existing.amount ?? 0) / 100;
+          const depositAmount = booking.deposit_amount;
           return NextResponse.json({
             clientSecret: existing.client_secret,
             paymentIntentId: existing.id,
-            amount: booking.deposit_amount,
+            amount: depositAmount,
+            cardFeeAmount: Math.max(existingAmount - depositAmount, 0),
+            amountCharged: existingAmount,
             currency: "USD",
           });
         }
@@ -111,6 +118,8 @@ export async function POST(request: NextRequest) {
           tour_slug: booking.tour_slug,
           tour_title: booking.tour_title,
           contact_email: booking.contact_email,
+          card_fee_rate: String(CARD_FEE_RATE),
+          card_fee_cents: String(cardFeeCents),
         },
       },
       { idempotencyKey }
@@ -129,6 +138,8 @@ export async function POST(request: NextRequest) {
       clientSecret: paymentIntent.client_secret,
       paymentIntentId: paymentIntent.id,
       amount: booking.deposit_amount,
+      cardFeeAmount: cardFeeCents / 100,
+      amountCharged: amountInCents / 100,
       currency: "USD",
     });
   } catch (error) {
