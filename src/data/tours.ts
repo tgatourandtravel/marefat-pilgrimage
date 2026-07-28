@@ -357,8 +357,8 @@ export const TOURS: Tour[] = [
     ],
 
     images: [
-      "/images/tours/spring-break-combo-2026/combo-thumbnail-1.png",
       "/images/tours/spring-break-combo-2026/combo-dec-2026-banner.png",
+      "/images/tours/spring-break-combo-2026/combo-thumbnail-1.png",
     ],
   },
 
@@ -456,8 +456,8 @@ export const TOURS: Tour[] = [
     ],
 
     images: [
-      "/images/tours/karbala-spring-break-2026/Karbala-thumbnail-1.png",
       "/images/tours/karbala-spring-break-2026/iraq-dec-2026-banner.png",
+      "/images/tours/karbala-spring-break-2026/Karbala-thumbnail-1.png",
     ],
   },
 
