@@ -357,6 +357,7 @@ export const TOURS: Tour[] = [
     ],
 
     images: [
+      "/images/tours/spring-break-combo-2026/combo-dec-2026-banner.png",
       "/images/tours/spring-break-combo-2026/combo-thumbnail-1.png",
     ],
   },
