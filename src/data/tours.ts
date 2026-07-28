@@ -456,6 +456,7 @@ export const TOURS: Tour[] = [
     ],
 
     images: [
+      "/images/tours/karbala-spring-break-2026/iraq-dec-2026-banner.png",
       "/images/tours/karbala-spring-break-2026/Karbala-thumbnail-1.png",
     ],
   },
