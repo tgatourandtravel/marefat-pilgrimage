@@ -142,28 +142,28 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                   </p>
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     <Link
-                      href="/tours/umrah-2026-thanksgiving"
+                      href="/tours/karbala-spring-break-2026"
                       className="group flex items-center gap-3 rounded-xl border border-charcoal/10 bg-ivory p-4 transition hover:border-gold/40 hover:bg-gold/5"
                     >
-                      <div className="flex-shrink-0 text-2xl">🕋</div>
+                      <div className="flex-shrink-0 text-2xl">🕌</div>
                       <div className="flex-1">
-                        <p className="text-xs font-medium uppercase tracking-wider text-charcoal/60">Included Tour 1</p>
-                        <p className="mt-0.5 text-sm font-semibold text-charcoal group-hover:text-gold">Umrah 2026 - Thanksgiving</p>
-                        <p className="mt-0.5 text-xs text-charcoal/60">March 29 - April 5 (7 days)</p>
+                        <p className="text-xs font-medium uppercase tracking-wider text-charcoal/60">Leg 1 — Iraq</p>
+                        <p className="mt-0.5 text-sm font-semibold text-charcoal group-hover:text-gold">Iraq — Karbala December 2026</p>
+                        <p className="mt-0.5 text-xs text-charcoal/60">Dec 20 – Dec 27 (7 days)</p>
                       </div>
                       <svg className="h-4 w-4 flex-shrink-0 text-charcoal/30 transition group-hover:text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </Link>
                     <Link
-                      href="/tours/karbala-spring-break-2026"
+                      href="/tours/umrah-2026-thanksgiving"
                       className="group flex items-center gap-3 rounded-xl border border-charcoal/10 bg-ivory p-4 transition hover:border-gold/40 hover:bg-gold/5"
                     >
-                      <div className="flex-shrink-0 text-2xl">🕌</div>
+                      <div className="flex-shrink-0 text-2xl">🕋</div>
                       <div className="flex-1">
-                        <p className="text-xs font-medium uppercase tracking-wider text-charcoal/60">Included Tour 2</p>
-                        <p className="mt-0.5 text-sm font-semibold text-charcoal group-hover:text-gold">Karbala 2026 - Spring Break</p>
-                        <p className="mt-0.5 text-xs text-charcoal/60">April 5 - April 12 (7 days)</p>
+                        <p className="text-xs font-medium uppercase tracking-wider text-charcoal/60">Leg 2 — Umrah</p>
+                        <p className="mt-0.5 text-sm font-semibold text-charcoal group-hover:text-gold">Umrah December 2026</p>
+                        <p className="mt-0.5 text-xs text-charcoal/60">Dec 27 – Jan 3 (7 days)</p>
                       </div>
                       <svg className="h-4 w-4 flex-shrink-0 text-charcoal/30 transition group-hover:text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -379,6 +379,36 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                       </Card>
                     )}
                   </div>
+
+                  {/* Itinerary */}
+                  {tour.itinerary && tour.itinerary.length > 0 && (
+                    <div>
+                      <h2 className="text-lg font-semibold text-charcoal">
+                        Day-by-Day Itinerary
+                      </h2>
+                      <ol className="mt-4 space-y-3">
+                        {tour.itinerary.map((day, index) => {
+                          const colonIdx = day.indexOf(":");
+                          const label = colonIdx !== -1 ? day.slice(0, colonIdx) : `Day ${index + 1}`;
+                          const detail = colonIdx !== -1 ? day.slice(colonIdx + 1).trim() : day;
+                          return (
+                            <li
+                              key={index}
+                              className="flex items-start gap-3 rounded-xl border border-charcoal/5 bg-ivory/90 px-4 py-3"
+                            >
+                              <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gold/15 text-[11px] font-bold text-gold-dark">
+                                {index + 1}
+                              </span>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-xs font-semibold text-charcoal/60">{label}</p>
+                                <p className="mt-0.5 text-sm leading-relaxed text-charcoal/80">{detail}</p>
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </ol>
+                    </div>
+                  )}
                 </TabsContent>
 
                 {/* Tab Content: What's Included */}
