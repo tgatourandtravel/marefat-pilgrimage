@@ -256,89 +256,87 @@ export const TOURS: Tour[] = [
   },
 
   // ----------------------------------------
-  // TOUR 2: Spring Break Combo - Umrah + Karbala 2026 (Premium)
+  // TOUR 2: Umrah & Iraq December 2026 — Combo (Premium)
   // ----------------------------------------
   {
     slug: "spring-break-combo-umrah-karbala-2026",
-    title: "Spring Break Combo: Umrah + Karbala 2026",
+    title: "Umrah & Iraq December 2026",
     subtitle: "Two Sacred Journeys, One Unforgettable Experience",
     destination: "Makkah, Madinah, Karbala & Najaf",
     region: "Multi",
     type: "Combo",
     packageLevel: "Premium",
 
-    startDate: "2026-03-29",
-    endDate: "2026-04-12",
+    startDate: "2026-12-20",
+    endDate: "2027-01-03",
     durationDays: 14,
 
-    priceFrom: 2000, // $2,000 USD (early bird)
+    priceFrom: 2699, // $2,699 USD
 
     hotelStars: 5,
     flightIncluded: false,
     meals: "Breakfast & Dinner",
     transfer: true,
     spiritualGuide: true,
-    spiritualGuideName: "Sayed Jafar Qazwini & Sayed Sadiq Qazwini",
+    spiritualGuideName: "Sheikh Mustafa Akhound & Sayed M. Sadiq Qazwini",
 
     popularityScore: 98,
     isFeatured: true,
-    isArchived: true,
-
-    earlyBirdDiscount: {
-      discountedPrice: 2000, // $2,000 USD early bird
-      originalPrice: 2699, // $2,699 USD regular price
-      deadline: "2026-02-10",
-    },
+    isArchived: false,
 
     specialNotes: {
-      deadline: "2026-02-10",
       limitedSeats: true,
-      customNote: "Combination of both tours with special discount. Umrah guided by Sayed Jafar Qazwini, Karbala guided by Sayed M. Sadiq Qazwini",
+      customNote: "Combination of Iraq & Umrah. Under the guidance of Sheikh Mustafa Akhound & Sayed M. Sadiq Qazwini",
     },
 
     description:
-      "Two sacred journeys. One unforgettable experience. A unique opportunity to visit the holy sites of Makkah, Madinah, and Karbala — in one complete journey. This combined package offers the best of both spiritual destinations with premium accommodations and religious guidance throughout.",
+      "Two sacred journeys. One unforgettable experience. A unique opportunity to visit the holy shrines of Karbala and Najaf in Iraq, followed by the holy sites of Makkah and Madinah — all in one complete December journey. This combined package offers the best of both spiritual destinations with premium accommodations and religious guidance throughout.",
 
     highlights: [
-      "Complete Umrah in Makkah & Madinah (Mar 29 - Apr 5)",
-      "Karbala & Najaf Ziyarat (Apr 5 - Apr 12)",
-      "Religious guidance: Sayed Jafar Qazwini (Umrah) & Sayed M. Sadiq Qazwini (Karbala)",
-      "5★ hotels in all destinations",
-      "Premium meals & VIP transfers throughout",
-      "Special discount with combined package",
+      "Iraq ziyarat: Karbala & Najaf (Dec 20–27)",
+      "Umrah in Makkah & Madinah (Dec 27–Jan 3)",
+      "Religious guidance by Sheikh Mustafa Akhound & Sayed M. Sadiq Qazwini",
+      "5★ hotels in all four destinations",
+      "All meals, VIP transfers and visas included",
+      "Ground package — no flight included",
     ],
 
     itinerary: [
-      "Day 1-2: Arrival in Jeddah, Umrah in Makkah (Address Jabal Omar)",
-      "Day 3-4: Ziyarat around Makkah, spiritual sessions",
-      "Day 5-7: Transfer to Madinah (Mövenpick Anwar al Maddinah), ziyarat at Prophet's Mosque",
-      "Day 8: Flight to Najaf, Iraq, transfer to 5★ hotel (Qasr Al Dur)",
-      "Day 9: Full day ziyarat at Imam Ali (AS) shrine and Masjid Kufa",
-      "Day 10: Transfer to Karbala, check-in to Royal Karbala Hotel",
-      "Day 11-13: Full days at Imam Hussein (AS) and Hazrat Abbas (AS) shrines",
-      "Day 14: Final ziyarat, farewell gathering, departure with full support",
+      "Day 1 (Dec 20): Arrival in Najaf, VIP transfer to 5★ Qasur al Dur Hotel",
+      "Day 2 (Dec 21): Ziyarat at Imam Ali (AS) shrine, spiritual guidance session",
+      "Day 3 (Dec 22): Full day — Masjid Kufa, Wadi al-Salam, historical sites of Najaf",
+      "Day 4 (Dec 23): Transfer to Karbala, check-in to 5★ Royal Karbala Hotel",
+      "Day 5 (Dec 24): Full day at Imam Hussein (AS) and Hazrat Abbas (AS) shrines",
+      "Day 6 (Dec 25): Historical sites of Karbala and personal prayers",
+      "Day 7 (Dec 26): Final ziyarat in Karbala, preparation for departure to Saudi Arabia",
+      "Day 8 (Dec 27): Travel to Saudi Arabia, arrival in Jeddah, transfer to Makkah",
+      "Day 9 (Dec 28): Umrah rites with scholar guidance and spiritual preparation",
+      "Day 10 (Dec 29): Ziyarat around Makkah, spiritual sessions",
+      "Day 11 (Dec 30): Transfer to Madinah by train, check-in to Dar al Iman Intercontinental",
+      "Day 12 (Dec 31): Guided ziyarat in Madinah — Quba Mosque, Uhud, historical sites",
+      "Day 13 (Jan 1): Spiritual program and free worship time at Prophet's Mosque",
+      "Day 14 (Jan 2): Continued ziyarat and personal worship",
+      "Day 15 (Jan 3): Departure with full assistance",
     ],
 
     hotelInfo:
-      "",
-      /*"5★ hotels in all destinations. Umrah: Mövenpick (Anwar al Maddinah) & Address Jabal Omar. Karbala: Royal Karbala. Najaf: Qasr Al Dur. All hotels steps from the holy sites.",*/
+      "Makkah's Hotel: Address Jabal Omar or Similar\nMadinah's Hotel: Dar al Iman Intercontinental\nNajaf's Hotel: Qasur al Dur\nKarbala's Hotel: Royal Karbala",
 
     flightsInfo:
-      "All flights included: US to Saudi Arabia, Saudi to Iraq, Iraq to US. Seamless connections managed by Marefat Pilgrimage.",
+      "Ground package only — international flights not included.",
 
     included: [
-      "5★ hotel accommodations in all destinations",
-      "Breakfast and dinner daily",
+      "5★ hotel accommodations in all four destinations",
+      "All meals throughout the journey",
       "All VIP ground transportation",
       "Visa processing (Saudi & Iraq)",
-      "Guided Umrah with Sayed Jafar Qazwini",
-      "Guided Karbala ziyarat with Sayed M. Sadiq Qazwini",
+      "Guided Umrah with Sheikh Mustafa Akhound & Sayed M. Sadiq Qazwini",
+      "Guided Iraq ziyarat with Sayed M. Sadiq Qazwini",
       "24/7 support throughout journey",
     ],
 
     excluded: [
       "International flights",
-      "Lunch meals",
       "Personal expenses",
       "Travel insurance (recommended)",
       "Optional activities and upgrades",
@@ -352,14 +350,9 @@ export const TOURS: Tour[] = [
 
     packages: [
       {
-        name: "Combo Early Booking",
-        price: "$2,000",
-        description: "Book by Feb 10 - Both tours combined with special discount.",
-      },
-      {
-        name: "Combo Standard",
+        name: "Combo Package",
         price: "$2,699",
-        description: "Complete package: Umrah + Karbala with all amenities.",
+        description: "Complete Iraq + Umrah ground package with 5★ hotels, all meals, visas and transportation.",
       },
     ],
 
@@ -369,81 +362,74 @@ export const TOURS: Tour[] = [
   },
 
   // ----------------------------------------
-  // TOUR 3: Karbala Spring Break 2026 (Premium)
+  // TOUR 3: Iraq — Karbala December 2026 (Premium)
   // ----------------------------------------
   {
     slug: "karbala-spring-break-2026",
-    title: "Karbala 2026 - Spring Break",
+    title: "Iraq — Karbala December 2026",
     subtitle: "A Journey of the Heart",
     destination: "Karbala & Najaf",
     region: "Iraq",
     type: "Ziyarat",
     packageLevel: "Premium",
 
-    startDate: "2026-04-05",
-    endDate: "2026-04-12",
+    startDate: "2026-12-20",
+    endDate: "2026-12-27",
     durationDays: 7,
 
-    priceFrom: 1099, // $1,099 USD
+    priceFrom: 1199, // $1,199 USD
 
     hotelStars: 5,
     flightIncluded: false,
     meals: "Full Board",
     transfer: true,
     spiritualGuide: true,
-    spiritualGuideName: "Sayed Sadiq Qazwini",
+    spiritualGuideName: "Sayed M. Sadiq Qazwini",
 
     popularityScore: 90,
     isFeatured: true,
-    isArchived: true,
-
-    earlyBirdDiscount: {
-      discountedPrice: 999, // $999 USD early bird
-      originalPrice: 1099, // $1,099 USD regular price
-      deadline: "2026-02-10",
-    },
+    isArchived: false,
 
     specialNotes: {
-      deadline: "2026-02-10",
       limitedSeats: true,
       customNote: "Under the religious guidance of Sayed M. Sadiq Qazwini",
     },
 
     description:
-      "Karbala is not just a destination. It is a journey of the heart. This Spring Break 2026, answer the call of Karbala with a pilgrimage designed for peace, comfort, and deep spiritual focus. Every step is taken with intention, reflection, and tranquility.",
+      "Karbala is not just a destination. It is a journey of the heart. This December 2026, answer the call of Karbala with a pilgrimage designed for peace, comfort, and deep spiritual focus. Every step is taken with intention, reflection, and tranquility.",
 
     highlights: [
-      "Religious guidance by Sayed Hossein Al Qazwini",
+      "Religious guidance by Sayed M. Sadiq Qazwini",
       "5★ hotels steps from the holy shrines",
       "Visit to Imam Hussein (AS) and Hazrat Abbas (AS) shrines",
       "Visit to Imam Ali (AS) shrine in Najaf",
       "Premium full-board meals (breakfast, lunch & dinner)",
-      "Seamless VIP transportation throughout the journey",
+      "Seamless VIP transportation throughout Iraq",
     ],
 
     itinerary: [
-      "Day 1: Arrival in Najaf International Airport, VIP transfer to 5★ hotel (Qasr Al Dur)",
-      "Day 2: Morning ziyarat at Imam Ali (AS) shrine, spiritual guidance session",
-      "Day 3: Full day ziyarat - Masjid Kufa, Wadi al-Salam, historical sites",
-      "Day 4: Transfer to Karbala, check-in to 5★ Royal Karbala Hotel near shrines",
-      "Day 5: Full day at Imam Hussein (AS) and Hazrat Abbas (AS) shrines",
-      "Day 6: Historical sites of Karbala and personal prayers with reflection",
-      "Day 7: Final ziyarat, farewell gathering, departure with full assistance",
+      "Day 1 (Dec 20): Arrival in Najaf International Airport, VIP transfer to 5★ Qasur al Dur Hotel",
+      "Day 2 (Dec 21): Morning ziyarat at Imam Ali (AS) shrine, spiritual guidance session",
+      "Day 3 (Dec 22): Full day ziyarat — Masjid Kufa, Wadi al-Salam, historical sites",
+      "Day 4 (Dec 23): Transfer to Karbala, check-in to 5★ Royal Karbala Hotel near shrines",
+      "Day 5 (Dec 24): Full day at Imam Hussein (AS) and Hazrat Abbas (AS) shrines",
+      "Day 6 (Dec 25): Historical sites of Karbala and personal prayers with reflection",
+      "Day 7 (Dec 26): Final ziyarat, farewell gathering",
+      "Day 8 (Dec 27): Departure with full assistance",
     ],
 
     hotelInfo:
-      "Karbala & Najaf",
-      /*"5★ hotels just steps from the holy sites. Karbala: Royal Karbala. Najaf: Qasr Al Dur. Walk with ease to the shrines, day or night. Rest peacefully between prayers in luxury that elevates your spiritual journey.",*/
+      "Najaf's Hotel: Qasur al Dur\nKarbala's Hotel: Royal Karbala",
 
     flightsInfo:
-      "Round-trip flights from major US cities included in the package.",
+      "Ground package only — international flights not included.",
 
     included: [
       "5★ hotel accommodation near shrines",
-      "Full board - breakfast, lunch & dinner daily",
-      "All ground VIP transportation",
-      "Guided ziyarat program with scholar",
+      "Full board — breakfast, lunch & dinner daily",
+      "All ground VIP transportation within Iraq",
       "Iraqi visa assistance",
+      "Guided ziyarat program with Sayed M. Sadiq Qazwini",
       "24/7 support throughout journey",
     ],
 
@@ -462,14 +448,9 @@ export const TOURS: Tour[] = [
 
     packages: [
       {
-        name: "Early Booking",
-        price: "$999",
-        description: "Book by Feb 10 - Ground package with all essentials.",
-      },
-      {
         name: "Standard",
-        price: "$1,099",
-        description: "5★ hotels, VIP transfers, guided ziyarat, full board.",
+        price: "$1,199",
+        description: "5★ hotels, VIP transfers, guided ziyarat, full board. No flight included.",
       },
     ],
 
@@ -479,84 +460,72 @@ export const TOURS: Tour[] = [
   },
 
   // ----------------------------------------
-  // TOUR 4: Thanksgiving Umrah 2026 (Premium)
+  // TOUR 4: Umrah December 2026 (Premium)
   // ----------------------------------------
   {
     slug: "umrah-2026-thanksgiving",
-    title: "Umrah 2026 - Thanksgiving",
+    title: "Umrah December 2026",
     subtitle: "A Carefully Designed Spiritual Journey",
     destination: "Makkah & Madinah",
     region: "Makkah/Madinah",
     type: "Umrah",
     packageLevel: "Premium",
 
-    startDate: "2026-11-25",
-    endDate: "2026-12-01",
+    startDate: "2026-12-27",
+    endDate: "2027-01-03",
     durationDays: 7,
 
-    priceFrom: 1399, // $1,399 USD — Quad Occupancy (base price)
-
-    roomPricing: {
-      quad: 1399,
-      triple: 1599,
-      double: 1899,
-      single: 2999,
-    },
+    priceFrom: 1599, // $1,599 USD — Ground Package
 
     hotelStars: 5,
     flightIncluded: false,
-    meals: "Dinner",
+    meals: "Breakfast & Dinner",
     transfer: true,
     spiritualGuide: true,
-    spiritualGuideName: "Sayed Hossein Al Qazwini",
+    spiritualGuideName: "Sheikh Mustafa Akhound & Sayed M. Sadiq Qazwini",
 
     popularityScore: 95,
     isFeatured: true,
 
-    earlyBirdDiscount: {
-      discountedPrice: 1099, // $1,099 USD early bird
-      originalPrice: 1599, // $1,599 USD regular price
-      deadline: "2026-02-10",
-    },
-
     specialNotes: {
-      deadline: "2026-02-10",
       limitedSeats: true,
-      customNote: "Under the religious guidance of Sayed Hossein Al Qazwini",
+      customNote: "Under the guidance of Sheikh Mustafa Akhound & Sayed M. Sadiq Qazwini",
     },
 
     description:
-      "This is not just a trip. It's a carefully designed spiritual journey — where comfort supports devotion, and every detail brings peace of mind. Experience the holiest sites with premium accommodations and religious guidance. Pricing is based on Quad Occupancy; Triple, Double, and Single room upgrades are available.",
+      "This is not just a trip. It's a carefully designed spiritual journey — where comfort supports devotion, and every detail brings peace of mind. Experience the holiest sites in Makkah and Madinah with premium accommodations and religious guidance throughout.",
 
     highlights: [
-      "Religious guidance by Sayed Hossein Al Qazwini",
+      "Religious guidance by Sheikh Mustafa Akhound & Sayed M. Sadiq Qazwini",
       "5★ renowned hotels near the holy sites",
-      "Premium full-course meals crafted fresh daily",
-      "Seamless VIP city transfers in premium private vehicles",
-      "Ground package with accommodation, Dinner, visa and transportation",
+      "Breakfast & dinner daily",
+      "Transportation within Saudi Arabia by train",
+      "Ground package with accommodation, visa and transportation",
     ],
 
     itinerary: [
-      "Day 1: Arrival in Jeddah, VIP transfer to Makkah 5★ hotel",
-      "Day 2-3: Umrah rites with scholar guidance and spiritual preparation",
-      "Day 4: Transfer to Madinah, check-in to 5★ hotel near Prophet's Mosque (Mövenpick)",
-      "Day 5: Guided ziyarat in Madinah - Quba Mosque, Uhud, historical sites",
-      "Day 6: Spiritual program and free worship time in Madinah",
-      "Day 7: Departure with full assistance",
+      "Day 1 (Dec 27): Arrival in Jeddah, VIP transfer to Makkah 5★ hotel (Address Jabal Omar or Similar)",
+      "Day 2 (Dec 28): Umrah rites with scholar guidance and spiritual preparation",
+      "Day 3 (Dec 29): Ziyarat around Makkah, spiritual sessions",
+      "Day 4 (Dec 30): Transfer to Madinah by train, check-in to Dar al Iman Intercontinental",
+      "Day 5 (Dec 31): Guided ziyarat in Madinah — Quba Mosque, Uhud, historical sites",
+      "Day 6 (Jan 1): Spiritual program and free worship time at Prophet's Mosque",
+      "Day 7 (Jan 2): Continued ziyarat and personal worship",
+      "Day 8 (Jan 3): Departure with full assistance",
     ],
 
     hotelInfo:
-      "Makkah's Hotel: Address Jabal Omar\nMadinah's Hotel: Anwar Al Madina Mövenpick",
+      "Makkah's Hotel: Address Jabal Omar or Similar\nMadinah's Hotel: Dar al Iman Intercontinental",
 
     flightsInfo:
-      "Round-trip economy flights from major US cities included. Business class upgrades available upon request.",
+      "Ground package only — international flights not included.",
 
     included: [
       "5★ accommodation near holy sites",
       "Breakfast and dinner daily",
       "Umrah visa processing",
-      "Premium Transfers",
-      "Guided Umrah with religious scholar",
+      "Transportation within Saudi Arabia by train",
+      "Guided Umrah with Sheikh Mustafa Akhound & Sayed M. Sadiq Qazwini",
       "24/7 support throughout journey",
     ],
 
@@ -576,14 +545,9 @@ export const TOURS: Tour[] = [
 
     packages: [
       {
-        name: "Early Booking",
-        price: "$1,099",
-        description: "Book by Feb 10, 2026 - Ground package with all essentials.",
-      },
-      {
         name: "Standard",
         price: "$1,599",
-        description: "5★ hotels, VIP transfers, guided Umrah, all-inclusive.",
+        description: "5★ hotels, train transfers, guided Umrah, breakfast & dinner. No flight included.",
       },
     ],
 
