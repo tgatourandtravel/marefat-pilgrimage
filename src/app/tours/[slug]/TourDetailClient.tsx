@@ -380,35 +380,6 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                     )}
                   </div>
 
-                  {/* Itinerary */}
-                  {tour.itinerary && tour.itinerary.length > 0 && (
-                    <div>
-                      <h2 className="text-lg font-semibold text-charcoal">
-                        Day-by-Day Itinerary
-                      </h2>
-                      <ol className="mt-4 space-y-3">
-                        {tour.itinerary.map((day, index) => {
-                          const colonIdx = day.indexOf(":");
-                          const label = colonIdx !== -1 ? day.slice(0, colonIdx) : `Day ${index + 1}`;
-                          const detail = colonIdx !== -1 ? day.slice(colonIdx + 1).trim() : day;
-                          return (
-                            <li
-                              key={index}
-                              className="flex items-start gap-3 rounded-xl border border-charcoal/5 bg-ivory/90 px-4 py-3"
-                            >
-                              <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gold/15 text-[11px] font-bold text-gold-dark">
-                                {index + 1}
-                              </span>
-                              <div className="min-w-0 flex-1">
-                                <p className="text-xs font-semibold text-charcoal/60">{label}</p>
-                                <p className="mt-0.5 text-sm leading-relaxed text-charcoal/80">{detail}</p>
-                              </div>
-                            </li>
-                          );
-                        })}
-                      </ol>
-                    </div>
-                  )}
                 </TabsContent>
 
                 {/* Tab Content: What's Included */}
