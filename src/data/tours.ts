@@ -357,8 +357,8 @@ export const TOURS: Tour[] = [
     ],
 
     images: [
-      "/images/tours/spring-break-combo-2026/combo-dec-2026-banner.png",
       "/images/tours/spring-break-combo-2026/combo-thumbnail-1.png",
+      "/images/tours/spring-break-combo-2026/combo-dec-2026-banner.png",
     ],
   },
 
@@ -456,8 +456,8 @@ export const TOURS: Tour[] = [
     ],
 
     images: [
-      "/images/tours/karbala-spring-break-2026/iraq-dec-2026-banner.png",
       "/images/tours/karbala-spring-break-2026/Karbala-thumbnail-1.png",
+      "/images/tours/karbala-spring-break-2026/iraq-dec-2026-banner.png",
     ],
   },
 
@@ -554,8 +554,8 @@ export const TOURS: Tour[] = [
     ],
 
     images: [
-      "/images/tours/spring-break-umrah-2026/umrah-dec-2026-banner.png",
       "/images/tours/spring-break-umrah-2026/umrah-thumbnail-1.png",
+      "/images/tours/spring-break-umrah-2026/umrah-dec-2026-banner.png",
       "/images/tours/spring-break-umrah-2026/umrah-thumbnail-2.jpg",
       "/images/tours/spring-break-umrah-2026/umrah-thumbnail-3.jpg",
     ],
