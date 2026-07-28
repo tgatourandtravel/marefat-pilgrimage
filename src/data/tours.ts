@@ -357,8 +357,8 @@ export const TOURS: Tour[] = [
     ],
 
     images: [
-      "/images/tours/spring-break-combo-2026/combo-dec-2026-banner.png",
       "/images/tours/spring-break-combo-2026/combo-thumbnail-1.png",
+      "/images/tours/spring-break-combo-2026/combo-dec-2026-banner.png",
     ],
   },
 
@@ -456,16 +456,132 @@ export const TOURS: Tour[] = [
     ],
 
     images: [
-      "/images/tours/karbala-spring-break-2026/iraq-dec-2026-banner.png",
       "/images/tours/karbala-spring-break-2026/Karbala-thumbnail-1.png",
+      "/images/tours/karbala-spring-break-2026/iraq-dec-2026-banner.png",
     ],
   },
 
   // ----------------------------------------
-  // TOUR 4: Umrah December 2026 (Premium)
+  // TOUR 4: Umrah 2026 - Thanksgiving (Premium) — ORIGINAL
   // ----------------------------------------
   {
     slug: "umrah-2026-thanksgiving",
+    title: "Umrah 2026 - Thanksgiving",
+    subtitle: "A Carefully Designed Spiritual Journey",
+    destination: "Makkah & Madinah",
+    region: "Makkah/Madinah",
+    type: "Umrah",
+    packageLevel: "Premium",
+
+    startDate: "2026-11-25",
+    endDate: "2026-12-01",
+    durationDays: 7,
+
+    priceFrom: 1399, // $1,399 USD — Quad Occupancy (base price)
+
+    roomPricing: {
+      quad: 1399,
+      triple: 1599,
+      double: 1899,
+      single: 2999,
+    },
+
+    hotelStars: 5,
+    flightIncluded: false,
+    meals: "Dinner",
+    transfer: true,
+    spiritualGuide: true,
+    spiritualGuideName: "Sayed Hossein Al Qazwini",
+
+    popularityScore: 95,
+    isFeatured: true,
+
+    earlyBirdDiscount: {
+      discountedPrice: 1099,
+      originalPrice: 1599,
+      deadline: "2026-02-10",
+    },
+
+    specialNotes: {
+      deadline: "2026-02-10",
+      limitedSeats: true,
+      customNote: "Under the religious guidance of Sayed Hossein Al Qazwini",
+    },
+
+    description:
+      "This is not just a trip. It's a carefully designed spiritual journey — where comfort supports devotion, and every detail brings peace of mind. Experience the holiest sites with premium accommodations and religious guidance. Pricing is based on Quad Occupancy; Triple, Double, and Single room upgrades are available.",
+
+    highlights: [
+      "Religious guidance by Sayed Hossein Al Qazwini",
+      "5★ renowned hotels near the holy sites",
+      "Premium full-course meals crafted fresh daily",
+      "Seamless VIP city transfers in premium private vehicles",
+      "Ground package with accommodation, Dinner, visa and transportation",
+    ],
+
+    itinerary: [
+      "Day 1: Arrival in Jeddah, VIP transfer to Makkah 5★ hotel",
+      "Day 2-3: Umrah rites with scholar guidance and spiritual preparation",
+      "Day 4: Transfer to Madinah, check-in to 5★ hotel near Prophet's Mosque (Mövenpick)",
+      "Day 5: Guided ziyarat in Madinah - Quba Mosque, Uhud, historical sites",
+      "Day 6: Spiritual program and free worship time in Madinah",
+      "Day 7: Departure with full assistance",
+    ],
+
+    hotelInfo:
+      "Makkah's Hotel: Address Jabal Omar\nMadinah's Hotel: Anwar Al Madina Mövenpick",
+
+    flightsInfo:
+      "Round-trip economy flights from major US cities included. Business class upgrades available upon request.",
+
+    included: [
+      "5★ accommodation near holy sites",
+      "Breakfast and dinner daily",
+      "Umrah visa processing",
+      "Premium Transfers",
+      "Guided Umrah with religious scholar",
+      "24/7 support throughout journey",
+    ],
+
+    excluded: [
+      "International flights",
+      "Lunch meals",
+      "Personal expenses",
+      "Travel insurance (recommended)",
+      "Optional site visits and upgrades",
+    ],
+
+    documentsNeeded: [
+      "Valid passport (6+ months)",
+      "Passport photos (2x2 inches)",
+      "Residence permit",
+    ],
+
+    packages: [
+      {
+        name: "Early Booking",
+        price: "$1,099",
+        description: "Book by Feb 10, 2026 - Ground package with all essentials.",
+      },
+      {
+        name: "Standard",
+        price: "$1,599",
+        description: "5★ hotels, VIP transfers, guided Umrah, all-inclusive.",
+      },
+    ],
+
+    images: [
+      "/images/tours/spring-break-umrah-2026/umrah-thumbnail-1.png",
+      "/images/tours/spring-break-umrah-2026/umrah-thumbnail-2.jpg",
+      "/images/tours/spring-break-umrah-2026/umrah-thumbnail-3.jpg",
+    ],
+  },
+
+  // ----------------------------------------
+  // TOUR 5: Umrah December 2026 (Premium)
+  // ----------------------------------------
+  {
+    slug: "umrah-december-2026",
     title: "Umrah December 2026",
     subtitle: "A Carefully Designed Spiritual Journey",
     destination: "Makkah & Madinah",
@@ -486,8 +602,9 @@ export const TOURS: Tour[] = [
     spiritualGuide: true,
     spiritualGuideName: "Sheikh Mustafa Akhound & Sayed M. Sadiq Qazwini",
 
-    popularityScore: 95,
+    popularityScore: 94,
     isFeatured: true,
+    isArchived: false,
 
     specialNotes: {
       limitedSeats: true,
@@ -555,9 +672,6 @@ export const TOURS: Tour[] = [
 
     images: [
       "/images/tours/spring-break-umrah-2026/umrah-dec-2026-banner.png",
-      "/images/tours/spring-break-umrah-2026/umrah-thumbnail-1.png",
-      "/images/tours/spring-break-umrah-2026/umrah-thumbnail-2.jpg",
-      "/images/tours/spring-break-umrah-2026/umrah-thumbnail-3.jpg",
     ],
   },
   // ----------------------------------------

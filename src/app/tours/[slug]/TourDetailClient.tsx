@@ -156,7 +156,7 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                       </svg>
                     </Link>
                     <Link
-                      href="/tours/umrah-2026-thanksgiving"
+                      href="/tours/umrah-december-2026"
                       className="group flex items-center gap-3 rounded-xl border border-charcoal/10 bg-ivory p-4 transition hover:border-gold/40 hover:bg-gold/5"
                     >
                       <div className="flex-shrink-0 text-2xl">🕋</div>
