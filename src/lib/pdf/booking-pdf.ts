@@ -130,7 +130,7 @@ function buildBookingPDF(data: BookingData): jsPDF {
     let ty = fy + 3;
     doc.text('www.marefatpilgrimage.com', margin, ty);
     ty += 4;
-    doc.text('Phone/WhatsApp: +1 (954) 330-8904', margin, ty);
+    doc.text('Phone/WhatsApp: +1 (954) 637-1246', margin, ty);
     ty += 4;
     doc.text('Email: info@marefatpilgrimage.com', margin, ty);
     ty += 4;

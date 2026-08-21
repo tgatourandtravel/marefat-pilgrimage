@@ -33,10 +33,10 @@ export function SiteFooter() {
             <p>
               Phone:{" "}
               <a
-                href="tel:+19543308904"
+                href="tel:+19546371246"
                 className="text-charcoal/80 underline-offset-2 hover:underline"
               >
-                +1 (954) 330-8904
+                +1 (954) 637-1246
               </a>
             </p>
             <p>

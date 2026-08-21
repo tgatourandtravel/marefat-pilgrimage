@@ -469,7 +469,7 @@ function SuccessContent() {
                 trackingCategory="booking_success"
                 className="font-medium text-gold-dark transition hover:underline"
               >
-                +1 (954) 330-8904
+                +1 (954) 637-1246
               </WhatsAppLink>
             </p>
           </div>

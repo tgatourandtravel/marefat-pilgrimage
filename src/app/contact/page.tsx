@@ -103,8 +103,8 @@ export default function ContactPage() {
                 </h2>
                 <p className="mt-3 text-sm">
                   Phone:{" "}
-                    <a href="tel:+19543308904" className="font-medium text-charcoal underline-offset-2 hover:underline">
-                      +1 (954) 330-8904
+                    <a href="tel:+19546371246" className="font-medium text-charcoal underline-offset-2 hover:underline">
+                      +1 (954) 637-1246
                     </a>
                 </p>
                 <p className="mt-1 text-sm">

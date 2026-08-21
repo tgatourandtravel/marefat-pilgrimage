@@ -243,7 +243,7 @@ function buildRegistrationConfirmationPDF(data: RegistrationConfirmationData): j
     let ty = fy + 3;
     doc.text('www.marefatpilgrimage.com', margin, ty);
     ty += 4;
-    doc.text('Contact: Ahmad Reshad Tajik · Phone/WhatsApp: +1 (954) 330-8904', margin, ty);
+    doc.text('Contact: Ahmad Reshad Tajik · Phone/WhatsApp: +1 (954) 637-1246', margin, ty);
     ty += 4;
     doc.text('Email: info@marefatpilgrimage.com', margin, ty);
     ty += 4;

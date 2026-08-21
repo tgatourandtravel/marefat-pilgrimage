@@ -82,7 +82,7 @@ const organizationSchema = {
   name: "Marefat Pilgrimage",
   legalName: "TGA Tour and Travel LLC",
   url: siteUrl,
-  telephone: "+19543308904",
+  telephone: "+19546371246",
   email: "info@marefatpilgrimage.com",
   address: COMPANY_POSTAL_ADDRESS_JSONLD,
 };

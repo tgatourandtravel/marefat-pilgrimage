@@ -251,7 +251,7 @@ export async function sendBookingConfirmationEmail({
           <div style="margin-top:32px; text-align:center; font-size:12px; color:#999;">
             <p style="margin:0 0 6px;">Questions? Contact us at
               <a href="mailto:info@marefatpilgrimage.com" style="color:#a07830; text-decoration:none;">info@marefatpilgrimage.com</a>
-              or WhatsApp <a href="https://wa.me/19543308904" style="color:#a07830; text-decoration:none;">+1 (954) 330-8904</a>
+              or WhatsApp <a href="https://wa.me/19546371246" style="color:#a07830; text-decoration:none;">+1 (954) 637-1246</a>
             </p>
             <p style="margin:0 0 8px; font-size:11px; color:#aaa; line-height:1.55;">TGA Tour and Travel LLC<br>${COMPANY_ADDRESS_HTML}</p>
             <p style="margin:0;">Marefat Pilgrimage — Premium Umrah, Hajj &amp; Ziyarat Tours</p>

@@ -7,7 +7,7 @@ declare global {
 export const META_PIXEL_ID =
   process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "1301892158679447";
 
-export const WHATSAPP_URL = "https://wa.me/19543308904";
+export const WHATSAPP_URL = "https://wa.me/19546371246";
 
 /** Admin routes are excluded from Meta Pixel (no init, no PageView). */
 export function isMetaPixelExcludedPath(

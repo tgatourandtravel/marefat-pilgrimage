@@ -379,8 +379,8 @@ export default function PrivacyPage() {
         </a>
         <br />
         Phone:{" "}
-        <a href="tel:+19543308904" className="text-charcoal underline underline-offset-2">
-          +1 (954) 330-8904
+        <a href="tel:+19546371246" className="text-charcoal underline underline-offset-2">
+          +1 (954) 637-1246
         </a>
       </p>
       <p>
