@@ -141,7 +141,20 @@ export default function PrivacyPage() {
         or contractual limitations.
       </p>
 
-      <h2>4. Sharing of personal data</h2>
+      <h2>4. SMS Communications</h2>
+      <p>
+        We will not share your opt-in to an SMS campaign with any third party for purposes unrelated
+        to providing you with the services of that campaign. We may share your Personal Data,
+        including your SMS opt-in or consent status, with third parties that help us provide our
+        messaging services, including but not limited to platform providers, phone companies, and
+        any other vendors who assist us in the delivery of text messages.
+      </p>
+      <p>
+        All the above categories exclude text messaging originator opt-in data and consent; this
+        information will not be shared with any third parties.
+      </p>
+
+      <h2>5. Sharing of personal data</h2>
       <p>
         To provide travel services, personal information may be shared with third parties when
         necessary.
@@ -182,7 +195,7 @@ export default function PrivacyPage() {
         fulfill contractual obligations or comply with legal requirements.
       </p>
 
-      <h2>5. Visa processing data</h2>
+      <h2>6. Visa processing data</h2>
       <p>If visa assistance is provided by the Company, customers may be required to submit documentation including:</p>
       <ul className="list-disc space-y-2 pl-5">
         <li>Passport copies</li>
@@ -199,7 +212,7 @@ export default function PrivacyPage() {
         once it is submitted to government authorities.
       </p>
 
-      <h2>6. Media and marketing consent</h2>
+      <h2>7. Media and marketing consent</h2>
       <p>
         During group travel or pilgrimage tours organized by Marefat Pilgrimage, photos, videos,
         or audio recordings may be taken.
@@ -225,21 +238,21 @@ export default function PrivacyPage() {
         published, the Company may not be able to remove previously published content.
       </p>
 
-      <h2>7. Data security</h2>
+      <h2>8. Data security</h2>
       <p>
         TGA Tour and Travel LLC takes reasonable administrative and technical measures to
         protect personal data from unauthorized access, disclosure, or misuse.
       </p>
       <p>However, no system of data storage or transmission can be guaranteed to be completely secure.</p>
 
-      <h2>8. Data incidents</h2>
+      <h2>9. Data incidents</h2>
       <p>
         In the event of a data security incident that affects personal information, TGA Tour and
         Travel LLC will take reasonable steps to investigate the incident and, where required by
         applicable law, notify affected individuals and relevant authorities.
       </p>
 
-      <h2>9. Online data transmission</h2>
+      <h2>10. Online data transmission</h2>
       <p>Customers acknowledge that information transmitted over the internet may not be completely secure.</p>
       <p>
         While we take reasonable steps to protect personal data, we cannot guarantee the
@@ -247,7 +260,7 @@ export default function PrivacyPage() {
       </p>
       <p>Customers transmit personal data to the Company at their own risk.</p>
 
-      <h2>10. Data retention</h2>
+      <h2>11. Data retention</h2>
       <p>
         Personal data will be retained only for as long as necessary to fulfill the purposes
         outlined in this Privacy Policy, including legal, accounting, and reporting
@@ -265,7 +278,7 @@ export default function PrivacyPage() {
         securely store such information.
       </p>
 
-      <h2>11. International data transfers</h2>
+      <h2>12. International data transfers</h2>
       <p>
         Because TGA Tour and Travel LLC operates internationally, personal information may be
         transferred to and processed in countries outside the customer&apos;s country of
@@ -290,7 +303,7 @@ export default function PrivacyPage() {
         Standard Contractual Clauses.
       </p>
 
-      <h2>12. European Union privacy rights (GDPR)</h2>
+      <h2>13. European Union privacy rights (GDPR)</h2>
       <p>Customers located within the European Union may have the following rights:</p>
       <ul className="list-disc space-y-2 pl-5">
         <li>Right of access to personal data</li>
@@ -307,7 +320,7 @@ export default function PrivacyPage() {
         provided in Section 16 of this Privacy Policy.
       </p>
 
-      <h2>13. California privacy rights (CCPA)</h2>
+      <h2>14. California privacy rights (CCPA)</h2>
       <p>Residents of California may have rights under the California Consumer Privacy Act (CCPA).</p>
       <p>These rights may include:</p>
       <ul className="list-disc space-y-2 pl-5">
@@ -325,7 +338,7 @@ export default function PrivacyPage() {
       </p>
       <p>The Company does not sell personal information to third parties.</p>
 
-      <h2>14. Third-party websites</h2>
+      <h2>15. Third-party websites</h2>
       <p>
         The Company&apos;s website or communications may contain links to third-party websites.
       </p>
@@ -349,7 +362,7 @@ export default function PrivacyPage() {
         .
       </p>
 
-      <h2>15. Policy changes</h2>
+      <h2>16. Policy changes</h2>
       <p>
         TGA Tour and Travel LLC reserves the right to update or modify this Privacy Policy at
         any time.
@@ -361,7 +374,7 @@ export default function PrivacyPage() {
         constitutes acceptance of the revised terms.
       </p>
 
-      <h2>16. Contact information</h2>
+      <h2>17. Contact information</h2>
       <p>Questions regarding this Privacy Policy or requests related to personal data may be directed to:</p>
       <p>
         <strong className="text-charcoal">TGA Tour and Travel LLC</strong>

@@ -101,6 +101,41 @@ export default function ConsultationPage() {
         </div>
       </section>
 
+      {/* SMS Consent — required for 10DLC/Zoho SMS compliance */}
+      <section className="mx-auto max-w-4xl px-6 pb-8 sm:px-8 lg:px-12">
+        <div className="rounded-2xl border border-charcoal/5 bg-ivory/90 p-6">
+          <h2 className="text-sm font-semibold text-charcoal">SMS Updates (Optional)</h2>
+          <p className="mt-1 text-xs text-charcoal/60">
+            Opt in below to receive SMS updates about your booking. This is optional and separate from your consultation booking.
+          </p>
+          <div className="mt-4">
+            <label htmlFor="sms-phone" className="block text-xs font-medium text-charcoal/70 mb-1">
+              Phone Number
+            </label>
+            <input
+              id="sms-phone"
+              type="tel"
+              placeholder="+1 (___) ___-____"
+              className="w-full rounded-xl border border-charcoal/15 bg-white px-4 py-2.5 text-sm text-charcoal placeholder:text-charcoal/30 focus:border-gold/60 focus:outline-none focus:ring-2 focus:ring-gold/20 sm:max-w-xs"
+            />
+          </div>
+          <label className="mt-4 flex cursor-pointer items-start gap-3">
+            <input
+              type="checkbox"
+              className="mt-0.5 h-4 w-4 flex-shrink-0 rounded border-charcoal/30 text-charcoal accent-charcoal"
+            />
+            <span className="text-xs leading-relaxed text-charcoal/70">
+              You are agreeing to receive SMS marketing, customer care, and account notification messages from Marefat Pilgrimage. Message frequency may vary. Standard Message and Data Rates may apply. Reply STOP to opt out. Reply HELP for help.{" "}
+              <Link href="/privacy" className="underline underline-offset-2 hover:text-charcoal">Privacy Policy</Link>{" "}
+              <Link href="/terms" className="underline underline-offset-2 hover:text-charcoal">Terms &amp; Conditions</Link>
+            </span>
+          </label>
+          <p className="mt-3 text-[10px] text-charcoal/40">
+            This consent is optional and only applies to SMS messaging. It is not required to book a consultation or use our services.
+          </p>
+        </div>
+      </section>
+
       {/* Additional Info */}
       <section className="mx-auto max-w-4xl px-6 pb-16 sm:px-8 lg:px-12">
         <div className="grid gap-6 md:grid-cols-3">
