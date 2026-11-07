@@ -97,6 +97,9 @@ export type Tour = {
 
   // Images (paths relative to /public)
   images?: string[];
+  // Optional listing/home card banner. When set, TourCard uses this instead of images[0],
+  // so the detail gallery can keep a different first image.
+  cardImage?: string;
 
   // Exclusive display mode — title-only card + custom detail layout
   exclusiveDisplay?: boolean;
@@ -459,9 +462,11 @@ export const TOURS: Tour[] = [
       },
     ],
 
+    // Listing/home card: banner with Sayed M. Sadiq Qazwini. Detail gallery stays below.
+    cardImage:
+      "/images/tours/karbala-spring-break-2026/iraq-dec-2026-card-banner.jpg",
     images: [
-      "/images/tours/karbala-spring-break-2026/iraq-dec-2026-banner-10days.jpg",
-      "/images/tours/karbala-spring-break-2026/iraq-dec-2026-banner-v2.jpg",
+      "/images/tours/karbala-spring-break-2026/iraq-dec-2026-gallery-1.jpg",
       "/images/tours/karbala-spring-break-2026/Karbala-thumbnail-1.png",
     ],
   },

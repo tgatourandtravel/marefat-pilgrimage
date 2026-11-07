@@ -22,18 +22,17 @@ export function TourCard({ tour }: TourCardProps) {
   const hasEarlyBird = tour.earlyBirdDiscount && new Date() <= new Date(tour.earlyBirdDiscount.deadline);
   const isOnRequest = tour.priceFrom === 0;
 
-  // Get the first image - handle both Sanity and static formats
-  const firstImage = tour.images?.[0];
+  // Prefer a dedicated listing banner when present; otherwise first gallery image.
+  // Handles both Sanity and static formats.
+  const listingImage = tour.cardImage ?? tour.images?.[0];
   let cardImage: string | null = null;
 
-  if (firstImage) {
-    if (typeof firstImage === "string") {
-      // Static format - direct path
-      cardImage = firstImage;
-    } else if (firstImage.asset) {
-      // Sanity format - use image URL builder
+  if (listingImage) {
+    if (typeof listingImage === "string") {
+      cardImage = listingImage;
+    } else if (listingImage.asset) {
       try {
-        cardImage = urlFor(firstImage).width(800).height(450).quality(85).url();
+        cardImage = urlFor(listingImage).width(800).height(450).quality(85).url();
       } catch (error) {
         console.error("Error building Sanity image URL:", error);
       }
