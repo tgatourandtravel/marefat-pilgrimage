@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { AnalyticsProviders } from "@/components/analytics/AnalyticsProviders";
 import { SiteChrome } from "@/components/layout/SiteChrome";
@@ -107,6 +108,7 @@ export default function RootLayout({
             <SiteFooter />
           </div>
         </AnalyticsProviders>
+        <Analytics />
       </body>
     </html>
   );
