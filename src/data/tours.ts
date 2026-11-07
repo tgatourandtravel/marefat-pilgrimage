@@ -139,7 +139,7 @@ export const TOURS: Tour[] = [
     meals: "Full Board",
     transfer: true,
     spiritualGuide: true,
-    spiritualGuideName: "Sayed Jafar Qazwini & Sayed M. Sadiq Qazwini",
+    spiritualGuideName: "Experienced religious scholar",
 
     popularityScore: 99,
     isFeatured: true,
@@ -147,14 +147,14 @@ export const TOURS: Tour[] = [
     specialNotes: {
       deadline: "2027-01-27",
       limitedSeats: true,
-      customNote: "Under the religious guidance of Sayed Jafar Qazwini & Sayed M. Sadiq Qazwini",
+      customNote: "Accompanied by an experienced religious scholar",
     },
 
     description:
-      "The journey of a lifetime awaits. Join Marefat Pilgrimage for a spiritually enriching Hajj experience under the religious guidance of Sayed Jafar Qazwini and Sayed M. Sadiq Qazwini. Every detail has been curated to ensure your peace of mind, allowing you to focus solely on your connection with Allah (SWT).",
+      "The journey of a lifetime awaits. Join Marefat Pilgrimage for a spiritually enriching Hajj experience. Every detail has been curated to ensure your peace of mind, allowing you to focus solely on your connection with Allah (SWT).",
 
     highlights: [
-      "Religious guidance by Sayed Jafar Qazwini & Sayed M. Sadiq Qazwini",
+      "Accompanied by an experienced religious scholar who guides pilgrims through the obligatory rites of Hajj, with practical support at every stage",
       "5★ Pullman Zamzam Hotel in Madinah (3 nights)",
       "5★ Marriott Jabal Omar in Makkah (10 nights)",
       "Haramain High-Speed Train transport",
@@ -603,8 +603,8 @@ export const TOURS: Tour[] = [
     spiritualGuideName: "Sheikh Mustafa Akhound & Sayed M. Sadiq Qazwini",
 
     popularityScore: 94,
-    isFeatured: true,
-    isArchived: false,
+    isFeatured: false,
+    isArchived: true, // Cancelled — archived and hidden from all listings
 
     specialNotes: {
       limitedSeats: true,
