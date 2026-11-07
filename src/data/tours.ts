@@ -281,8 +281,8 @@ export const TOURS: Tour[] = [
     spiritualGuideName: "Sheikh Mustafa Akhound & Sayed M. Sadiq Qazwini",
 
     popularityScore: 98,
-    isFeatured: true,
-    isArchived: false,
+    isFeatured: false,
+    isArchived: true, // Archived — no longer offered
 
     specialNotes: {
       limitedSeats: true,
@@ -367,18 +367,18 @@ export const TOURS: Tour[] = [
   // ----------------------------------------
   {
     slug: "karbala-spring-break-2026",
-    title: "Iraq — Karbala December 2026",
+    title: "Iraq December 2026",
     subtitle: "A Journey of the Heart",
     destination: "Karbala & Najaf",
     region: "Iraq",
     type: "Ziyarat",
     packageLevel: "Premium",
 
-    startDate: "2026-12-20",
-    endDate: "2026-12-27",
-    durationDays: 7,
+    startDate: "2026-12-21",
+    endDate: "2026-12-31",
+    durationDays: 10,
 
-    priceFrom: 1199, // $1,199 USD
+    priceFrom: 1499, // $1,499 USD
 
     hotelStars: 5,
     flightIncluded: false,
@@ -404,23 +404,27 @@ export const TOURS: Tour[] = [
       "5★ hotels steps from the holy shrines",
       "Visit to Imam Hussein (AS) and Hazrat Abbas (AS) shrines",
       "Visit to Imam Ali (AS) shrine in Najaf",
+      "Day trip to Samarra & Kadhimiya",
       "Premium full-board meals (breakfast, lunch & dinner)",
       "Seamless VIP transportation throughout Iraq",
     ],
 
     itinerary: [
-      "Day 1 (Dec 20): Arrival in Najaf International Airport, VIP transfer to 5★ Qasur al Dur Hotel",
-      "Day 2 (Dec 21): Morning ziyarat at Imam Ali (AS) shrine, spiritual guidance session",
-      "Day 3 (Dec 22): Full day ziyarat — Masjid Kufa, Wadi al-Salam, historical sites",
-      "Day 4 (Dec 23): Transfer to Karbala, check-in to 5★ Royal Karbala Hotel near shrines",
-      "Day 5 (Dec 24): Full day at Imam Hussein (AS) and Hazrat Abbas (AS) shrines",
-      "Day 6 (Dec 25): Historical sites of Karbala and personal prayers with reflection",
-      "Day 7 (Dec 26): Final ziyarat, farewell gathering",
-      "Day 8 (Dec 27): Departure with full assistance",
+      "Day 1 (Dec 21): Arrival in Najaf International Airport, VIP transfer to 5★ Al-Kawthar Hotel",
+      "Day 2 (Dec 22): Morning ziyarat at Imam Ali (AS) shrine, spiritual guidance session",
+      "Day 3 (Dec 23): Full day ziyarat — Masjid Kufa, Wadi al-Salam, historical sites",
+      "Day 4 (Dec 24): Personal prayers and reflection at Imam Ali (AS) shrine",
+      "Day 5 (Dec 25): Transfer to Karbala, check-in to 5★ Royal Karbala Hotel near shrines",
+      "Day 6 (Dec 26): Full day at Imam Hussein (AS) and Hazrat Abbas (AS) shrines",
+      "Day 7 (Dec 27): Historical sites of Karbala and personal prayers with reflection",
+      "Day 8 (Dec 28): Day trip to Samarra & Kadhimiya",
+      "Day 9 (Dec 29): Personal prayers and ziyarat at the holy shrines in Karbala",
+      "Day 10 (Dec 30): Final ziyarat, farewell gathering",
+      "Day 11 (Dec 31): Departure with full assistance",
     ],
 
     hotelInfo:
-      "Najaf's Hotel: Qasur al Dur\nKarbala's Hotel: Royal Karbala",
+      "Najaf's Hotel: Al-Kawthar Hotel\nKarbala's Hotel: Royal Karbala",
 
     flightsInfo:
       "Ground package only — international flights not included.",
@@ -450,13 +454,14 @@ export const TOURS: Tour[] = [
     packages: [
       {
         name: "Standard",
-        price: "$1,199",
+        price: "$1,499",
         description: "5★ hotels, VIP transfers, guided ziyarat, full board. No flight included.",
       },
     ],
 
     images: [
-      "/images/tours/karbala-spring-break-2026/iraq-dec-2026-banner.png",
+      "/images/tours/karbala-spring-break-2026/iraq-dec-2026-banner-10days.jpg",
+      "/images/tours/karbala-spring-break-2026/iraq-dec-2026-banner-v2.jpg",
       "/images/tours/karbala-spring-break-2026/Karbala-thumbnail-1.png",
     ],
   },
