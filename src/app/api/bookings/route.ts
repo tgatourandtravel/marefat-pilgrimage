@@ -10,6 +10,12 @@ import {
   validateTravelerFields,
 } from '@/lib/utils/validation';
 import { parseFlightBookingPreferences } from '@/lib/booking/flight-request';
+import {
+  type BillingAddress,
+  billingAddressToColumns,
+  normalizeBillingAddress,
+  validateBillingAddress,
+} from '@/lib/booking/billing-address';
 
 // Force dynamic rendering to prevent static optimization at build time
 export const dynamic = 'force-dynamic';
@@ -39,6 +45,7 @@ interface TravelerInput {
 interface CreateBookingRequest {
   tourSlug: string;
   booker: BookerInput;
+  billingAddress: BillingAddress;
   travelers: TravelerInput[];
   hasInsurance: boolean;
   hasFlightBooking: boolean;
@@ -90,6 +97,15 @@ if (!allowed) {
         { status: 400 }
       );
     }
+
+    const billingErrors = validateBillingAddress(body.billingAddress);
+    if (Object.keys(billingErrors).length > 0) {
+      return NextResponse.json(
+        { error: 'Invalid billing address', details: billingErrors },
+        { status: 400 }
+      );
+    }
+    const billingColumns = billingAddressToColumns(normalizeBillingAddress(body.billingAddress));
 
     const travelerErrors = body.travelers
       .map((traveler, index) => {
@@ -192,6 +208,7 @@ if (!allowed) {
         contact_last_name: body.booker.lastName.trim(),
         preferred_departure_city: flightPrefs.departureCity,
         preferred_return_city: flightPrefs.returnCity,
+        ...billingColumns,
       })
       .select()
       .single();
@@ -207,7 +224,13 @@ if (!allowed) {
             ADD COLUMN IF NOT EXISTS contact_first_name text NOT NULL DEFAULT '',
             ADD COLUMN IF NOT EXISTS contact_last_name  text NOT NULL DEFAULT '',
             ADD COLUMN IF NOT EXISTS preferred_departure_city text,
-            ADD COLUMN IF NOT EXISTS preferred_return_city     text;`,
+            ADD COLUMN IF NOT EXISTS preferred_return_city     text,
+            ADD COLUMN IF NOT EXISTS billing_address_line1 text,
+            ADD COLUMN IF NOT EXISTS billing_address_line2 text,
+            ADD COLUMN IF NOT EXISTS billing_city          text,
+            ADD COLUMN IF NOT EXISTS billing_state         text,
+            ADD COLUMN IF NOT EXISTS billing_postal_code   text,
+            ADD COLUMN IF NOT EXISTS billing_country       text;`,
         } as never);
       } catch (_) { /* RPC may not exist */ }
 
@@ -225,6 +248,7 @@ if (!allowed) {
           contact_last_name: body.booker.lastName.trim(),
           preferred_departure_city: flightPrefs.departureCity,
           preferred_return_city: flightPrefs.returnCity,
+          ...billingColumns,
         })
         .select()
         .single();

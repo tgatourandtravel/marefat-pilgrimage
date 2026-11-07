@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { stripe, isStripeConfigured } from "@/lib/stripe/client";
 import { checkRateLimit } from "@/lib/utils/rate-limit";
+import { billingAddressFromBooking } from "@/lib/booking/billing-address";
 
 export const dynamic = "force-dynamic";
 
@@ -75,10 +76,23 @@ export async function POST(request: NextRequest) {
 
     // Attach the payment method to a customer before reusing it in PaymentIntent.
     // Stripe requires this for setup-confirmed payment methods.
+    const billingAddress = billingAddressFromBooking(booking);
     const customer = await stripe.customers.create({
       email: booking.contact_email,
       name: `${booking.contact_first_name ?? ""} ${booking.contact_last_name ?? ""}`.trim() || undefined,
       phone: booking.contact_phone || undefined,
+      ...(billingAddress
+        ? {
+            address: {
+              line1: billingAddress.line1,
+              line2: billingAddress.line2 || undefined,
+              city: billingAddress.city,
+              state: billingAddress.state || undefined,
+              postal_code: billingAddress.postalCode || undefined,
+              country: billingAddress.country,
+            },
+          }
+        : {}),
       metadata: {
         booking_ref: booking.booking_ref,
       },

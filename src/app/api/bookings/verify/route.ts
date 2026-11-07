@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { getBookingExpiry } from '@/lib/utils/booking-ref';
 import { isOTPExpired } from '@/lib/utils/otp';
 import { sendBookingConfirmationEmail, sendNewBookingAdminEmail } from '@/lib/email/resend';
+import { billingAddressFromBooking, formatBillingAddressLines } from '@/lib/booking/billing-address';
 import type { Booking, VerificationCode } from '@/lib/supabase/types';
 
 // Force dynamic rendering to prevent static optimization at build time
@@ -156,6 +157,10 @@ export async function POST(request: NextRequest) {
           customerName: `${booking.contact_first_name} ${booking.contact_last_name}`,
           customerEmail: booking.contact_email,
           customerPhone: booking.contact_phone,
+          billingAddressLines: (() => {
+            const address = billingAddressFromBooking(booking);
+            return address ? formatBillingAddressLines(address) : undefined;
+          })(),
           tourTitle: booking.tour_title,
           paymentMethod: booking.payment_method,
           depositAmount: booking.deposit_amount,

@@ -16,5 +16,10 @@ export default async function ToursPage() {
     tours = getAllTours();
   }
 
+  if (tours.length === 0) {
+    const { getAllTours } = await import("@/data/tours");
+    tours = getAllTours();
+  }
+
   return <ToursClient tours={tours} />;
 }

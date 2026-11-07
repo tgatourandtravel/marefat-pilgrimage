@@ -35,6 +35,7 @@ export interface BookingData {
   hasFlightBooking: boolean;
   contactEmail: string;
   contactPhone: string;
+  billingAddress?: string | null;
   createdAt?: string;
   expiresAt?: string;
   paymentMethod?: string | null;
@@ -250,6 +251,7 @@ function buildBookingPDF(data: BookingData): jsPDF {
     [
       ['Email', valueOrDash(data.contactEmail)],
       ['Phone', valueOrDash(data.contactPhone)],
+      ...(data.billingAddress ? [['Billing Address', data.billingAddress] as [string, string]] : []),
     ],
     2
   );
@@ -293,7 +295,7 @@ function buildBookingPDF(data: BookingData): jsPDF {
   pricingRows.push(['Total Amount', formatCurrency(data.grandTotal)]);
   pricingRows.push(['Deposit Due Now (30%)', formatCurrency(data.depositAmount)]);
   drawKeyValueRows(pricingRows, 2);
-  drawParagraph(`Remaining balance of ${formatCurrency(data.grandTotal - data.depositAmount)} is due 30 days before departure.`);
+  drawParagraph(`Remaining balance of ${formatCurrency(data.grandTotal - data.depositAmount)} is due 45 days before departure.`);
   drawKeyValueRows([['Selected Payment Method', formatPaymentMethod(data.paymentMethod)]], 1);
 
   if (data.paymentMethod === 'card') {

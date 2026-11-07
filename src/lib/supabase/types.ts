@@ -23,6 +23,12 @@ export interface Booking {
   contact_last_name: string;
   contact_email: string;
   contact_phone: string;
+  billing_address_line1: string | null;
+  billing_address_line2: string | null;
+  billing_city: string | null;
+  billing_state: string | null;
+  billing_postal_code: string | null;
+  billing_country: string | null;
   base_price_per_person: number;
   number_of_travelers: number;
   insurance_total: number;

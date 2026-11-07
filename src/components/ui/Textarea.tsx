@@ -33,7 +33,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     const sizeStyles: Record<SizeVariant, string> = {
       xs: "px-2.5 py-1.5 text-xs min-h-[64px]",
       sm: "px-3 py-2 text-xs min-h-[72px]",
-      md: "px-3 py-2.5 text-sm min-h-[96px]",
+      md: "px-3 py-2.5 text-base sm:text-sm min-h-[96px]",
       lg: "px-4 py-3 text-base min-h-[120px]",
       xl: "px-5 py-4 text-lg min-h-[144px]",
     };

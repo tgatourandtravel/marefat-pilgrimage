@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import type { Booking, Traveler } from '@/lib/supabase/types';
+import { billingAddressFromBooking, formatBillingAddressLines } from '@/lib/booking/billing-address';
 import ConfirmBookingModal from '@/components/admin/ConfirmBookingModal';
 
 // ─── Section Component ────────────────────────────────────────────────────────
@@ -24,7 +25,7 @@ function Row({ label, value }: { label: string; value?: string | number | null }
   return (
     <div className="flex items-start justify-between py-2 border-b border-charcoal/5 last:border-0">
       <span className="text-xs text-charcoal/50 w-40 shrink-0">{label}</span>
-      <span className="text-sm text-charcoal font-medium text-right">
+      <span className="text-sm text-charcoal font-medium text-right whitespace-pre-line">
         {value ?? <span className="text-charcoal/30 font-normal">—</span>}
       </span>
     </div>
@@ -163,6 +164,13 @@ export default function BookingDetailPage() {
           <Row label="Name"   value={`${booking.contact_first_name} ${booking.contact_last_name}`} />
           <Row label="Email"  value={booking.contact_email} />
           <Row label="Phone"  value={booking.contact_phone} />
+          <Row
+            label="Billing Address"
+            value={(() => {
+              const address = billingAddressFromBooking(booking);
+              return address ? formatBillingAddressLines(address).join('\n') : undefined;
+            })()}
+          />
         </Section>
 
         {/* Payment */}

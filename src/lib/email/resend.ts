@@ -215,15 +215,15 @@ export async function sendBookingConfirmationEmail({
             <table style="width:100%; border-collapse:collapse; font-size:14px; margin-bottom:8px;">
               <tr>
                 <td style="padding:6px 0; color:#666;">Deposit Due Now (30%)</td>
-                <td style="padding:6px 0; text-align:right; font-weight:700; font-size:16px; color:#151515;">USD $${depositAmount.toLocaleString()}</td>
+                <td style="padding:6px 0; text-align:right; font-weight:700; font-size:16px; color:#151515;">USD $${depositAmount.toLocaleString("en-US")}</td>
               </tr>
               <tr>
                 <td style="padding:6px 0; color:#666;">Remaining Balance</td>
-                <td style="padding:6px 0; text-align:right; color:#151515;">USD $${remainingBalance.toLocaleString()}</td>
+                <td style="padding:6px 0; text-align:right; color:#151515;">USD $${remainingBalance.toLocaleString("en-US")}</td>
               </tr>
               <tr style="border-top:1px solid #eee;">
                 <td style="padding:10px 0 6px; font-weight:600; color:#151515;">Total Amount</td>
-                <td style="padding:10px 0 6px; text-align:right; font-weight:700; color:#151515;">USD $${grandTotal.toLocaleString()}</td>
+                <td style="padding:10px 0 6px; text-align:right; font-weight:700; color:#151515;">USD $${grandTotal.toLocaleString("en-US")}</td>
               </tr>
             </table>
             <p style="margin:0 0 24px; font-size:12px; color:#888;">
@@ -294,7 +294,7 @@ export async function sendPaymentSuccessAdminEmail({
           <p><strong>Booking reference:</strong> ${bookingRef}</p>
           <p><strong>Tour:</strong> ${tourTitle}</p>
           <p><strong>Customer email:</strong> ${customerEmail}</p>
-          <p><strong>Amount:</strong> ${currency} ${amount.toLocaleString()}</p>
+          <p><strong>Amount:</strong> ${currency} ${amount.toLocaleString("en-US")}</p>
           <p style="margin-top: 20px;">Please review this booking in your dashboard and continue operations.</p>
           <p style="margin-top: 24px; font-size: 11px; color: #999; line-height: 1.55;">TGA Tour and Travel LLC<br>${COMPANY_ADDRESS_HTML}</p>
         </div>
@@ -309,6 +309,7 @@ interface SendNewBookingAdminEmailParams {
   customerName: string;
   customerEmail: string;
   customerPhone: string;
+  billingAddressLines?: string[];
   tourTitle: string;
   paymentMethod: string;
   depositAmount: number;
@@ -319,11 +320,21 @@ interface SendNewBookingAdminEmailParams {
   preferredReturnCity?: string | null;
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 export async function sendNewBookingAdminEmail({
   bookingRef,
   customerName,
   customerEmail,
   customerPhone,
+  billingAddressLines,
   tourTitle,
   paymentMethod,
   depositAmount,
@@ -389,6 +400,12 @@ export async function sendNewBookingAdminEmail({
                 <td style="padding:8px 0; color:#777; font-weight:500; border-bottom:1px solid #f0f0f0;">Phone</td>
                 <td style="padding:8px 0; border-bottom:1px solid #f0f0f0;">${customerPhone}</td>
               </tr>
+              ${billingAddressLines?.length ? `
+              <tr>
+                <td style="padding:8px 0; color:#777; font-weight:500; border-bottom:1px solid #f0f0f0; vertical-align:top;">Billing Address</td>
+                <td style="padding:8px 0; border-bottom:1px solid #f0f0f0;">${billingAddressLines.map(escapeHtml).join('<br>')}</td>
+              </tr>
+              ` : ''}
               <tr>
                 <td style="padding:8px 0; color:#777; font-weight:500; border-bottom:1px solid #f0f0f0;">Tour</td>
                 <td style="padding:8px 0; font-weight:600; border-bottom:1px solid #f0f0f0;">${tourTitle}</td>
@@ -474,6 +491,6 @@ export async function sendBookingConfirmedEmail({
     to,
     subject: `Registration Confirmation — ${bookingRef} | Marefat Pilgrimage`,
     attachments: pdfAttachment ? [{ filename: `Marefat-Confirmation-${bookingRef}.pdf`, content: pdfAttachment }] : undefined,
-    html: `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/></head><body style="font-family:system-ui,sans-serif;color:#151515;margin:0;padding:0;background:#f5f5f5"><div style="max-width:650px;margin:0 auto;padding:32px 16px"><div style="background:#fff;border-radius:12px 12px 0 0;padding:28px 32px;border-bottom:3px solid #c7a56a"><p style="margin:0 0 2px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:#888">Marefat Pilgrimage</p><h1 style="margin:0;font-size:22px;font-weight:800;color:#c7a56a">Registration Confirmation</h1><p style="margin:4px 0 0;font-size:13px;color:#666">${tourTitle}</p></div><div style="background:#fff;padding:28px 32px;border:1px solid #e5e5e5;border-top:none;border-radius:0 0 12px 12px"><h3 style="margin:0 0 12px;font-size:13px;font-weight:700;text-transform:uppercase;color:#555">Booker Details</h3><table style="width:100%;border-collapse:collapse;font-size:13px;border:1px solid #e5dcc8;margin-bottom:24px"><tr style="border-bottom:1px solid #e5dcc8"><td style="padding:9px 12px;color:#666;width:120px;background:#fdfbf7">Full Name</td><td style="padding:9px 12px;font-weight:600">${firstName} ${lastName}</td><td style="padding:9px 12px;color:#666;width:120px;background:#fdfbf7">E-mail</td><td style="padding:9px 12px">${email}</td></tr><tr><td style="padding:9px 12px;color:#666;background:#fdfbf7">Phone</td><td style="padding:9px 12px" colspan="3">${phone}</td></tr></table><p style="margin:0 0 24px;font-size:14px;line-height:1.75;color:#444">Thank you for entrusting us to accompany you on this blessed journey. We're honored to guide you, and we pray to share in your spiritual rewards and blessings.</p><h3 style="margin:0 0 12px;font-size:13px;font-weight:700;text-transform:uppercase;color:#555">Travelers</h3><table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:28px">${travelersHtml}</table><h3 style="margin:0 0 16px;font-size:13px;font-weight:700;text-transform:uppercase;color:#555">Hotel</h3>${hotelBlock('Medina',hotelMedina)}${hotelBlock('Mecca',hotelMecca)}<div style="background:#f7f3eb;border-radius:8px;padding:14px 16px;margin-bottom:28px;font-size:13px;color:#555;line-height:1.6"><strong style="color:#151515">Transportation:</strong> Package transportation is available within Saudi Arabia for airport pickup and drop-off.</div><h3 style="margin:0 0 8px;font-size:13px;font-weight:700;text-transform:uppercase;color:#555">Payment Summary</h3><table style="width:100%;border-collapse:collapse;font-size:13px;border:1px solid #e5dcc8;margin-bottom:8px"><tr style="border-bottom:1px solid #e5dcc8"><td style="padding:9px 14px;color:#666;background:#fdfbf7">Total Price</td><td style="padding:9px 14px;font-weight:700">USD $${grandTotal.toLocaleString()}</td><td style="padding:9px 14px;color:#666;background:#fdfbf7">Amount Paid</td><td style="padding:9px 14px;font-weight:700;color:#16a34a">USD $${depositAmount.toLocaleString()}</td></tr><tr><td style="padding:9px 14px;color:#666;background:#fdfbf7">Balance Due</td><td style="padding:9px 14px;font-weight:700">USD $${balanceDue.toLocaleString()}</td><td style="padding:9px 14px;color:#666;background:#fdfbf7">Balance Due Date</td><td style="padding:9px 14px;font-weight:700">${formatDate(balanceDueDate)}</td></tr></table><p style="margin:0 0 6px;font-size:13px;color:#444"><strong>Payment Method:</strong> ${methodLabel}</p>${notes?`<div style="background:#fef9ee;border:1px solid #e5dcc8;border-radius:8px;padding:14px 16px;margin-bottom:24px;font-size:13px;color:#555"><strong style="color:#151515">Notes:</strong> ${notes}</div>`:''}<p style="margin:24px 0 4px;font-size:14px;color:#444;line-height:1.7">If you have any inquiries or require assistance before your trip, please feel free to contact us.</p><p style="margin:0 0 4px;font-size:14px;color:#444">Respectfully,</p><p style="margin:0;font-size:14px;font-weight:700;color:#151515">Marefat Pilgrimage Team</p></div><div style="margin-top:24px;background:#151515;border-radius:10px;padding:20px 28px;text-align:center"><a href="https://www.marefatpilgrimage.com" style="color:#c7a56a;text-decoration:none;font-size:13px;font-weight:600;display:inline-block">www.marefatpilgrimage.com</a><p style="margin:14px 0 0;color:#bdbdbd;font-size:11px;line-height:1.6;font-weight:600;letter-spacing:0.02em;text-transform:none">TGA Tour and Travel LLC</p><p style="margin:8px 0 0;color:#9ca3af;font-size:10px;line-height:1.65">${COMPANY_ADDRESS_HTML}</p></div></div></body></html>`,
+    html: `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/></head><body style="font-family:system-ui,sans-serif;color:#151515;margin:0;padding:0;background:#f5f5f5"><div style="max-width:650px;margin:0 auto;padding:32px 16px"><div style="background:#fff;border-radius:12px 12px 0 0;padding:28px 32px;border-bottom:3px solid #c7a56a"><p style="margin:0 0 2px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:#888">Marefat Pilgrimage</p><h1 style="margin:0;font-size:22px;font-weight:800;color:#c7a56a">Registration Confirmation</h1><p style="margin:4px 0 0;font-size:13px;color:#666">${tourTitle}</p></div><div style="background:#fff;padding:28px 32px;border:1px solid #e5e5e5;border-top:none;border-radius:0 0 12px 12px"><h3 style="margin:0 0 12px;font-size:13px;font-weight:700;text-transform:uppercase;color:#555">Booker Details</h3><table style="width:100%;border-collapse:collapse;font-size:13px;border:1px solid #e5dcc8;margin-bottom:24px"><tr style="border-bottom:1px solid #e5dcc8"><td style="padding:9px 12px;color:#666;width:120px;background:#fdfbf7">Full Name</td><td style="padding:9px 12px;font-weight:600">${firstName} ${lastName}</td><td style="padding:9px 12px;color:#666;width:120px;background:#fdfbf7">E-mail</td><td style="padding:9px 12px">${email}</td></tr><tr><td style="padding:9px 12px;color:#666;background:#fdfbf7">Phone</td><td style="padding:9px 12px" colspan="3">${phone}</td></tr></table><p style="margin:0 0 24px;font-size:14px;line-height:1.75;color:#444">Thank you for entrusting us to accompany you on this blessed journey. We're honored to guide you, and we pray to share in your spiritual rewards and blessings.</p><h3 style="margin:0 0 12px;font-size:13px;font-weight:700;text-transform:uppercase;color:#555">Travelers</h3><table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:28px">${travelersHtml}</table><h3 style="margin:0 0 16px;font-size:13px;font-weight:700;text-transform:uppercase;color:#555">Hotel</h3>${hotelBlock('Medina',hotelMedina)}${hotelBlock('Mecca',hotelMecca)}<div style="background:#f7f3eb;border-radius:8px;padding:14px 16px;margin-bottom:28px;font-size:13px;color:#555;line-height:1.6"><strong style="color:#151515">Transportation:</strong> Package transportation is available within Saudi Arabia for airport pickup and drop-off.</div><h3 style="margin:0 0 8px;font-size:13px;font-weight:700;text-transform:uppercase;color:#555">Payment Summary</h3><table style="width:100%;border-collapse:collapse;font-size:13px;border:1px solid #e5dcc8;margin-bottom:8px"><tr style="border-bottom:1px solid #e5dcc8"><td style="padding:9px 14px;color:#666;background:#fdfbf7">Total Price</td><td style="padding:9px 14px;font-weight:700">USD $${grandTotal.toLocaleString("en-US")}</td><td style="padding:9px 14px;color:#666;background:#fdfbf7">Amount Paid</td><td style="padding:9px 14px;font-weight:700;color:#16a34a">USD $${depositAmount.toLocaleString("en-US")}</td></tr><tr><td style="padding:9px 14px;color:#666;background:#fdfbf7">Balance Due</td><td style="padding:9px 14px;font-weight:700">USD $${balanceDue.toLocaleString("en-US")}</td><td style="padding:9px 14px;color:#666;background:#fdfbf7">Balance Due Date</td><td style="padding:9px 14px;font-weight:700">${formatDate(balanceDueDate)}</td></tr></table><p style="margin:0 0 6px;font-size:13px;color:#444"><strong>Payment Method:</strong> ${methodLabel}</p>${notes?`<div style="background:#fef9ee;border:1px solid #e5dcc8;border-radius:8px;padding:14px 16px;margin-bottom:24px;font-size:13px;color:#555"><strong style="color:#151515">Notes:</strong> ${notes}</div>`:''}<p style="margin:24px 0 4px;font-size:14px;color:#444;line-height:1.7">If you have any inquiries or require assistance before your trip, please feel free to contact us.</p><p style="margin:0 0 4px;font-size:14px;color:#444">Respectfully,</p><p style="margin:0;font-size:14px;font-weight:700;color:#151515">Marefat Pilgrimage Team</p></div><div style="margin-top:24px;background:#151515;border-radius:10px;padding:20px 28px;text-align:center"><a href="https://www.marefatpilgrimage.com" style="color:#c7a56a;text-decoration:none;font-size:13px;font-weight:600;display:inline-block">www.marefatpilgrimage.com</a><p style="margin:14px 0 0;color:#bdbdbd;font-size:11px;line-height:1.6;font-weight:600;letter-spacing:0.02em;text-transform:none">TGA Tour and Travel LLC</p><p style="margin:8px 0 0;color:#9ca3af;font-size:10px;line-height:1.65">${COMPANY_ADDRESS_HTML}</p></div></div></body></html>`,
   });
 }

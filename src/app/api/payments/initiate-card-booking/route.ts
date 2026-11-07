@@ -6,6 +6,12 @@ import { getTourBySlug } from '@/data/tours';
 import { validateBookerFields, validateTravelerFields } from '@/lib/utils/validation';
 import { parseFlightBookingPreferences } from '@/lib/booking/flight-request';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
+import {
+  type BillingAddress,
+  billingAddressToColumns,
+  normalizeBillingAddress,
+  validateBillingAddress,
+} from '@/lib/booking/billing-address';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,6 +39,7 @@ interface TravelerInput {
 interface InitiateCardBookingRequest {
   tourSlug: string;
   booker: BookerInput;
+  billingAddress: BillingAddress;
   travelers: TravelerInput[];
   hasInsurance: boolean;
   hasFlightBooking: boolean;
@@ -75,6 +82,12 @@ export async function POST(request: NextRequest) {
     if (Object.keys(bookerErrors).length > 0) {
       return NextResponse.json({ error: 'Invalid booker information', details: bookerErrors }, { status: 400 });
     }
+
+    const billingErrors = validateBillingAddress(body.billingAddress);
+    if (Object.keys(billingErrors).length > 0) {
+      return NextResponse.json({ error: 'Invalid billing address', details: billingErrors }, { status: 400 });
+    }
+    const billingColumns = billingAddressToColumns(normalizeBillingAddress(body.billingAddress));
 
     const travelerErrors = body.travelers
       .map((traveler, index) => {
@@ -123,41 +136,53 @@ export async function POST(request: NextRequest) {
     }
 
     // ── Create booking (pre-verified — payment IS the verification) ─────────
-    const { data: booking, error: bookingError } = await supabaseAdmin
+    const bookingPayload = {
+      booking_ref: bookingRef,
+      tour_slug: tour.slug,
+      tour_title: tour.title,
+      tour_destination: tour.destination,
+      tour_start_date: tour.startDate || null,
+      tour_duration_days: tour.durationDays || null,
+      contact_first_name: body.booker.firstName.trim(),
+      contact_last_name: body.booker.lastName.trim(),
+      contact_email: body.booker.email.toLowerCase(),
+      contact_phone: body.booker.phone,
+      base_price_per_person: basePricePerPerson,
+      number_of_travelers: numberOfTravelers,
+      insurance_total: 0,
+      flight_total: flightTotal,
+      grand_total: grandTotal,
+      deposit_amount: depositAmount,
+      has_insurance: false,
+      has_flight_booking: body.hasFlightBooking,
+      preferred_departure_city: flightPrefs.departureCity,
+      preferred_return_city: flightPrefs.returnCity,
+      stripe_payment_intent_id: null,
+      payment_method: 'card',
+      payment_status: 'unpaid',
+      payment_paid_at: null,
+      // Booking is pre-verified: the card payment itself is the identity check
+      status: 'awaiting_card_payment',
+      is_verified: true,
+      verified_at: new Date().toISOString(),
+      expires_at: null,
+    };
+
+    let { data: booking, error: bookingError } = await supabaseAdmin
       .from('bookings')
-      .insert({
-        booking_ref: bookingRef,
-        tour_slug: tour.slug,
-        tour_title: tour.title,
-        tour_destination: tour.destination,
-        tour_start_date: tour.startDate || null,
-        tour_duration_days: tour.durationDays || null,
-        contact_first_name: body.booker.firstName.trim(),
-        contact_last_name: body.booker.lastName.trim(),
-        contact_email: body.booker.email.toLowerCase(),
-        contact_phone: body.booker.phone,
-        base_price_per_person: basePricePerPerson,
-        number_of_travelers: numberOfTravelers,
-        insurance_total: 0,
-        flight_total: flightTotal,
-        grand_total: grandTotal,
-        deposit_amount: depositAmount,
-        has_insurance: false,
-        has_flight_booking: body.hasFlightBooking,
-        preferred_departure_city: flightPrefs.departureCity,
-        preferred_return_city: flightPrefs.returnCity,
-        stripe_payment_intent_id: null,
-        payment_method: 'card',
-        payment_status: 'unpaid',
-        payment_paid_at: null,
-        // Booking is pre-verified: the card payment itself is the identity check
-        status: 'awaiting_card_payment',
-        is_verified: true,
-        verified_at: new Date().toISOString(),
-        expires_at: null,
-      })
+      .insert({ ...bookingPayload, ...billingColumns })
       .select()
       .single();
+
+    // Billing columns missing (migration not applied yet): 42703 = PG-level, PGRST204 = PostgREST schema cache miss
+    if (bookingError?.code === '42703' || bookingError?.code === 'PGRST204') {
+      console.error('Billing address columns missing on bookings — saving booking without billing address:', bookingError.message);
+      ({ data: booking, error: bookingError } = await supabaseAdmin
+        .from('bookings')
+        .insert(bookingPayload)
+        .select()
+        .single());
+    }
 
     if (bookingError || !booking) {
       console.error('Booking creation error:', bookingError);

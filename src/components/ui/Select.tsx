@@ -34,7 +34,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     const sizeStyles: Record<SizeVariant, string> = {
       xs: "pl-2.5 pr-8 py-2 text-xs min-h-[36px]",
       sm: "pl-3 pr-9 py-2 text-xs min-h-[40px]",
-      md: "pl-3 pr-10 py-2.5 text-sm min-h-[44px]",
+      md: "pl-3 pr-10 py-2.5 text-base sm:text-sm min-h-[44px]",
       lg: "pl-4 pr-11 py-3 text-base min-h-[48px]",
       xl: "pl-5 pr-12 py-3.5 text-lg min-h-[56px]",
     };

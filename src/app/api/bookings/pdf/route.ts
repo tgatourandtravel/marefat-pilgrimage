@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { generateBookingPDFBytes, type BookingData } from "@/lib/pdf/booking-pdf";
 import { stripe } from "@/lib/stripe/client";
+import { billingAddressFromBooking, formatBillingAddressLines } from "@/lib/booking/billing-address";
 
 export const dynamic = "force-dynamic";
 
@@ -69,6 +70,10 @@ export async function GET(request: NextRequest) {
       hasFlightBooking: booking.has_flight_booking,
       contactEmail: booking.contact_email,
       contactPhone: booking.contact_phone,
+      billingAddress: (() => {
+        const address = billingAddressFromBooking(booking);
+        return address ? formatBillingAddressLines(address).join("\n") : null;
+      })(),
       createdAt: booking.created_at,
       expiresAt: booking.expires_at,
       paymentMethod: booking.payment_method,

@@ -32,7 +32,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const sizeStyles: Record<SizeVariant, string> = {
       xs: "px-2.5 py-2 text-xs min-h-[36px]",
       sm: "px-3 py-2 text-xs min-h-[40px]",
-      md: "px-3 py-2.5 text-sm min-h-[44px]",
+      md: "px-3 py-2.5 text-base sm:text-sm min-h-[44px]",
       lg: "px-4 py-3 text-base min-h-[48px]",
       xl: "px-5 py-3.5 text-lg min-h-[56px]",
     };

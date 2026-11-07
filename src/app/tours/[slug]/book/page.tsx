@@ -10,12 +10,25 @@ import { validateTravelerFields, validateBookerFields } from "@/lib/utils/valida
 import { focusFirstInvalidField } from "@/lib/focusFirstInvalidField";
 import { COMPANY_ADDRESS_USA } from "@/lib/company-address";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { Card } from "@/components/ui/Card";
 import { FormErrorBanner } from "@/components/ui/FormErrorBanner";
 import { StepProgress } from "@/components/booking/StepProgress";
 import { LegalConsent } from "@/components/booking/LegalConsent";
 import { ONLINE_PAYMENT_ENABLED } from "@/lib/config/features";
 import FundingAwarePaymentForm from "@/components/ui/FundingAwarePaymentForm";
+import {
+  type BillingAddress,
+  type BillingCountry,
+  COUNTRY_OPTIONS,
+  EMPTY_BILLING_ADDRESS,
+  formatBillingAddressLines,
+  getRegionOptions,
+  isCanadianAddress,
+  maskPostalCodeInput,
+  normalizeBillingAddress,
+  validateBillingAddress,
+} from "@/lib/booking/billing-address";
 
 // Booker: The person making the reservation and payment
 type BookerInfo = {
@@ -240,6 +253,10 @@ export default function TourBookingPage({ params }: Props) {
   });
   const [isBookerTraveling, setIsBookerTraveling] = useState(true);
 
+  const [billingAddress, setBillingAddress] = useState<BillingAddress>(EMPTY_BILLING_ADDRESS);
+  const [billingErrors, setBillingErrors] = useState<Record<string, string>>({});
+  const isCanadaBilling = isCanadianAddress(billingAddress);
+
   // Travelers information
   const [numberOfTravelers, setNumberOfTravelers] = useState<number>(1);
   const [travelers, setTravelers] = useState<TravelerInfo[]>([
@@ -306,6 +323,29 @@ export default function TourBookingPage({ params }: Props) {
       const updated = [...travelers];
       updated[0] = { ...updated[0], [field]: value };
       setTravelers(updated);
+    }
+  };
+
+  const updateBillingAddress = (field: keyof BillingAddress, value: string) => {
+    setBillingAddress(prev => {
+      if (field === "country" && value !== prev.country) {
+        return { ...prev, country: value as BillingCountry, state: "", postalCode: "" };
+      }
+      if (field === "postalCode") {
+        return { ...prev, postalCode: maskPostalCodeInput(prev.country, value) };
+      }
+      return { ...prev, [field]: value };
+    });
+    if (billingErrors[field] || (field === "country" && Object.keys(billingErrors).length > 0)) {
+      setBillingErrors(prev => {
+        const next = { ...prev };
+        delete next[field];
+        if (field === "country") {
+          delete next.state;
+          delete next.postalCode;
+        }
+        return next;
+      });
     }
   };
 
@@ -385,6 +425,14 @@ export default function TourBookingPage({ params }: Props) {
         setBookerErrors(bookerFieldErrors);
       } else {
         setBookerErrors({});
+      }
+
+      const billingFieldErrors = validateBillingAddress(billingAddress);
+      if (Object.keys(billingFieldErrors).length > 0) {
+        hasErrors = true;
+        setBillingErrors(billingFieldErrors);
+      } else {
+        setBillingErrors({});
       }
 
       // 2. Validate all travelers
@@ -486,6 +534,7 @@ export default function TourBookingPage({ params }: Props) {
             phone: booker.phone,
             isTraveling: isBookerTraveling,
           },
+          billingAddress: normalizeBillingAddress(billingAddress),
           travelers: travelers.map((t, index) => ({
             firstName: (index === 0 && isBookerTraveling) ? booker.firstName : t.firstName,
             lastName: (index === 0 && isBookerTraveling) ? booker.lastName : t.lastName,
@@ -559,6 +608,7 @@ export default function TourBookingPage({ params }: Props) {
             phone: booker.phone,
             isTraveling: isBookerTraveling,
           },
+          billingAddress: normalizeBillingAddress(billingAddress),
           // Travelers with passport info
           travelers: travelers.map((t, index) => ({
             // If booker is traveler 1, use booker's name
@@ -733,6 +783,97 @@ export default function TourBookingPage({ params }: Props) {
                           </p>
                         </div>
                       </label>
+                    </div>
+                  </Card>
+
+                  {/* Billing Address Card */}
+                  <Card variant="elevated" padding="lg" className="space-y-4">
+                    <div>
+                      <h2 className="font-display text-lg font-semibold text-charcoal">
+                        Billing Address
+                      </h2>
+                      <p className="mt-2 text-xs text-charcoal/60">
+                        The address of the person paying for this booking. It will appear on your invoice and receipt.
+                      </p>
+                    </div>
+
+                    <Select
+                      label="Country"
+                      name="billing-country"
+                      autoComplete="billing country"
+                      value={billingAddress.country}
+                      onChange={(e) => updateBillingAddress("country", e.target.value)}
+                      options={[...COUNTRY_OPTIONS]}
+                      error={billingErrors.country}
+                      required
+                    />
+
+                    <Input
+                      label="Street Address"
+                      type="text"
+                      name="billing-address-line1"
+                      autoComplete="billing address-line1"
+                      value={billingAddress.line1}
+                      onChange={(e) => updateBillingAddress("line1", e.target.value)}
+                      error={billingErrors.line1}
+                      placeholder="123 Main Street"
+                      maxLength={100}
+                      required
+                    />
+
+                    <Input
+                      label="Apartment, Suite, Unit (optional)"
+                      type="text"
+                      name="billing-address-line2"
+                      autoComplete="billing address-line2"
+                      value={billingAddress.line2}
+                      onChange={(e) => updateBillingAddress("line2", e.target.value)}
+                      error={billingErrors.line2}
+                      placeholder="Apt 4B"
+                      maxLength={100}
+                    />
+
+                    <Input
+                      label="City"
+                      type="text"
+                      name="billing-city"
+                      autoComplete="billing address-level2"
+                      value={billingAddress.city}
+                      onChange={(e) => updateBillingAddress("city", e.target.value)}
+                      error={billingErrors.city}
+                      placeholder={isCanadaBilling ? "Toronto" : "Miami"}
+                      maxLength={60}
+                      required
+                    />
+
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <Select
+                        label={isCanadaBilling ? "Province" : "State"}
+                        name="billing-state"
+                        autoComplete="billing address-level1"
+                        value={billingAddress.state}
+                        onChange={(e) => updateBillingAddress("state", e.target.value)}
+                        options={[
+                          { value: "", label: isCanadaBilling ? "Select province" : "Select state" },
+                          ...getRegionOptions(billingAddress.country).map((r) => ({ value: r.code, label: r.name })),
+                        ]}
+                        error={billingErrors.state}
+                        required
+                      />
+                      <Input
+                        label={isCanadaBilling ? "Postal Code" : "ZIP Code"}
+                        type="text"
+                        name="billing-postal-code"
+                        autoComplete="billing postal-code"
+                        inputMode={isCanadaBilling ? "text" : "numeric"}
+                        autoCapitalize={isCanadaBilling ? "characters" : "off"}
+                        value={billingAddress.postalCode}
+                        onChange={(e) => updateBillingAddress("postalCode", e.target.value)}
+                        error={billingErrors.postalCode}
+                        placeholder={isCanadaBilling ? "M5V 2T6" : "33101"}
+                        maxLength={isCanadaBilling ? 7 : 10}
+                        required
+                      />
                     </div>
                   </Card>
 
@@ -1119,6 +1260,12 @@ export default function TourBookingPage({ params }: Props) {
                           <p className="text-charcoal/60">Phone Number</p>
                           <p className="mt-0.5 text-charcoal">{booker.phone}</p>
                         </div>
+                        <div className="sm:col-span-2">
+                          <p className="text-charcoal/60">Billing Address</p>
+                          {formatBillingAddressLines(billingAddress).map((line) => (
+                            <p key={line} className="mt-0.5 text-charcoal">{line}</p>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </Card>
@@ -1319,7 +1466,7 @@ export default function TourBookingPage({ params }: Props) {
                     <div className="space-y-2.5 text-sm">
                       <div className="flex justify-between">
                         <span className="text-charcoal/70">Tour Package × {numberOfTravelers}</span>
-                        <span className="text-charcoal">${baseTotal.toLocaleString()}</span>
+                        <span className="text-charcoal">${baseTotal.toLocaleString("en-US")}</span>
                       </div>
                       {addons.flightBooking && !tour.flightIncluded && (
                         <div className="flex justify-between text-xs leading-relaxed text-charcoal/70">
@@ -1332,11 +1479,11 @@ export default function TourBookingPage({ params }: Props) {
                       <div className="border-t border-charcoal/10 pt-2.5">
                         <div className="flex justify-between">
                           <span className="font-semibold text-charcoal">Total Amount</span>
-                          <span className="text-lg font-bold text-charcoal">${grandTotal.toLocaleString()}</span>
+                          <span className="text-lg font-bold text-charcoal">${grandTotal.toLocaleString("en-US")}</span>
                         </div>
                         <div className="mt-2 flex justify-between text-xs">
                           <span className="text-charcoal/70">Deposit Due Now (30%)</span>
-                          <span className="font-semibold text-gold-dark">${depositAmount.toLocaleString()}</span>
+                          <span className="font-semibold text-gold-dark">${depositAmount.toLocaleString("en-US")}</span>
                         </div>
                         {paymentMethod === 'card' && cardFeeAmount > 0 && (
                           <>
@@ -1353,7 +1500,7 @@ export default function TourBookingPage({ params }: Props) {
                           </>
                         )}
                         <p className="mt-2 text-xs text-charcoal/60">
-                          Remaining balance of ${(grandTotal - depositAmount).toLocaleString()} due 45 days before departure
+                          Remaining balance of ${(grandTotal - depositAmount).toLocaleString("en-US")} due 45 days before departure
                         </p>
                       </div>
                     </div>
@@ -1497,11 +1644,11 @@ export default function TourBookingPage({ params }: Props) {
                         <p className="text-xs font-semibold uppercase tracking-wide text-charcoal/60">Deposit Breakdown</p>
                         <div className="flex justify-between">
                           <span className="text-charcoal/70">Tour package × {numberOfTravelers}</span>
-                          <span className="text-charcoal">${baseTotal.toLocaleString()}</span>
+                          <span className="text-charcoal">${baseTotal.toLocaleString("en-US")}</span>
                         </div>
                         <div className="flex justify-between border-t border-charcoal/10 pt-2">
                           <span className="text-charcoal/70">Deposit due now (30%)</span>
-                          <span className="text-charcoal">${depositAmount.toLocaleString()}</span>
+                          <span className="text-charcoal">${depositAmount.toLocaleString("en-US")}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-charcoal/70">
@@ -1521,9 +1668,9 @@ export default function TourBookingPage({ params }: Props) {
                   <div className="rounded-xl bg-gold/10 p-4 space-y-2">
                     <p className="text-xs font-semibold text-charcoal">Payment Terms</p>
                     <p className="text-xs leading-relaxed text-charcoal/75">
-                      A deposit of <strong className="text-charcoal">${depositAmount.toLocaleString()}</strong> (30% of total) is required to secure your booking.
+                      A deposit of <strong className="text-charcoal">${depositAmount.toLocaleString("en-US")}</strong> (30% of total) is required to secure your booking.
                       Please complete the deposit within <strong className="text-charcoal">7 days</strong> of your booking request.
-                      The remaining balance of <strong className="text-charcoal">${(grandTotal - depositAmount).toLocaleString()}</strong> is due no later than{" "}
+                      The remaining balance of <strong className="text-charcoal">${(grandTotal - depositAmount).toLocaleString("en-US")}</strong> is due no later than{" "}
                       <strong className="text-charcoal">45 days</strong> prior to your travel date.
                     </p>
                     {paymentMethod === "card" && (
@@ -1700,7 +1847,7 @@ export default function TourBookingPage({ params }: Props) {
                       : `Base Price × ${numberOfTravelers}`}
                   </span>
                   <span className="font-medium text-charcoal">
-                    ${baseTotal.toLocaleString()}
+                    ${baseTotal.toLocaleString("en-US")}
                   </span>
                 </div>
 
@@ -1728,7 +1875,7 @@ export default function TourBookingPage({ params }: Props) {
                     Total
                   </span>
                   <span className="font-display text-lg font-bold text-charcoal">
-                    ${grandTotal.toLocaleString()}
+                    ${grandTotal.toLocaleString("en-US")}
                   </span>
                 </div>
 
@@ -1736,7 +1883,7 @@ export default function TourBookingPage({ params }: Props) {
                 <div className="rounded-lg bg-gold/10 p-3">
                   <div className="flex justify-between text-sm">
                     <span className="font-medium text-charcoal/80">Deposit Due Now (30%)</span>
-                    <span className="font-semibold text-charcoal">${depositAmount.toLocaleString()}</span>
+                    <span className="font-semibold text-charcoal">${depositAmount.toLocaleString("en-US")}</span>
                   </div>
                   {paymentMethod === 'card' && cardFeeAmount > 0 && (
                     <>

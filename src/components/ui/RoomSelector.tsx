@@ -52,7 +52,7 @@ export function RoomSelector({ options, selected, onChange }: RoomSelectorProps)
                 {option.occupancy}
               </span>
               <span className={`mt-1.5 text-base font-bold leading-none ${isSelected ? "text-charcoal" : "text-charcoal/70"}`}>
-                ${option.price.toLocaleString()}
+                ${option.price.toLocaleString("en-US")}
               </span>
               <span className="text-[9px] text-charcoal/40">per person</span>
 
@@ -117,7 +117,7 @@ export function RoomSelectorTrigger({ options, selected, onChange }: RoomSelecto
           {selected.label}
         </span>
         <span className="text-sm font-bold text-charcoal">
-          · ${selected.price.toLocaleString()}
+          · ${selected.price.toLocaleString("en-US")}
         </span>
         <svg
           className="ml-0.5 h-3.5 w-3.5 shrink-0 text-charcoal/40"
@@ -176,7 +176,7 @@ export function RoomSelectorTrigger({ options, selected, onChange }: RoomSelecto
                 {/* Price */}
                 <div className="text-right">
                   <span className={`text-base font-bold ${isSelected ? "text-charcoal" : "text-charcoal/70"}`}>
-                    ${option.price.toLocaleString()}
+                    ${option.price.toLocaleString("en-US")}
                   </span>
                   <p className="text-[10px] text-charcoal/40">per person</p>
                 </div>
@@ -191,7 +191,7 @@ export function RoomSelectorTrigger({ options, selected, onChange }: RoomSelecto
           onClick={handleConfirm}
           className="mt-4 w-full rounded-full bg-charcoal px-6 py-3 text-sm font-semibold text-ivory shadow-soft transition hover:bg-charcoal/90 active:scale-[0.98]"
         >
-          Confirm — {pending.label} · ${pending.price.toLocaleString()}
+          Confirm — {pending.label} · ${pending.price.toLocaleString("en-US")}
         </button>
       </BottomSheet>
     </>

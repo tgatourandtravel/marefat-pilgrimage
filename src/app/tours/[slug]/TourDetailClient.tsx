@@ -149,7 +149,7 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                       <div className="flex-shrink-0 text-2xl">🕌</div>
                       <div className="flex-1">
                         <p className="text-xs font-medium uppercase tracking-wider text-charcoal/60">Leg 1 — Iraq</p>
-                        <p className="mt-0.5 text-sm font-semibold text-charcoal group-hover:text-gold">Iraq — Karbala December 2026</p>
+                        <p className="mt-0.5 text-sm font-semibold text-charcoal group-hover:text-gold">Iraq December 2026</p>
                         <p className="mt-0.5 text-xs text-charcoal/60">Dec 20 – Dec 27 (7 days)</p>
                       </div>
                       <svg className="h-4 w-4 flex-shrink-0 text-charcoal/30 transition group-hover:text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -192,7 +192,7 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
 
       {/* Main Content */}
       <section className="mx-auto max-w-7xl px-6 py-10 sm:px-8 lg:px-12">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.8fr)_minmax(0,1.2fr)]">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1.8fr)_minmax(0,1.2fr)]">
           {/* Left Column: Content */}
           <div className="space-y-8">
             {/* Info Cards — hidden for exclusive display tours */}
@@ -651,10 +651,10 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                         </span>
                       </div>
                       <p className="text-sm text-charcoal/50 line-through">
-                        ${originalPrice?.toLocaleString()}
+                        ${originalPrice?.toLocaleString("en-US")}
                       </p>
                       <p className="text-3xl font-semibold text-charcoal">
-                        ${displayPrice.toLocaleString()}
+                        ${displayPrice.toLocaleString("en-US")}
                       </p>
                       <p className="text-xs text-charcoal/60">per person</p>
                     </>
@@ -664,7 +664,7 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
                         Price
                       </p>
                       <p className="mt-1 text-3xl font-semibold text-charcoal">
-                        ${displayPrice.toLocaleString()}
+                        ${displayPrice.toLocaleString("en-US")}
                       </p>
                       <p className="text-xs text-charcoal/60">per person</p>
                     </>
@@ -787,7 +787,7 @@ export default function TourDetailClient({ tour }: TourDetailClientProps) {
               ) : (
                 <>
                   <p className="text-sm font-medium text-charcoal">
-                    ${displayPrice.toLocaleString()}{" "}
+                    ${displayPrice.toLocaleString("en-US")}{" "}
                     <span className="text-xs font-normal text-charcoal/60">per person</span>
                   </p>
                   {hasEarlyBird && (
